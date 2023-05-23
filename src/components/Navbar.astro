@@ -1,0 +1,83 @@
+---
+export interface Prosps {
+  languageLink: "en" | "fr";
+}
+const { languageLink } = Astro.props
+---
+
+<div class="nav-wrapper">
+  <nav>
+    <ul>
+      <li>
+        <a href="#about">A propos</a>
+      </li>
+      <li>
+        <a href="#projects">Projets</a>
+      <li>
+        <a href="#contact">Contact</a>
+      </li>
+    </ul>
+  </nav>
+  <a class="lang" href=`/${languageLink}`>{languageLink}</a>
+  <button class="toggle-theme">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-moon" viewBox="0 0 24 24">
+      <defs></defs>
+      <path
+        d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z">
+      </path>
+    </svg>
+  </button>
+</div>
+
+<style lang="scss">
+  .nav-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 60px;
+    width: 100%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    padding: 0 2rem;
+  }
+  nav ul {
+    display: flex;
+    gap: 1.2rem;
+    list-style: none;
+    a {
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0 0.2rem;
+    }
+  }
+  .lang {
+    margin-left: 1.4rem;
+    text-transform: uppercase;
+    font-size: 1rem;
+    font-weight: 400;
+  }
+  .toggle-theme {
+    height: 36px;
+    width: 36px;
+    margin-left: 1.4rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    svg {
+      transition: transform 0.3s ease;
+    }
+    &:hover {
+      svg {
+        transform: rotate(-45deg);
+      }
+    }
+  }
+</style>

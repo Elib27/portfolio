@@ -7,12 +7,15 @@ const { title } = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content="Astro description">
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
@@ -22,15 +25,24 @@ const { title } = Astro.props;
 </html>
 <style is:global>
 	:root {
-		--accent: 124, 58, 237;
-		--accent-gradient: linear-gradient(45deg, rgb(var(--accent)), #da62c4 30%, white 60%);
+		--primary: #570DF8;
+		--secondary: #F000B8;
+		--accent: #7B73E1;
+		--background: #F6F6F6;
+		--text: #121212;
 	}
 	html {
-		font-family: system-ui, sans-serif;
-		background-color: #F6F6F6;
+		font-family: "Inter", sans-serif;
+		background-color: var(--background);
 	}
-	code {
-		font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-			Bitstream Vera Sans Mono, Courier New, monospace;
+	body {
+		margin: 0;
+	}
+	a {
+		color: var(--text);
+		text-decoration: none;
+	}
+	* {
+		box-sizing: border-box;
 	}
 </style>
