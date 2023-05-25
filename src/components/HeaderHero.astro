@@ -7,6 +7,7 @@
     Hello, je suis<span class="text-gradient"> Eliot Bas</span>,
     <br>développeur web freelance
   </h1>
+  <canvas id="three-canvas"></canvas>
 </section>
 
 <style lang="scss">
@@ -15,6 +16,7 @@
     width: 100%;
     display: flex;
     align-items: center;
+    position: relative;
     h1 {
       padding-left: 10%;
       transform: translateY(-50%);
@@ -25,5 +27,76 @@
     .text-gradient {
       color: var(--accent);
     }
+    #three-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
   }
 </style>
+
+<script>
+  import * as THREE from 'three';
+
+  const renderCanvas = document.querySelector("#three-canvas");
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    document.body.clientWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas: renderCanvas,
+    antialias: true,
+    alpha: true
+  });
+  renderer.setSize(document.body.clientWidth, window.innerHeight);
+
+  const circleTexture = new THREE.TextureLoader().load("circle.png");
+
+  const plane = new THREE.PlaneGeometry(0.1, 0.1);
+  const planeMaterial = new THREE.MeshBasicMaterial({
+    map: circleTexture,
+    color: 0xfea600,
+    // transparent: true,
+  });
+  scene.add(new THREE.Mesh(plane, planeMaterial))
+
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
+  const material = new THREE.PointsMaterial({
+    map: circleTexture,
+    color: 0xfea600,
+    // transparent: true,
+    size: 1,
+  });
+  const cube = new THREE.Points(geometry, material);
+  scene.add(cube);
+
+  camera.position.z = 5;
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    cube.rotation.x += 0.01;
+    cube.rotation.y += 0.01;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  function onWindowResize() {
+    camera.aspect = document.body.clientWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(document.body.clientWidth, window.innerHeight);
+  } 
+
+  window.addEventListener('resize', onWindowResize);
+</script>
