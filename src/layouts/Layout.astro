@@ -25,18 +25,31 @@ const { title } = Astro.props;
 </html>
 <style is:global>
 	:root {
+		color-scheme: light;
 		--primary: #570DF8;
 		--secondary: #F000B8;
 		--accent: #7B73E1;
 		--background: #F6F6F6;
 		--text: #121212;
+		&.dark-theme {
+			--primary: #570DF8;
+			--secondary: #F000B8;
+			--accent: #7B73E1;
+			--background: #1d1d1d;
+			--text: #F6F6F6;
+		}
 	}
 	html {
 		font-family: "Inter", sans-serif;
 		background-color: var(--background);
+		scroll-behavior: smooth;
+		transition: background-color 0.1s ease-out;
 	}
 	body {
 		margin: 0;
+	}
+	h1, h2, h3, p {
+		color: var(--text);
 	}
 	a {
 		color: var(--text);
