@@ -58,39 +58,62 @@
     alpha: true
   });
   renderer.setSize(document.body.clientWidth, window.innerHeight);
+  
+  
+  // Points
+  
+  const PARTICLES_COUNT = 500;
+  const DISTANCE_FROM_CENTER = 30;
+  
+  const vertices = new Float32Array(PARTICLES_COUNT * 3);
+  
+  for (let i = 0; i < PARTICLES_COUNT; i++) {
+    vertices[3*i] = THREE.MathUtils.randFloatSpread(DISTANCE_FROM_CENTER * 2);
+    vertices[3*i + 1] = THREE.MathUtils.randFloatSpread(DISTANCE_FROM_CENTER * 2);
+    vertices[3*i + 2] = THREE.MathUtils.randFloatSpread(DISTANCE_FROM_CENTER - 5);
+  }
+  
+  const circleAlphaMap = new THREE.TextureLoader().load("circle.jpg");
 
-  const circleTexture = new THREE.TextureLoader().load("circle.png");
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
-  const plane = new THREE.PlaneGeometry(0.1, 0.1);
-  const planeMaterial = new THREE.MeshBasicMaterial({
-    map: circleTexture,
-    color: 0xfea600,
-    // transparent: true,
-  });
-  scene.add(new THREE.Mesh(plane, planeMaterial))
-
-  const geometry = new THREE.BoxGeometry(2, 2, 2);
   const material = new THREE.PointsMaterial({
-    map: circleTexture,
+    transparent: true,
+    alphaMap: circleAlphaMap,
+    alphaTest: 0.2,
     color: 0xfea600,
-    // transparent: true,
-    size: 1,
+    size: 1
   });
-  const cube = new THREE.Points(geometry, material);
-  scene.add(cube);
+  const points = new THREE.Points(geometry, material);
 
-  camera.position.z = 5;
+  const pointsGroup = new THREE.Group();
+  pointsGroup.add(points); 
 
+  scene.add(pointsGroup);
+
+  camera.position.z = 15;
+  
+  let mouseX = 0;
+  let mouseY = 0;
+  function animateOnMouse(e: MouseEvent) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  }
+  
+  window.addEventListener('mousemove', animateOnMouse);
+  
   function animate() {
-    requestAnimationFrame(animate);
-
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-
+    const ratioX = (mouseX / window.innerWidth - 0.5) * 2;
+    const ratioY = (mouseY / window.innerHeight - 0.5) * 2;
+    pointsGroup.rotation.x = Math.sin(ratioY * Math.PI / 2) * Math.PI / 20;
+    pointsGroup.rotation.y = Math.sin(ratioX * Math.PI / 2) * Math.PI / 20;
     renderer.render(scene, camera);
+    requestAnimationFrame(animate);
   }
 
   animate();
+
 
   function onWindowResize() {
     camera.aspect = document.body.clientWidth / window.innerHeight;
@@ -99,4 +122,5 @@
   } 
 
   window.addEventListener('resize', onWindowResize);
+
 </script>
