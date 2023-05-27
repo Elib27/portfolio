@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
-import HeaderHero from '../components/HeaderHero.astro';
-import About from '../components/About.astro';
+import Navbar from '../sections/Navbar.astro';
+import HeaderHero from '../sections/HeaderHero.astro';
+import About from '../sections/About.astro';
+import TechnoBand from '../components/TechnoBand.astro';
 ---
 
 <Layout title="Eliot Bas Website">
@@ -10,5 +11,6 @@ import About from '../components/About.astro';
 		<Navbar languageLink="en"/>
 		<HeaderHero />
 		<About />
+		<TechnoBand />
 	</main>
 </Layout>
