@@ -1,0 +1,130 @@
+---
+
+---
+
+<button class="toggle-theme" aria-label="toggle theme">
+  <svg class="theme-icon" aria-hidden="true" data-theme="dark" width="24" height="24" viewBox="0 0 24 24">
+    <circle class="sun" cx="12" cy="12" r="6" mask="url(#moon-mask)" fill="currentColor" />
+    <g class="sun-beams" stroke="currentColor" stroke-linecap="round" stroke-width="1.5">
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </g>
+    <mask class="moon" id="moon-mask">
+      <rect x="0" y="0" width="100%" height="100%" fill="white" />
+      <circle cx="24" cy="10" r="6" fill="black" />
+    </mask>
+  </svg>
+</button>
+
+<style lang="scss">
+  .toggle-theme {
+    height: 1.8rem;
+    width: 1.8rem;
+    margin-left: 1.4rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    outline-offset: 4px;
+    .theme-icon {
+      height: 100%;
+      width: 100%;
+      color: var(--text);
+      & > :is(.moon, .sun, .sun-beams) {
+        transform-origin: center center;
+      }
+      .moon {
+        transition: transform 0.25s ease;
+      }
+      .sun {
+        transition: transform 0.25s ease;
+      }
+      .sun-beams {
+        transition: opacity 0.15s ease, transform 0.25s ease;
+      }
+      &[data-theme="light"] {
+        & > .sun {
+          transform: scale(1.4);
+        }
+        & > .sun-beams {
+          opacity: 0;
+          transform: rotate(45deg);
+        }
+        & > .moon > circle {
+          transform: translateX(-7px);
+          transition: transform 0.25s ease-out;
+          @supports (cx: 1) {
+            transform: translateX(0);
+            cx: 17;
+            transition: cx 0.25s ease-out;
+          }
+        }
+      }
+    }
+  }
+</style>
+
+<script>
+  const toggleThemeButton = document.querySelector<HTMLButtonElement>('.toggle-theme');
+  const themeIcon = document.querySelector<SVGElement>('.theme-icon');
+
+  initTheme();
+
+  function initTheme() {
+    const theme = getLocalStorageTheme() ? getLocalStorageTheme() : getPreferredTheme();
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+    }
+    else {
+      document.documentElement.classList.remove('dark-theme');
+    }
+    updateDataTheme();
+  }
+
+  function getLocalStorageTheme() {
+    const storedTheme = localStorage.getItem('theme');
+    return storedTheme ? storedTheme : null;
+  }
+
+  function getPreferredTheme() {
+    const isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return isDarkTheme ? 'dark' : 'light';
+  }
+
+  function updateDataTheme() {
+    if (themeIcon) {
+      const currentTheme = document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light';
+      themeIcon.setAttribute('data-theme', currentTheme);
+    }
+  }
+
+  toggleThemeButton?.addEventListener('click', toggleTheme);
+
+  function toggleTheme() {
+    document.documentElement.classList.toggle('dark-theme');
+    updateDataTheme();
+    updatePreferredTheme();
+  }
+
+  function updatePreferredTheme() {
+    if (document.documentElement.classList.contains('dark-theme')) {
+      localStorage.setItem('theme', 'dark');
+    }
+    else {
+      localStorage.setItem('theme', 'light');
+    }
+  }
+
+</script>

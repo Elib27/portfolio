@@ -1,4 +1,6 @@
 ---
+import ToggleThemeButton from './ToggleThemeButton.astro';
+
 export interface Prosps {
   languageLink: "en" | "fr";
 }
@@ -19,15 +21,7 @@ const { languageLink } = Astro.props
     </ul>
   </nav>
   <a class="lang" href=`/${languageLink}`>{languageLink}</a>
-  <button class="toggle-theme">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-      <defs></defs>
-      <path
-        d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z">
-      </path>
-    </svg>
-  </button>
+  <ToggleThemeButton />
 </div>
 
 <style lang="scss">
@@ -59,68 +53,4 @@ const { languageLink } = Astro.props
     font-size: 1rem;
     font-weight: 400;
   }
-  .toggle-theme {
-    height: 36px;
-    width: 36px;
-    margin-left: 1.4rem;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    svg {
-      color: var(--text);
-      transition: transform 0.3s ease;
-    }
-    &:hover {
-      svg {
-        transform: rotate(-45deg);
-      }
-    }
-  }
 </style>
-
-<script>
-  const toggleThemeButton = document.querySelector('.toggle-theme');
-
-  initTheme();
-
-  function initTheme() {
-    const theme = getLocalStorageTheme() ? getLocalStorageTheme() : getPreferredTheme();
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark-theme');
-    }
-    else {
-      document.documentElement.classList.remove('dark-theme');
-    }
-  }
-
-  function getLocalStorageTheme() {
-    const storedTheme = localStorage.getItem('theme');
-    return storedTheme ? storedTheme : null;
-  }
-
-  function getPreferredTheme() {
-    const isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return isDarkTheme ? 'dark' : 'light';
-  }
-  
-  toggleThemeButton?.addEventListener('click', toggleTheme);
-
-  function toggleTheme() {
-    document.documentElement.classList.toggle('dark-theme');
-    updatePreferredTheme();
-  }
-
-  function updatePreferredTheme() {
-    if (document.documentElement.classList.contains('dark-theme')) {
-      localStorage.setItem('theme', 'dark');
-    } else {
-      localStorage.setItem('theme', 'light');
-    }
-  }
-
-</script>
