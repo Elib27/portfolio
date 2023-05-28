@@ -1,9 +1,12 @@
 ---
+import { AstroAssets, Image } from 'astro:assets'
+// import type { ImageType } from 'astro/client-image';
+
 export interface Props {
   title: string;
   description: string;
   technologies : string[];
-  image: string;
+  image: any;
   imageAlt: string;
   websiteLink: string;
   repositoryLink: string;
@@ -33,7 +36,12 @@ const {
     </ul>
   </div>
   <a href={websiteLink}>
-    <img class=`project-image ${inverted ? "top-left" : "bottom-right"}` src={image} alt={imageAlt}>
+    <Image
+      class="project-image bottom-right"
+      height={image.height}
+      width={image.width}
+      src={image.src}
+      alt={imageAlt}>
   </a>
 </div>
 

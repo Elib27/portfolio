@@ -1,9 +1,10 @@
 ---
 import Project from '../components/Project.astro'
+import MyPortfolio from '../assets/bas_eliot_portfolio.jpg'
 ---
 
 <section class="projects-container">
-  <Project
+  <!-- <Project
     title="Spotify Clone"
     description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum. consectetur adipisicing elit. Quisquam, voluptatum. fuga, voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum. consectetur adipisicing elit."
     technologies={["Next.js", "Redux", "Spotify API"]}
@@ -21,12 +22,12 @@ import Project from '../components/Project.astro'
     websiteLink="https://estienne-genealogie.fr/"
     repositoryLink="https://github.com/Elib27/site-genealogie"
     inverted
-  />
+  /> -->
   <Project
     title="My Porfolio"
     description="Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetu 5 BC, making it over 2000 years old. Richard McClintock."
     technologies={["Astro", "GSAP", "Three JS"]}
-    image="bas_eliot_portfolio.jpg"
+    image={MyPortfolio}
     imageAlt="portfolio de bas eliot"
     websiteLink="https://eliotbas.fr/"
     repositoryLink="https://github.com/Elib27/portfolio"
