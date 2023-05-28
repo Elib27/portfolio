@@ -1,0 +1,97 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  technologies : string[];
+  image: string;
+  imageAlt: string;
+  websiteLink: string;
+  repositoryLink: string;
+  inverted?: boolean;
+}
+
+const {
+  title,
+  description,
+  technologies,
+  image,
+  imageAlt,
+  websiteLink,
+  repositoryLink,
+  inverted
+} = Astro.props
+---
+
+<div class="project-container">
+  <div class=`presentation ${inverted ? "bottom-right" : "top-left"}`>
+    <h3>{title}</h3>
+    <p class="description">{description}</p>
+    <ul class="technologies">
+      {technologies.map(technologie => (
+        <li>{technologie}</li>
+      ))}
+    </ul>
+  </div>
+  <a href={websiteLink}>
+    <img class=`project-image ${inverted ? "top-left" : "bottom-right"}` src={image} alt={imageAlt}>
+  </a>
+</div>
+
+<style lang="scss">
+  .project-container {
+    --border-radius: 16px;
+    aspect-ratio: 2;
+    width: 800px;
+    position: relative;
+    .top-left {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .bottom-right {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+    .presentation {
+      width: 60%;
+      aspect-ratio: 16/9;
+      background-color: var(--background);
+      border-radius: var(--border-radius);
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+      padding: 1rem 2rem;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.1s ease-out;
+      h3 {
+        font-size: 1.25rem;
+        margin: 1rem 0 1.5rem 0;
+        text-align: center;
+      }
+      .description {
+        margin: 0 0 1rem 0;
+      }
+      .technologies {
+        display: flex;
+        justify-content: space-evenly;
+        margin-top: auto;
+        list-style: none;
+        padding: 0;
+        li {
+          font-size: 1rem;
+          padding: 0.5rem 1rem;
+          border-radius: 6px;
+          color: var(--background);
+          background-color: var(--text);
+        }
+      }
+    }
+    .project-image {
+      width: 60%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: var(--border-radius);
+    }
+  }
+</style>
