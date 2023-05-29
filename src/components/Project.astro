@@ -1,12 +1,13 @@
 ---
-import { AstroAssets, Image } from 'astro:assets'
-// import type { ImageType } from 'astro/client-image';
+import { Image } from 'astro:assets'
+import GithubLogo from '../assets/github.svg?raw'
+import LinkIcon from '../assets/link.svg?raw'
 
 export interface Props {
   title: string;
   description: string;
   technologies : string[];
-  image: any;
+  image: ImageMetadata;
   imageAlt: string;
   websiteLink: string;
   repositoryLink: string;
@@ -23,6 +24,8 @@ const {
   repositoryLink,
   inverted
 } = Astro.props
+
+const imagePosition = inverted ? "top-left" : "bottom-right";
 ---
 
 <div class="project-container">
@@ -35,14 +38,20 @@ const {
       ))}
     </ul>
   </div>
-  <a href={websiteLink}>
+  <a href={websiteLink} target="_blank">
     <Image
-      class="project-image bottom-right"
-      height={image.height}
-      width={image.width}
-      src={image.src}
+      class={"project-image " + imagePosition}
+      src={image}
       alt={imageAlt}>
   </a>
+  <div class="project-links">
+    <a class="link github" href={repositoryLink} target="_blank">
+      <Fragment set:html={GithubLogo} />
+    </a>
+    <a class="link website" href={websiteLink} target="_blank">
+      <Fragment set:html={LinkIcon} />
+    </a>
+  </div>
 </div>
 
 <style lang="scss">
@@ -96,10 +105,27 @@ const {
       }
     }
     .project-image {
+      height: auto;
       width: 60%;
       aspect-ratio: 16/9;
       object-fit: cover;
       border-radius: var(--border-radius);
+    }
+    .project-links {
+      width: 40%;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      column-gap: 2rem;
+      .link :global(svg){
+        transform: scale(0.8);
+        transition: color 0.15s ease-out;
+        &:hover {
+          color: var(--accent);
+        }
+      }
     }
   }
 </style>
