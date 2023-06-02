@@ -25,11 +25,11 @@ const {
   inverted
 } = Astro.props
 
-const imagePosition = inverted ? "top-left" : "bottom-right";
+const imagePosition = inverted ? "left" : "right";
 ---
 
 <div class="project-container">
-  <div class=`presentation ${inverted ? "bottom-right" : "top-left"}`>
+  <div class=`presentation ${inverted ? "right" : "left"}`>
     <h3>{title}</h3>
     <p class="description">{description}</p>
     <ul class="technologies">
@@ -44,7 +44,7 @@ const imagePosition = inverted ? "top-left" : "bottom-right";
       src={image}
       alt={imageAlt}>
   </a>
-  <div class="project-links">
+  <div class=`project-links ${inverted ? "right" : "left"}`>
     <a class="link github" href={repositoryLink} target="_blank">
       <Fragment set:html={GithubLogo} />
     </a>
@@ -60,33 +60,32 @@ const imagePosition = inverted ? "top-left" : "bottom-right";
     aspect-ratio: 2;
     width: 800px;
     position: relative;
-    .top-left {
-      position: absolute;
-      top: 0;
+    .left {
       left: 0;
     }
-    .bottom-right {
-      position: absolute;
-      bottom: 0;
+    .right {
       right: 0;
     }
     .presentation {
       width: 60%;
+      position: absolute;
+      top: 0;
       aspect-ratio: 16/9;
-      background-color: var(--background);
+      background-color: var(--white);
       border-radius: var(--border-radius);
       box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
       padding: 1rem 2rem;
       z-index: 1;
       display: flex;
       flex-direction: column;
-      transition: background-color 0.1s ease-out;
       h3 {
+        color: var(--black);
         font-size: 1.25rem;
         margin: 1rem 0 1.5rem 0;
         text-align: center;
       }
       .description {
+        color: var(--black);
         margin: 0 0 1rem 0;
       }
       .technologies {
@@ -99,13 +98,15 @@ const imagePosition = inverted ? "top-left" : "bottom-right";
           font-size: 1rem;
           padding: 0.5rem 1rem;
           border-radius: 6px;
-          color: var(--background);
-          background-color: var(--text);
+          color: var(--white);
+          background-color: var(--black);
         }
       }
     }
     .project-image {
       height: auto;
+      position: absolute;
+      bottom: 0;
       width: 60%;
       aspect-ratio: 16/9;
       object-fit: cover;
@@ -115,12 +116,16 @@ const imagePosition = inverted ? "top-left" : "bottom-right";
       width: 40%;
       position: absolute;
       bottom: 0;
-      left: 0;
       display: flex;
       justify-content: center;
       column-gap: 2rem;
+      .link {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
       .link :global(svg){
-        transform: scale(0.8);
+        transform: scale(0.6);
         transition: color 0.15s ease-out;
         &:hover {
           color: var(--accent);
