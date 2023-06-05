@@ -44,12 +44,14 @@ const imagePosition = inverted ? "left" : "right";
       src={image}
       alt={imageAlt}>
   </a>
-  <div class=`project-links ${inverted ? "right" : "left"}`>
+  <div class=`project-links ${inverted ? "right" : "left"} ${inverted && "inverted"}`>
+    <a class="link website" href={websiteLink} target="_blank">
+      <span>Voir</span>
+      <Fragment set:html={LinkIcon} />
+    </a>
     <a class="link github" href={repositoryLink} target="_blank">
       <Fragment set:html={GithubLogo} />
-    </a>
-    <a class="link website" href={websiteLink} target="_blank">
-      <Fragment set:html={LinkIcon} />
+      <span>Github Repo</span>
     </a>
   </div>
 </div>
@@ -115,20 +117,49 @@ const imagePosition = inverted ? "left" : "right";
     .project-links {
       width: 40%;
       position: absolute;
-      bottom: 0;
+      bottom: 2%;
       display: flex;
       justify-content: center;
+      align-items: center;
       column-gap: 2rem;
-      .link {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      &.inverted {
+        flex-direction: row-reverse;
       }
-      .link :global(svg){
-        transform: scale(0.6);
-        transition: color 0.15s ease-out;
-        &:hover {
-          color: var(--accent);
+      .link {
+        height: fit-content;
+        display: flex;
+        align-items: center;
+        &.website {
+          padding: 0.6rem 1.2rem;
+          background-color: var(--text);
+          border-radius: 10px;
+          gap: 0.8rem;
+          span {
+            color: var(--background);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            font-size: 1.2rem;
+          }
+        }
+        &.website :global(svg) {
+          height: 22px;
+          width: 22px;
+          color: var(--background);
+        }
+        &.github {
+          gap: 0.5rem;
+          span {
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+          }
+        }
+        &.github :global(svg) {
+          height: 22px;
+          width: 22px;
+          color: var(--text);
         }
       }
     }
