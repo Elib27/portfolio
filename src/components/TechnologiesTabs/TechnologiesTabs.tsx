@@ -16,7 +16,7 @@ import JestLogo from "../../assets/technologies/jest.svg"
 
 const tab_links = ["Technos principales", "Autres technos", "Outils"];
 
-function MainTechnosTab(props: {active: boolean}) {
+function MainTechnosTab(props: { active: boolean }) {
   return (
     <Show when={props.active}>
       <div>
@@ -47,7 +47,7 @@ function MainTechnosTab(props: {active: boolean}) {
   )
 }
 
-function OtherTechnosTab(props: {active: boolean}) {
+function OtherTechnosTab(props: { active: boolean }) {
   return (
     <Show when={props.active}>
       <div>
@@ -62,7 +62,7 @@ function OtherTechnosTab(props: {active: boolean}) {
   )
 }
 
-function ToolsTab(props: {active: boolean}) {
+function ToolsTab(props: { active: boolean }) {
   return (
     <Show when={props.active}>
       <div>
@@ -85,13 +85,13 @@ export default function TechnologiesTabs() {
     console.log("active tab: " + tab())
   })
 
-   return (
+  return (
     <div class={styles.container}>
       <div class={styles.tab_links_container}>
         {tab_links.map((link, index) => (
           <button
             onClick={() => setTab(index)}
-            classList={{[styles.tab_link]: true, [styles.tab_link_active]: tab() === index}}
+            classList={{ [styles.tab_link]: true, [styles.tab_link_active]: tab() === index }}
           >{link}</button>
         ))}
       </div>
