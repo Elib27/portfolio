@@ -79,26 +79,23 @@ function ToolsTab(props: { active: boolean }) {
 
 export default function TechnologiesTabs() {
 
-  const [tab, setTab] = createSignal(0);
-
-  createEffect(() => {
-    console.log("active tab: " + tab())
-  })
+  const [tab, setTab] = createSignal(1);
 
   return (
     <div class={styles.container}>
       <div class={styles.tab_links_container}>
         {tab_links.map((link, index) => (
           <button
-            onClick={() => setTab(index)}
-            classList={{ [styles.tab_link]: true, [styles.tab_link_active]: tab() === index }}
+            onClick={() => setTab(index + 1)}
+            classList={{[styles.tab_link]: true, [styles.tab_link_active]: tab() === index + 1}}
           >{link}</button>
         ))}
+        <div classList={{[styles.tab_selector]: true, [styles["tab_" + tab()]]: true}}></div>
       </div>
       <div class={styles.tab}>
-        <MainTechnosTab active={tab() === 0} />
-        <OtherTechnosTab active={tab() === 1} />
-        <ToolsTab active={tab() === 2} />
+        <MainTechnosTab active={tab() === 1} />
+        <OtherTechnosTab active={tab() === 2} />
+        <ToolsTab active={tab() === 3} />
       </div>
     </div>
   )

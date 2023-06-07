@@ -14,7 +14,6 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  position: relative;
   overflow: hidden;
 }
 .tab_link {
@@ -22,21 +21,40 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--white);
   background: transparent;
   border: none;
   padding: 0;
-  color: var(--white);
-  border-top-left-radius: var(--radius);
-  border-bottom-left-radius: var(--radius);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+  transition: color 0.3s ease-out;
+  z-index: 2;
 }
 .tab_link_active {
+  color: var(--black);
+}
+.tab_selector {
+  position: absolute;
+  top: 0;
+  height: calc(100% / 3);
+  width: 100%;
   background-color: var(--gray);
   color: var(--black);
+  border-top-left-radius: calc(var(--radius) - 1px);
+  border-bottom-left-radius: calc(var(--radius) - 1px);
   box-shadow: 0px 0px 10px rgba(0,0,0,0.25);
+  transition: transform 0.3s ease-out;
   z-index: 1;
+  &.tab_1 {
+    transform: translateY(0);
+  }
+  &.tab_2 {
+    transform: translateY(100%);
+  }
+  &.tab_3 {
+    transform: translateY(200%);
+  }
 }
 .tab {
   height: 100%;
