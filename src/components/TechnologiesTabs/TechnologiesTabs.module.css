@@ -67,6 +67,7 @@
   gap: 1rem;
 }
 .techno_title {
+  color: var(--black);
   margin: 1rem 0 0 0;
   text-align: center;
 }
