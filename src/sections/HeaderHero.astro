@@ -37,10 +37,9 @@
       position: absolute;
       top: 0;
       left: 0;
-      height: 100vh;
-      width: 100%;
       z-index: -1;
       pointer-events: none;
+      -webkit-mask-image: linear-gradient(rgba(0, 0, 0, 1.0) 80%, transparent 100%);
     }
   }
 </style>
@@ -64,44 +63,42 @@
     alpha: true
   });
   renderer.setSize(document.body.clientWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
   
-  
-  // Points
-  
-  const PARTICLES_COUNT = 500;
-  const DISTANCE_FROM_CENTER = 30;
-  
-  const vertices = new Float32Array(PARTICLES_COUNT * 3);
-  
-  for (let i = 0; i < PARTICLES_COUNT; i++) {
-    vertices[3*i] = THREE.MathUtils.randFloatSpread(DISTANCE_FROM_CENTER * 2);
-    vertices[3*i + 1] = THREE.MathUtils.randFloatSpread(DISTANCE_FROM_CENTER * 2);
-    vertices[3*i + 2] = THREE.MathUtils.randFloatSpread(DISTANCE_FROM_CENTER - 5);
+
+  // Lines
+
+  const LINES_COUNT = 20;
+  const LINES_SPACE = 0.7;
+  const LINES_ROTATION = 0.04;
+
+  const curve = new THREE.SplineCurve([
+    new THREE.Vector2( -10, 0 ),
+    new THREE.Vector2( -5, 5 ),
+    new THREE.Vector2( 0, 0 ),
+    new THREE.Vector2( 5, -5 ),
+    new THREE.Vector2( 10, 0 )
+  ]);
+
+  const points = curve.getPoints(100);
+  const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+  const splineGroup = new THREE.Group();
+  for (let i = 0; i < LINES_COUNT ; i++) {
+    const material = new THREE.LineBasicMaterial( { color: 0x585EFB } );
+    const spline = new THREE.Line( geometry, material );
+    spline.position.z = i * LINES_SPACE;
+    spline.rotation.z = i * LINES_ROTATION;
+    splineGroup.add(spline);
   }
-  
-  const circleAlphaMap = new THREE.TextureLoader().load("circle.jpg");
 
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-  const material = new THREE.PointsMaterial({
-    transparent: true,
-    alphaMap: circleAlphaMap,
-    alphaTest: 0.2,
-    color: 0xfea600,
-    size: 1
-  });
-  const points = new THREE.Points(geometry, material);
-
-  const pointsGroup = new THREE.Group();
-  pointsGroup.add(points); 
-
-  scene.add(pointsGroup);
+  scene.add(splineGroup);
 
   camera.position.z = 15;
   
   let mouseX = 0;
   let mouseY = 0;
+
   function animateOnMouse(e: MouseEvent) {
     mouseX = e.clientX;
     mouseY = e.clientY;
@@ -112,19 +109,19 @@
   function animate() {
     const ratioX = (mouseX / window.innerWidth - 0.5) * 2;
     const ratioY = (mouseY / window.innerHeight - 0.5) * 2;
-    pointsGroup.rotation.x = Math.sin(ratioY * Math.PI / 2) * Math.PI / 20;
-    pointsGroup.rotation.y = Math.sin(ratioX * Math.PI / 2) * Math.PI / 20;
+    splineGroup.rotation.x = Math.sin(ratioY * Math.PI / 2) * Math.PI / 20;
+    splineGroup.rotation.y = Math.sin(ratioX * Math.PI / 2) * Math.PI / 20;
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   }
 
   animate();
 
-
   function onWindowResize() {
     camera.aspect = document.body.clientWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(document.body.clientWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
   } 
 
   window.addEventListener('resize', onWindowResize);
