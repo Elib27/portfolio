@@ -13,20 +13,28 @@ import WordpressLogo from "../../assets/technologies/wordpress.svg"
 import Threejs from "../../assets/technologies/threejs.svg"
 import GsapLogo from "../../assets/technologies/gsap.svg"
 import PrismaLogo from "../../assets/technologies/prisma.svg"
-import PostgresqlLogo from "../../assets/technologies/postgresql.svg"
+import SqlLogo from "../../assets/technologies/sql.svg"
 // Tools
 import GitLogo from "../../assets/technologies/git.svg"
 import JestLogo from "../../assets/technologies/jest.svg"
 import NetlifyLogo from "../../assets/technologies/netlify.svg"
 import VercelLogo from "../../assets/technologies/vercel.svg"
+import GithubLogo from "../../assets/technologies/github.svg"
+import GitlabLogo from "../../assets/technologies/gitlab.svg"
 
 const tab_links = ["Technos principales", "Autres technos", "Outils"];
 
-function Tab(props: { active: boolean, children: JSXElement }) {
+function Tab(props: { tabIndex: number, currentTab: number, children: JSXElement}) {
   return (
-    <Show when={props.active}>
+    <div classList={{
+      [styles.tab]: true,
+      [styles.tab_active]: props.currentTab === props.tabIndex,
+      [styles.tab_up]: props.currentTab > props.tabIndex,
+      [styles.tab_down]: props.currentTab < props.tabIndex
+      }}
+    >
       {props.children}
-    </Show>
+    </div>
   )
 }
 
@@ -45,8 +53,8 @@ export default function TechnologiesTabs() {
         ))}
         <div classList={{ [styles.tab_selector]: true, [styles["tab_" + tab()]]: true }}></div>
       </div>
-      <div class={styles.tab}>
-        <Tab active={tab() === 1}>
+      <div class={styles.tab_container}>
+        <Tab tabIndex={1} currentTab={tab()}>
           <div>
             <img src={NextLogo.src} height="80px" width="80px" alt="next logo" />
             <p class={styles.techno_title}>Next JS</p>
@@ -72,7 +80,7 @@ export default function TechnologiesTabs() {
             <p class={styles.techno_title}>SASS</p>
           </div>
         </Tab>
-        <Tab active={tab() === 2} >
+        <Tab tabIndex={2} currentTab={tab()}>
           <div>
             <img src={SolidjsLogo.src} height="80px" width="80px" alt="solid js logo" />
             <p class={styles.techno_title}>SolidJS</p>
@@ -94,11 +102,11 @@ export default function TechnologiesTabs() {
             <p class={styles.techno_title}>Prisma</p>
           </div>
           <div>
-            <img src={PostgresqlLogo.src} height="80px" width="80px" alt="postgresql logo" />
-            <p class={styles.techno_title}>PostgreSQL</p>
+            <img src={SqlLogo.src} height="80px" width="80px" alt="sql logo" />
+            <p class={styles.techno_title}>SQL</p>
           </div>
         </Tab>
-        <Tab active={tab() === 3} >
+        <Tab tabIndex={3} currentTab={tab()}>
           <div>
             <img src={GitLogo.src} height="80px" width="80px" alt="git logo" />
             <p class={styles.techno_title}>Git</p>
@@ -114,6 +122,14 @@ export default function TechnologiesTabs() {
           <div>
             <img src={VercelLogo.src} height="80px" width="80px" alt="vercel logo" />
             <p class={styles.techno_title}>Vercel</p>
+          </div>
+          <div>
+            <img src={GithubLogo.src} height="80px" width="80px" alt="github logo" />
+            <p class={styles.techno_title}>Github</p>
+          </div>
+          <div>
+            <img src={GitlabLogo.src} height="80px" width="80px" alt="gitlab logo" />
+            <p class={styles.techno_title}>GitLab</p>
           </div>
         </Tab>
       </div>
