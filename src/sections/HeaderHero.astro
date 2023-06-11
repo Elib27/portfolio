@@ -50,6 +50,7 @@
   const renderCanvas = document.querySelector("#three-canvas");
 
   const scene = new THREE.Scene();
+
   const camera = new THREE.PerspectiveCamera(
     75,
     document.body.clientWidth / window.innerHeight,
@@ -64,6 +65,8 @@
   });
   renderer.setSize(document.body.clientWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
+
+  camera.position.set(0, 2, 0);
   
 
   // Lines
@@ -73,11 +76,13 @@
   const LINES_ROTATION = 0.04;
 
   const curve = new THREE.SplineCurve([
-    new THREE.Vector2( -10, 0 ),
-    new THREE.Vector2( -5, 5 ),
-    new THREE.Vector2( 0, 0 ),
-    new THREE.Vector2( 5, -5 ),
-    new THREE.Vector2( 10, 0 )
+    new THREE.Vector2(-20, -1),
+    new THREE.Vector2(-10, -2),
+    new THREE.Vector2(-5, -2),
+    new THREE.Vector2(0, 0),
+    new THREE.Vector2(5, 2),
+    new THREE.Vector2(10, 0),
+    new THREE.Vector2(20, -2),
   ]);
 
   const points = curve.getPoints(100);
@@ -87,30 +92,21 @@
   for (let i = 0; i < LINES_COUNT ; i++) {
     const material = new THREE.LineBasicMaterial( { color: 0x585EFB } );
     const spline = new THREE.Line( geometry, material );
-    spline.position.z = i * LINES_SPACE;
-    spline.rotation.z = i * LINES_ROTATION;
+    spline.position.z = - i * LINES_SPACE;
+    if (i < LINES_COUNT / 2) {
+      spline.rotation.z = i * LINES_ROTATION;
+    } else {
+      spline.rotation.z = LINES_ROTATION * (LINES_COUNT - 1 - i);
+    }
     splineGroup.add(spline);
   }
-
   scene.add(splineGroup);
 
-  camera.position.z = 15;
-  
-  let mouseX = 0;
-  let mouseY = 0;
-
-  function animateOnMouse(e: MouseEvent) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  }
-  
-  window.addEventListener('mousemove', animateOnMouse);
-  
   function animate() {
-    const ratioX = (mouseX / window.innerWidth - 0.5) * 2;
-    const ratioY = (mouseY / window.innerHeight - 0.5) * 2;
-    splineGroup.rotation.x = Math.sin(ratioY * Math.PI / 2) * Math.PI / 20;
-    splineGroup.rotation.y = Math.sin(ratioX * Math.PI / 2) * Math.PI / 20;
+    const currTime = Date.now() * 0.001;
+    for (let i = 0; i < LINES_COUNT ; i++) {
+      splineGroup.children[i].rotation.z = Math.sin(currTime + i/5) * 0.1;
+    }
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   }
