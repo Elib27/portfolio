@@ -1,43 +1,46 @@
 ---
+import SectionLayout from '../layouts/SectionLayout.astro'
 import Project from '../components/Project.astro'
 import SpotifyClone from '../assets/spotify_clone.jpg'
 import HestiaGenealogie from '../assets/hestia_genealogie.jpg'
 import MyPortfolio from '../assets/bas_eliot_portfolio.jpg'
 ---
 
-<section id="projects">
-  <Project
-    title="Spotify Clone"
-    description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum. consectetur adipisicing elit. Quisquam, voluptatum. fuga, voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum. consectetur adipisicing elit."
-    technologies={["Next.js", "Redux", "Spotify API"]}
-    image={SpotifyClone}
-    imageAlt="spotify clone"
-    websiteLink="https://spotify-clone-nextjs-elib27.vercel.app/"
-    repositoryLink="https://github.com/Elib27/spotify-clone-nextjs"
-  />
-  <Project
-    title="Hestia Généalogie"
-    description="5 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetu 5 BC, making it over 2000 years old. Richard McClintock."
-    technologies={["Astro", "SEO", "SASS"]}
-    image={HestiaGenealogie}
-    imageAlt="hestia genealogie"
-    websiteLink="https://estienne-genealogie.fr/"
-    repositoryLink="https://github.com/Elib27/site-genealogie"
-    inverted
-  />
-  <Project
-    title="My Porfolio"
-    description="Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetu 5 BC, making it over 2000 years old. Richard McClintock."
-    technologies={["Astro", "GSAP", "Three JS"]}
-    image={MyPortfolio}
-    imageAlt="portfolio de bas eliot"
-    websiteLink="https://eliotbas.fr/"
-    repositoryLink="https://github.com/Elib27/portfolio"
-  />
-</section>
+<SectionLayout title="Projets" id="projects">
+  <div class="projects-container">
+    <Project
+      title="Spotify Clone"
+      description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum. consectetur adipisicing elit. Quisquam, voluptatum. fuga, voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum. consectetur adipisicing elit."
+      technologies={["Next.js", "Redux", "Spotify API"]}
+      image={SpotifyClone}
+      imageAlt="spotify clone"
+      websiteLink="https://spotify-clone-nextjs-elib27.vercel.app/"
+      repositoryLink="https://github.com/Elib27/spotify-clone-nextjs"
+    />
+    <Project
+      title="Hestia Généalogie"
+      description="5 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetu 5 BC, making it over 2000 years old. Richard McClintock."
+      technologies={["Astro", "SEO", "SASS"]}
+      image={HestiaGenealogie}
+      imageAlt="hestia genealogie"
+      websiteLink="https://estienne-genealogie.fr/"
+      repositoryLink="https://github.com/Elib27/site-genealogie"
+      inverted
+    />
+    <Project
+      title="My Porfolio"
+      description="Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetu 5 BC, making it over 2000 years old. Richard McClintock."
+      technologies={["Astro", "GSAP", "Three JS"]}
+      image={MyPortfolio}
+      imageAlt="portfolio de bas eliot"
+      websiteLink="https://eliotbas.fr/"
+      repositoryLink="https://github.com/Elib27/portfolio"
+    />
+  </div>
+</SectionLayout>
 
 <style lang="scss">
-  #projects {
+  .projects-container {
     width: 100%;
     padding: 2rem 0;
     display: flex;

@@ -1,14 +1,16 @@
 ---
+import SectionLayout from '../layouts/SectionLayout.astro'
 import TechnologiesTabs from '../components/TechnologiesTabs/TechnologiesTabs.jsx'
 ---
 
-<section id="technologies">
-  <h2>Technologies</h2>
-  <TechnologiesTabs client:idle />
-</section>
+<SectionLayout  title="Technologies" id="technologies">
+  <div class="container">
+    <TechnologiesTabs client:idle />
+  </div>
+</SectionLayout>
 
 <style lang="scss">
-  #technologies {
+  .container {
     display: flex;
     flex-direction: column;
     align-items: center;

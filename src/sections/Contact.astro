@@ -1,0 +1,69 @@
+---
+import SectionLayout from "../layouts/SectionLayout.astro";
+---
+
+<SectionLayout title="Contact" id="contact">
+  <div class="container">
+    <p>Une envie de discuter ?</p>
+    <a class="bubble" href="mailto:eliot.bas.dev@gmail.com">
+      <span class="email">eliot.bas.dev@gmail.com</span>
+    </a>
+  </div>
+</SectionLayout>
+
+<style lang="scss">
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    p {
+      font-size: 1.4rem;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .bubble {
+      background-color: var(--secondary);
+      width: fit-content;
+      padding: 3rem 5rem;
+      border-radius: 2rem;
+      position: relative;
+      margin-bottom: 5rem;
+      &::after {
+        content: "";
+        height : 0;
+        width : 0;
+        border-top : 6rem solid var(--secondary);
+        border-right : 8rem solid transparent;
+        position: absolute;
+        bottom: -3rem;
+        left: 0;
+        z-index: -1;
+      }
+      &:hover {
+        .email {
+          &::after {
+            transform: scaleX(50%);
+          }
+        }
+      }
+      .email {
+        font-size: 3rem;
+        text-align: center;
+        position: relative;
+        padding-bottom: 0.6rem;
+        color: var(--black);
+        &::after {
+          content: "";
+          height : 3px;
+          width : 100%;
+          background-color: var(--black);
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          transform-origin: left center;
+          transition: transform 0.3s cubic-bezier(0, 0, 0.25, 1);
+        }
+      }
+    }
+  }
+</style>
