@@ -1,0 +1,20 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <span class="copyright">©{year} Designed & Built by BAS Eliot</span>
+</footer>
+
+<style lang="scss">
+  footer {
+    height: 100px;
+    background-color: var(--black);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .copyright {
+      color: var(--white);
+    }
+  }
+</style>
