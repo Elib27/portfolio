@@ -1,5 +1,7 @@
 ---
 import SectionLayout from "../layouts/SectionLayout.astro";
+import LinkedinLogo from "../assets/linkedin.svg?raw";
+import GithubLogo from "../assets/technologies/github.svg?raw";
 ---
 
 <SectionLayout title="Contact" id="contact">
@@ -8,6 +10,15 @@ import SectionLayout from "../layouts/SectionLayout.astro";
     <a class="bubble" href="mailto:eliot.bas.dev@gmail.com">
       <span class="email">eliot.bas.dev@gmail.com</span>
     </a>
+    <p>Ou bien me retrouver sur :</p>
+    <div class="social-media">
+      <a href="https://www.linkedin.com/in/eliot-bas-749ba2253/" target="_blank" rel="noopener noreferrer">
+        <Fragment set:html={LinkedinLogo}/>
+      </a>
+      <a href="https://github.com/Elib27" target="_blank" rel="noopener noreferrer">
+        <Fragment set:html={GithubLogo}/>
+      </a>
+    </div>
   </div>
 </SectionLayout>
 
@@ -64,6 +75,11 @@ import SectionLayout from "../layouts/SectionLayout.astro";
           transition: transform 0.3s cubic-bezier(0, 0, 0.25, 1);
         }
       }
+    }
+    .social-media {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
     }
   }
 </style>
