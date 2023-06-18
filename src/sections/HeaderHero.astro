@@ -103,9 +103,9 @@
   scene.add(splineGroup);
 
   function animate() {
-    const currTime = Date.now() * 0.001;
+    const currTime = Date.now() / 1000;
     for (let i = 0; i < LINES_COUNT ; i++) {
-      splineGroup.children[i].rotation.z = Math.sin(currTime + i/5) * 0.1;
+      splineGroup.children[i].rotation.z = Math.sin(currTime + i/5) * 0.15;
     }
     renderer.render(scene, camera);
     requestAnimationFrame(animate);

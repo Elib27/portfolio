@@ -91,7 +91,7 @@ export default function TechnologiesTabs() {
           </div>
           <div>
             <img src={Threejs.src} height="80px" width="80px" alt="wordpress logo" />
-            <p class={styles.techno_title}>ThreeJS</p>
+            <p class={styles.techno_title}>Three.js</p>
           </div>
           <div>
             <img src={GsapLogo.src} height="80px" width="80px" alt="gsap logo" />
