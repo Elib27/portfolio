@@ -1,4 +1,4 @@
-import { children, createSignal, JSXElement, Show } from "solid-js"
+import { createSignal, JSXElement } from "solid-js"
 import styles from "./TechnologiesTabs.module.css"
 // Main technos
 import ReactLogo from "../../assets/technologies/react.svg"

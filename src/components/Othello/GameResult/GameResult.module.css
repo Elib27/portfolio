@@ -1,0 +1,67 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.resetButton {
+  background-color: var(--black);
+  font-size: 1.25em;
+  color: var(--white);
+  padding: 0.5em 1em;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  border: none;
+}
+
+.resetButton:active {
+  transform: scale(0.98);
+}
+
+.title {
+  font-size: 3em;
+  margin: 2rem;
+  color: var(--accent);
+}
+
+.winnerText {
+  font-size: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.scoreTitle {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  font-size: 2.6rem;
+  margin: 0.5em;
+  font-weight: 700;
+}
+
+.piece {
+  height: 2.6rem;
+  width: 2.6rem;
+  border-radius: 50%;
+}
+
+.player {
+  background-color: var(--accent);
+}
+
+.AIplayer {
+  background-color: var(--black);
+}

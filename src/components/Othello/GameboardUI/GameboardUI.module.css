@@ -1,0 +1,48 @@
+.gameboard {
+  height: clamp(200px, 60vmin, 1000px);
+  width: clamp(200px, 60vmin, 1000px);
+  table-layout: fixed;
+  text-align: center;
+  border-collapse: collapse;
+  position: relative;
+  font-size: 2rem;
+  background-color: var(--light-gray);
+}
+
+.cell {
+  border: 1px solid var(--black);
+}
+
+.row {
+  height: 12.5%;
+}
+
+.piece {
+  height: 85%;
+  width: 85%;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.black {
+  background-color: var(--black);
+}
+
+.accent{
+  background-color: var(--accent);
+}
+
+.possibleMove {
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.lastAIMove {
+  box-shadow: 0 0 8px 5px rgba(0, 0, 0, 0.25);
+}
+
+@media screen and (max-width: 960px) {
+  .gameboard {
+    height: clamp(200px, 80vmin, 1000px);
+    width: clamp(200px, 80vmin, 1000px);
+  }
+}

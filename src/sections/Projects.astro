@@ -4,6 +4,7 @@ import Project from '../components/Project.astro'
 import SpotifyClone from '../assets/spotify_clone.jpg'
 import HestiaGenealogie from '../assets/hestia_genealogie.jpg'
 import MyPortfolio from '../assets/bas_eliot_portfolio.jpg'
+import OthelloProject from '../components/Othello/OthelloProject'
 ---
 
 <SectionLayout title="Projets" id="projects">
@@ -36,6 +37,7 @@ import MyPortfolio from '../assets/bas_eliot_portfolio.jpg'
       websiteLink="https://eliotbas.fr/"
       repositoryLink="https://github.com/Elib27/portfolio"
     />
+    <OthelloProject client:visible />
   </div>
 </SectionLayout>
 
