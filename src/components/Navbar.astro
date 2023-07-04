@@ -1,17 +1,32 @@
 ---
-import ToggleThemeButton from '../components/ToggleThemeButton.astro';
+import ToggleThemeButton from '../components/ToggleThemeButton.astro'
 
 export interface Prosps {
-  languageLink: "en" | "fr";
+  languageLink: 'en' | 'fr'
 }
 const { languageLink } = Astro.props
 ---
 
 <div class="nav-wrapper">
   <a href="#">
-    <svg class="logo" width="81" height="81" viewBox="0 0 81 81" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="0.785522" y="0.959625" width="80" height="80" rx="10" fill="currentColor"/>
-      <path d="M31.1548 55.9596V26.8687H50.0753V31.2863H36.4247V39.1841H49.0952V43.6017H36.4247V51.542H50.1889V55.9596H31.1548Z" fill="#currentColor"/>
+    <svg
+      class="logo"
+      width="81"
+      height="81"
+      viewBox="0 0 81 81"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="0.785522"
+        y="0.959625"
+        width="80"
+        height="80"
+        rx="10"
+        fill="currentColor"></rect>
+      <path
+        d="M31.1548 55.9596V26.8687H50.0753V31.2863H36.4247V39.1841H49.0952V43.6017H36.4247V51.542H50.1889V55.9596H31.1548Z"
+        fill="#currentColor"></path>
     </svg>
   </a>
   <div class="nav-container">
@@ -22,69 +37,70 @@ const { languageLink } = Astro.props
         </li>
         <li>
           <a href="#projects">Projets</a>
-        <li>
-          <a href="#contact">Contact</a>
+          <li>
+            <a href="#contact">Contact</a>
+          </li>
         </li>
       </ul>
+      <a class="lang" href=`/${languageLink}`>{languageLink}</a>
+      <ToggleThemeButton />
     </nav>
-    <a class="lang" href=`/${languageLink}`>{languageLink}</a>
-    <ToggleThemeButton />
   </div>
-</div>
 
-<style lang="scss">
-  .nav-wrapper {
-    position: fixed;
-    top: 1rem;
-    left: 0;
-    height: 60px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 2rem;
-    z-index: 999;
-    pointer-events: none;
-    & > * {
-      pointer-events: all;
-    }
-    .logo {
-      width: 50px;
-      height: 50px;
-      rect {
-        fill: var(--text);
-        transition: fill 0.15s ease-out;
-      }
-      path {
-        fill: var(--background);
-        transition: fill 0.15s ease-out;
-      }
-    }
-    .nav-container {
+  <style lang="scss">
+    .nav-wrapper {
+      position: fixed;
+      top: 1rem;
+      left: 0;
+      height: 60px;
+      width: 100%;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 1.4rem;
-      padding: 0 1.6rem;
-      background-color: var(--nav-background);
-      border-radius: 30px;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
+      padding: 0 2rem;
+      z-index: 999;
+      pointer-events: none;
+      & > * {
+        pointer-events: all;
+      }
+      .logo {
+        width: 50px;
+        height: 50px;
+        rect {
+          fill: var(--text);
+          transition: fill 0.15s ease-out;
+        }
+        path {
+          fill: var(--background);
+          transition: fill 0.15s ease-out;
+        }
+      }
+      .nav-container {
+        display: flex;
+        align-items: center;
+        gap: 1.4rem;
+        padding: 0 1.6rem;
+        background-color: var(--nav-background);
+        border-radius: 30px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
+      }
     }
-  }
-  nav ul {
-    display: flex;
-    gap: 1.2rem;
-    list-style: none;
-    padding: 0;
-    letter-spacing: 0.5px;
-    a {
-      font-weight: 600;
+    nav ul {
+      display: flex;
+      gap: 1.2rem;
+      list-style: none;
+      padding: 0;
+      letter-spacing: 0.5px;
+      a {
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 0 0.2rem;
+      }
+    }
+    .lang {
+      text-transform: uppercase;
       font-size: 1rem;
-      padding: 0 0.2rem;
+      font-weight: 400;
     }
-  }
-  .lang {
-    text-transform: uppercase;
-    font-size: 1rem;
-    font-weight: 400;
-  }
-</style>
+  </style>
+</div>

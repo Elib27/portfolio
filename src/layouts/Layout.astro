@@ -1,21 +1,24 @@
 ---
 export interface Props {
-	title: string;
+	title: string
 }
 
-const { title } = Astro.props;
+const { title } = Astro.props
 ---
 
 <!DOCTYPE html>
 <html lang="fr">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description">
+		<meta name="description" content="Astro description" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet">
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap"
+			rel="stylesheet"
+		/>
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
@@ -26,24 +29,24 @@ const { title } = Astro.props;
 <style is:global>
 	:root {
 		color-scheme: light;
-		--primary: #585EFB;
-		--secondary: #D2D4FF;
-		--accent: #585EFB;
+		--primary: #585efb;
+		--secondary: #d2d4ff;
+		--accent: #585efb;
 		--black: #121212;
 		--gray: #e4e4e6;
-		--white: #F6F6F6;
+		--white: #f6f6f6;
 		--text: #121212;
-		--background: #F6F6F6;
-		--nav-background: #F6F6F6;
+		--background: #f6f6f6;
+		--nav-background: #f6f6f6;
 		--radius: 18px;
 		&.dark-theme {
 			--background: #02031d;
-			--text: #F6F6F6;
+			--text: #f6f6f6;
 			--nav-background: #35357e;
 		}
 	}
 	html {
-		font-family: "Figtree", sans-serif;
+		font-family: 'Figtree', sans-serif;
 		background-color: var(--background);
 		scroll-behavior: smooth;
 		transition: background-color 0.1s ease-out;
@@ -52,7 +55,11 @@ const { title } = Astro.props;
 		margin: 0;
 		overflow-x: hidden;
 	}
-	h1, h2, h3, p, span {
+	h1,
+	h2,
+	h3,
+	p,
+	span {
 		color: var(--text);
 	}
 	a {

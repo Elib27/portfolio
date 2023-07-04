@@ -13,7 +13,6 @@
 .projectTitle {
   color: var(--text);
   font-size: 2rem;
-  margin: 0 0 1.5rem 0;
   text-align: center;
 }
 
@@ -22,7 +21,8 @@
 }
 
 .description {
-  margin: 2rem auto;
+  margin: 0 auto;
+  margin-bottom: 2rem;
   width: clamp(400px, 60%, 800px);
 }
 
@@ -33,9 +33,10 @@
 }
 
 .techno {
+  display: inline-block;
   font-size: 1rem;
   padding: 0.5rem 1rem;
-  margin: 1rem;
+  margin: 0 1rem;
   border-radius: 6px;
   color: var(--background);
   background-color: var(--text);

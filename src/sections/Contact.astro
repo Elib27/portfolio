@@ -1,7 +1,7 @@
 ---
-import SectionLayout from "../layouts/SectionLayout.astro";
-import LinkedinLogo from "../assets/linkedin.svg?raw";
-import GithubLogo from "../assets/technologies/github.svg?raw";
+import SectionLayout from '../layouts/SectionLayout.astro'
+import LinkedinLogo from '../assets/linkedin.svg?raw'
+import GithubLogo from '../assets/technologies/github.svg?raw'
 ---
 
 <SectionLayout title="Contact" id="contact">
@@ -12,11 +12,19 @@ import GithubLogo from "../assets/technologies/github.svg?raw";
     </a>
     <p>Ou bien me retrouver sur :</p>
     <div class="social-media">
-      <a href="https://www.linkedin.com/in/eliot-bas-749ba2253/" target="_blank" rel="noopener noreferrer">
-        <Fragment set:html={LinkedinLogo}/>
+      <a
+        href="https://www.linkedin.com/in/eliot-bas-749ba2253/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Fragment set:html={LinkedinLogo} />
       </a>
-      <a href="https://github.com/Elib27" target="_blank" rel="noopener noreferrer">
-        <Fragment set:html={GithubLogo}/>
+      <a
+        href="https://github.com/Elib27"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Fragment set:html={GithubLogo} />
       </a>
     </div>
   </div>
@@ -40,11 +48,11 @@ import GithubLogo from "../assets/technologies/github.svg?raw";
       position: relative;
       margin-bottom: 5rem;
       &::after {
-        content: "";
-        height : 0;
-        width : 0;
-        border-top : 6rem solid var(--secondary);
-        border-right : 8rem solid transparent;
+        content: '';
+        height: 0;
+        width: 0;
+        border-top: 6rem solid var(--secondary);
+        border-right: 8rem solid transparent;
         position: absolute;
         bottom: -3rem;
         left: 0;
@@ -64,9 +72,9 @@ import GithubLogo from "../assets/technologies/github.svg?raw";
         padding-bottom: 0.6rem;
         color: var(--black);
         &::after {
-          content: "";
-          height : 3px;
-          width : 100%;
+          content: '';
+          height: 3px;
+          width: 100%;
           background-color: var(--black);
           position: absolute;
           bottom: 0;
