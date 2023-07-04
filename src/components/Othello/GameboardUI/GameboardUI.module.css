@@ -35,6 +35,7 @@
 .possibleMove {
   border: 1px solid var(--text);
   opacity: 0.25;
+  cursor: pointer;
 }
 
 .lastAIMove {

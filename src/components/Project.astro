@@ -42,127 +42,127 @@ const imagePosition = inverted ? 'left' : 'right'
       src={image}
       alt={imageAlt}
     />
-    <div
-      class=`project-links ${inverted ? "right" : "left"} ${inverted && "inverted"}`
-    >
-      <a class="link website" href={websiteLink} target="_blank">
-        <span>Voir</span>
-        <Fragment set:html={LinkIcon} />
-      </a>
-      <a class="link github" href={repositoryLink} target="_blank">
-        <Fragment set:html={GithubLogo} />
-        <span>Github Repo</span>
-      </a>
-    </div>
   </a>
+  <div
+    class=`project-links ${inverted ? "right" : "left"} ${inverted && "inverted"}`
+  >
+    <a class="link website" href={websiteLink} target="_blank">
+      <span>Voir</span>
+      <Fragment set:html={LinkIcon} />
+    </a>
+    <a class="link github" href={repositoryLink} target="_blank">
+      <Fragment set:html={GithubLogo} />
+      <span>Github Repo</span>
+    </a>
+  </div>
+</div>
 
-  <style lang="scss">
-    .project-container {
-      --border-radius: 16px;
-      aspect-ratio: 2;
-      width: 800px;
-      position: relative;
-      .left {
-        left: 0;
+<style lang="scss">
+  .project-container {
+    --border-radius: 16px;
+    aspect-ratio: 2;
+    width: 800px;
+    position: relative;
+    .left {
+      left: 0;
+    }
+    .right {
+      right: 0;
+    }
+    .presentation {
+      width: 60%;
+      position: absolute;
+      top: 0;
+      aspect-ratio: 16/9;
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+      padding: 1rem 2rem;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      h3 {
+        color: var(--black);
+        font-size: 1.25rem;
+        margin: 1rem 0 1.5rem 0;
+        text-align: center;
       }
-      .right {
-        right: 0;
+      .description {
+        color: var(--black);
+        margin: 0 0 1rem 0;
       }
-      .presentation {
-        width: 60%;
-        position: absolute;
-        top: 0;
-        aspect-ratio: 16/9;
-        background-color: var(--white);
-        border-radius: var(--border-radius);
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
-        padding: 1rem 2rem;
-        z-index: 1;
+      .technologies {
         display: flex;
-        flex-direction: column;
-        h3 {
-          color: var(--black);
-          font-size: 1.25rem;
-          margin: 1rem 0 1.5rem 0;
-          text-align: center;
-        }
-        .description {
-          color: var(--black);
-          margin: 0 0 1rem 0;
-        }
-        .technologies {
-          display: flex;
-          justify-content: space-evenly;
-          margin-top: auto;
-          list-style: none;
-          padding: 0;
-          li {
-            font-size: 1rem;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            color: var(--white);
-            background-color: var(--black);
-          }
-        }
-      }
-      .project-image {
-        height: auto;
-        position: absolute;
-        bottom: 0;
-        width: 60%;
-        aspect-ratio: 16/9;
-        object-fit: cover;
-        border-radius: var(--border-radius);
-      }
-      .project-links {
-        width: 40%;
-        position: absolute;
-        bottom: 2%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        column-gap: 2rem;
-        &.inverted {
-          flex-direction: row-reverse;
-        }
-        .link {
-          height: fit-content;
-          display: flex;
-          align-items: center;
-          &.website {
-            padding: 0.6rem 1.2rem;
-            background-color: var(--text);
-            border-radius: 10px;
-            gap: 0.8rem;
-            span {
-              color: var(--background);
-              font-weight: 500;
-              letter-spacing: 0.5px;
-              font-size: 1.2rem;
-            }
-          }
-          &.website :global(svg) {
-            height: 22px;
-            width: 22px;
-            color: var(--background);
-          }
-          &.github {
-            gap: 0.5rem;
-            span {
-              color: var(--text);
-              font-size: 1rem;
-              font-weight: 500;
-              letter-spacing: 0.5px;
-              white-space: nowrap;
-            }
-          }
-          &.github :global(svg) {
-            height: 22px;
-            width: 22px;
-            color: var(--text);
-          }
+        justify-content: space-evenly;
+        margin-top: auto;
+        list-style: none;
+        padding: 0;
+        li {
+          font-size: 1rem;
+          padding: 0.5rem 1rem;
+          border-radius: 6px;
+          color: var(--white);
+          background-color: var(--black);
         }
       }
     }
-  </style>
-</div>
+    .project-image {
+      height: auto;
+      position: absolute;
+      bottom: 0;
+      width: 60%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: var(--border-radius);
+    }
+    .project-links {
+      width: 40%;
+      position: absolute;
+      bottom: 2%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      column-gap: 2rem;
+      &.inverted {
+        flex-direction: row-reverse;
+      }
+      .link {
+        height: fit-content;
+        display: flex;
+        align-items: center;
+        &.website {
+          padding: 0.6rem 1.2rem;
+          background-color: var(--text);
+          border-radius: 10px;
+          gap: 0.8rem;
+          span {
+            color: var(--background);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            font-size: 1.2rem;
+          }
+        }
+        &.website :global(svg) {
+          height: 22px;
+          width: 22px;
+          color: var(--background);
+        }
+        &.github {
+          gap: 0.5rem;
+          span {
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+          }
+        }
+        &.github :global(svg) {
+          height: 22px;
+          width: 22px;
+          color: var(--text);
+        }
+      }
+    }
+  }
+</style>
