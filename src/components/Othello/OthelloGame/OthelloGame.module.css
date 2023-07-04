@@ -17,14 +17,15 @@
 }
 
 .playerRound {
+  color: var(--text);
   margin: 2rem 0;
   font-size: 1.5em;
   text-align: center;
 }
 
 .resetButton {
-  color: var(--white);
-  background-color: var(--black);
+  color: var(--background);
+  background-color: var(--text);
   font-family: "Figtree", sans-serif;
   font-size: 1.25em;
   padding: 0.5em 1em;
