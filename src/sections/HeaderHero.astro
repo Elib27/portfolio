@@ -23,6 +23,7 @@
       font-weight: 800;
       line-height: 1.4;
       margin: 0;
+      transition: color var(--theme-transition);
     }
     .text-gradient {
       color: var(--accent);
@@ -49,7 +50,9 @@
 <script>
   import * as THREE from 'three'
 
-  const renderCanvas = document.querySelector('#three-canvas')
+  const renderCanvas = document.querySelector(
+    '#three-canvas'
+  ) as HTMLCanvasElement
 
   const scene = new THREE.Scene()
 

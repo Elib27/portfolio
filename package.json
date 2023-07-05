@@ -15,5 +15,8 @@
     "sass": "^1.62.1",
     "solid-js": "^1.7.5",
     "three": "^0.152.2"
+  },
+  "devDependencies": {
+    "@types/three": "^0.152.1"
   }
 }
