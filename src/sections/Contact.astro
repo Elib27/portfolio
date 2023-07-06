@@ -1,5 +1,6 @@
 ---
 import SectionLayout from '../layouts/SectionLayout.astro'
+import GravityButton from '../components/GravityButton.astro'
 import LinkedinLogo from '../assets/linkedin.svg?raw'
 import GithubLogo from '../assets/technologies/github.svg?raw'
 ---
@@ -10,22 +11,26 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
     <a class="bubble" href="mailto:eliot.bas.dev@gmail.com">
       <span class="email">eliot.bas.dev@gmail.com</span>
     </a>
-    <p>Ou bien me retrouver sur :</p>
+    <p class="social-media-msg">Ou bien me retrouver sur :</p>
     <div class="social-media">
-      <a
-        href="https://www.linkedin.com/in/eliot-bas-749ba2253/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Fragment set:html={LinkedinLogo} />
-      </a>
-      <a
-        href="https://github.com/Elib27"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Fragment set:html={GithubLogo} />
-      </a>
+      <GravityButton>
+        <a
+          href="https://www.linkedin.com/in/eliot-bas-749ba2253/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Fragment set:html={LinkedinLogo} />
+        </a>
+      </GravityButton>
+      <GravityButton>
+        <a
+          href="https://github.com/Elib27"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Fragment set:html={GithubLogo} />
+        </a>
+      </GravityButton>
     </div>
   </div>
 </SectionLayout>
@@ -84,11 +89,14 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
         }
       }
     }
+    .social-media-msg {
+      margin-bottom: 2rem;
+    }
     .social-media {
       display: flex;
-      gap: 2rem;
-      align-items: center;
+      gap: 1rem;
       margin-bottom: 1rem;
+      align-items: center;
     }
   }
 </style>

@@ -1,0 +1,62 @@
+---
+---
+
+<div class="gravity-zone">
+  <div class="button-container">
+    <slot />
+  </div>
+</div>
+
+<style lang="scss">
+  .gravity-zone {
+    height: 9rem;
+    width: 9rem;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .button-container {
+      transform: translate(var(--tX, 0), var(--tY, 0));
+      transition: transform 0.2s ease-out;
+    }
+  }
+</style>
+
+<script>
+  function updateButtonPosition(e: MouseEvent, gravityZone: HTMLDivElement) {
+    const rect = gravityZone.getBoundingClientRect()
+    const halfHeight = gravityZone.offsetHeight / 2
+
+    const x = e.clientX - rect.left - halfHeight
+    const y = e.clientY - rect.top - halfHeight
+
+    const angle = Math.atan2(y, x)
+    const r1 = Math.sqrt(x * x + y * y)
+    const invertedR1 = (1 - r1 / halfHeight) * r1
+
+    const PRECISION = 100
+    const tx = Math.round(Math.cos(angle) * invertedR1 * PRECISION) / PRECISION
+    const ty = Math.round(Math.sin(angle) * invertedR1 * PRECISION) / PRECISION
+
+    gravityZone?.style.setProperty('--tX', `${tx}px`)
+    gravityZone?.style.setProperty('--tY', `${ty}px`)
+  }
+
+  function resetButtonPosition(gravityZone: HTMLDivElement) {
+    gravityZone?.style.setProperty('--tX', '0px')
+    gravityZone?.style.setProperty('--tY', '0px')
+  }
+
+  const gravityZones =
+    document.querySelectorAll<HTMLDivElement>('.gravity-zone')
+
+  gravityZones.forEach((gravityZone: HTMLDivElement) => {
+    gravityZone.addEventListener('mousemove', (e) =>
+      updateButtonPosition(e, gravityZone)
+    )
+    gravityZone.addEventListener('mouseleave', () =>
+      resetButtonPosition(gravityZone)
+    )
+  })
+</script>
