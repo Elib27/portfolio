@@ -25,27 +25,30 @@
 
 <script>
   function updateButtonPosition(e: MouseEvent, gravityZone: HTMLDivElement) {
-    const rect = gravityZone.getBoundingClientRect()
-    const halfHeight = gravityZone.offsetHeight / 2
+    const {
+      left: offsetLeft,
+      top: offsetTop,
+      height,
+    } = gravityZone.getBoundingClientRect()
+    const halfHeight = height / 2
 
-    const x = e.clientX - rect.left - halfHeight
-    const y = e.clientY - rect.top - halfHeight
+    const x = e.clientX - offsetLeft - halfHeight
+    const y = e.clientY - offsetTop - halfHeight
 
     const angle = Math.atan2(y, x)
-    const r1 = Math.sqrt(x * x + y * y)
-    const invertedR1 = (1 - r1 / halfHeight) * r1
+    const r1 = Math.sqrt(x ** 2 + y ** 2)
+    const r2 = (1 - r1 / halfHeight) * r1
 
-    const PRECISION = 100
-    const tx = Math.round(Math.cos(angle) * invertedR1 * PRECISION) / PRECISION
-    const ty = Math.round(Math.sin(angle) * invertedR1 * PRECISION) / PRECISION
+    const tx = Math.cos(angle) * r2
+    const ty = Math.sin(angle) * r2
 
-    gravityZone?.style.setProperty('--tX', `${tx}px`)
-    gravityZone?.style.setProperty('--tY', `${ty}px`)
+    gravityZone.style.setProperty('--tX', `${tx}px`)
+    gravityZone.style.setProperty('--tY', `${ty}px`)
   }
 
   function resetButtonPosition(gravityZone: HTMLDivElement) {
-    gravityZone?.style.setProperty('--tX', '0px')
-    gravityZone?.style.setProperty('--tY', '0px')
+    gravityZone.style.setProperty('--tX', '0px')
+    gravityZone.style.setProperty('--tY', '0px')
   }
 
   const gravityZones =
