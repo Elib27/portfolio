@@ -3,8 +3,10 @@
 
 <section id="home">
   <h1>
-    Hello, je suis<span class="text-gradient"> Eliot Bas</span>,
-    <br /><span class="bg-text">développeur web freelance</span>
+    <span class="line animated">
+      Hello, je suis <span class="text-gradient">Eliot Bas</span>,
+    </span>
+    <br /><span class="bg-text line animated">développeur web freelance</span>
   </h1>
   <canvas id="three-canvas"></canvas>
 </section>
@@ -24,14 +26,28 @@
       line-height: 1.4;
       margin: 0;
       transition: color var(--theme-transition);
-    }
-    .text-gradient {
-      color: var(--accent);
-    }
-    .bg-text {
-      background: linear-gradient(45deg, var(--accent), #6368f2);
-      color: var(--white);
-      padding: 0 1.6rem 0.2rem 1.6rem;
+      .text-gradient {
+        color: var(--accent);
+      }
+      .bg-text {
+        background: linear-gradient(45deg, var(--accent), #6368f2);
+        color: var(--white);
+        padding: 0 1.6rem 0.2rem 1.6rem;
+      }
+      .line {
+        display: inline-block;
+        transform-origin: left center;
+        transition: transform 1s cubic-bezier(0, 0, 0.16, 1);
+        &:first-of-type {
+          transition-delay: 0.25s;
+        }
+        &:last-of-type {
+          transition-delay: 0.4s;
+        }
+      }
+      .animated {
+        transform: translateY(40px) rotate(15deg);
+      }
     }
     #three-canvas {
       position: absolute;

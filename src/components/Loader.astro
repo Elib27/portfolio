@@ -1,0 +1,49 @@
+---
+---
+
+<div class="loader">
+  <span class="loader-text">Loader</span>
+</div>
+<style lang="scss">
+  .loader {
+    background-color: var(--black);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.65s cubic-bezier(0.63, 0.12, 0.87, 0.3);
+    z-index: 9999;
+    &.hidden {
+      transform: translateY(-100%);
+    }
+    .loader-text {
+      font-size: 2rem;
+      letter-spacing: 1px;
+      font-weight: 700;
+      color: var(--white);
+    }
+  }
+</style>
+
+<script>
+  const loader = document.querySelector<HTMLDivElement>('.loader')
+  function animateLoader() {
+    loader?.classList.add('hidden')
+    setTimeout(() => (loader!.style.display = 'none'), 650)
+  }
+
+  const animatedElements = document.querySelectorAll<Element>('.animated')
+
+  function animateElements() {
+    animatedElements?.forEach((element) => {
+      element.classList.remove('animated')
+    })
+  }
+
+  window.addEventListener('load', animateLoader)
+  window.addEventListener('load', animateElements)
+</script>
