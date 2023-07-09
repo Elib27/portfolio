@@ -1,34 +1,15 @@
 ---
 import ToggleThemeButton from '../components/ToggleThemeButton.astro'
+import Logo from '../components/Logo.astro'
 
-export interface Prosps {
+export interface Props {
   languageLink: 'en' | 'fr'
 }
 const { languageLink } = Astro.props
 ---
 
 <div class="nav-wrapper">
-  <a href="#">
-    <svg
-      class="logo"
-      width="81"
-      height="81"
-      viewBox="0 0 81 81"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        x="0.785522"
-        y="0.959625"
-        width="80"
-        height="80"
-        rx="10"
-        fill="currentColor"></rect>
-      <path
-        d="M31.1548 55.9596V26.8687H50.0753V31.2863H36.4247V39.1841H49.0952V43.6017H36.4247V51.542H50.1889V55.9596H31.1548Z"
-        fill="#currentColor"></path>
-    </svg>
-  </a>
+  <Logo />
   <div class="nav-container">
     <nav>
       <ul>
@@ -60,26 +41,12 @@ const { languageLink } = Astro.props
       padding: 0 2rem;
       z-index: 999;
       pointer-events: none;
-      & > * {
-        pointer-events: all;
-      }
-      .logo {
-        width: 50px;
-        height: 50px;
-        rect {
-          fill: var(--text);
-          transition: fill var(--theme-transition);
-        }
-        path {
-          fill: var(--background);
-          transition: fill var(--theme-transition);
-        }
-      }
       .nav-container {
         padding: 0 1.6rem;
         background-color: var(--nav-background);
         border-radius: 30px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
+        pointer-events: all;
       }
     }
     nav {
