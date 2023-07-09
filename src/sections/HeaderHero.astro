@@ -10,7 +10,9 @@
     </span>
     <br /><span class="bg-text line animated">développeur web freelance</span>
   </h1>
-  <canvas id="three-canvas"></canvas>
+  <div class="three-canvas-container animated">
+    <canvas id="three-canvas"></canvas>
+  </div>
 </section>
 
 <style lang="scss">
@@ -53,16 +55,29 @@
         transform: translateY(40px) rotate(15deg);
       }
     }
-    #three-canvas {
+    .three-canvas-container {
       position: absolute;
       top: 0;
       left: 0;
       z-index: -1;
-      pointer-events: none;
       -webkit-mask-image: linear-gradient(
-        rgba(0, 0, 0, 1) 80%,
-        transparent 100%
+        to right,
+        rgba(0, 0, 0, 1) 50%,
+        transparent 60%
       );
+      -webkit-mask-size: 250% 100%;
+      -webkit-mask-position: left;
+      transition: -webkit-mask-position 1s linear 0.4s;
+      pointer-events: none;
+      &.animated {
+        -webkit-mask-position: right;
+      }
+      #three-canvas {
+        -webkit-mask-image: linear-gradient(
+          rgba(0, 0, 0, 1) 80%,
+          transparent 100%
+        );
+      }
     }
   }
 </style>
