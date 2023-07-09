@@ -108,20 +108,20 @@ export default function TechnologiesTabs() {
         </Tab>
         <Tab tabIndex={3} currentTab={tab()}>
           <div>
-            <img src={GitLogo.src} height="80px" width="80px" alt="git logo" />
-            <p class={styles.techno_title}>Git</p>
-          </div>
-          <div>
-            <img src={JestLogo.src} height="80px" width="80px" alt="jest logo" />
-            <p class={styles.techno_title}>Jest</p>
+            <img src={VercelLogo.src} height="80px" width="80px" alt="vercel logo" />
+            <p class={styles.techno_title}>Vercel</p>
           </div>
           <div>
             <img src={NetlifyLogo.src} height="80px" width="80px" alt="netlify logo" />
             <p class={styles.techno_title}>Netlify</p>
           </div>
           <div>
-            <img src={VercelLogo.src} height="80px" width="80px" alt="vercel logo" />
-            <p class={styles.techno_title}>Vercel</p>
+            <img src={JestLogo.src} height="80px" width="80px" alt="jest logo" />
+            <p class={styles.techno_title}>Jest</p>
+          </div>
+          <div>
+            <img src={GitLogo.src} height="80px" width="80px" alt="git logo" />
+            <p class={styles.techno_title}>Git</p>
           </div>
           <div>
             <img src={GithubLogo.src} height="80px" width="80px" alt="github logo" />
