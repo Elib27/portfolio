@@ -4,7 +4,9 @@
 <section id="home">
   <h1>
     <span class="line animated">
-      Hello, je suis <span class="text-gradient">Eliot Bas</span>,
+      <span class="color-transition">
+        Hello, je suis <span class="text-gradient">Eliot Bas</span>,
+      </span>
     </span>
     <br /><span class="bg-text line animated">développeur web freelance</span>
   </h1>
@@ -25,7 +27,9 @@
       font-weight: 800;
       line-height: 1.4;
       margin: 0;
-      transition: color var(--theme-transition);
+      .color-transition {
+        transition: color var(--theme-transition);
+      }
       .text-gradient {
         color: var(--accent);
       }
@@ -39,10 +43,10 @@
         transform-origin: left center;
         transition: transform 1s cubic-bezier(0, 0, 0.16, 1);
         &:first-of-type {
-          transition-delay: 0.25s;
+          transition-delay: 0.2s;
         }
         &:last-of-type {
-          transition-delay: 0.4s;
+          transition-delay: 0.35s;
         }
       }
       .animated {
