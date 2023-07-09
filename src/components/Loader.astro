@@ -6,21 +6,25 @@
 </div>
 <style lang="scss">
   .loader {
+    --diagonal-angle: -3deg;
+    --loader-height-offset: -50vw * tan(var(--diagonal-angle));
     background-color: var(--black);
     position: fixed;
-    top: 0;
+    top: calc(-1 * var(--loader-height-offset));
     left: 0;
-    right: 0;
-    bottom: 0;
+    height: calc(100vh + 2 * var(--loader-height-offset));
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    transform: skewY(var(--diagonal-angle)) translateY(0);
     transition: transform 0.65s cubic-bezier(0.63, 0.12, 0.87, 0.3);
     z-index: 9999;
     &.hidden {
-      transform: translateY(-100%);
+      transform: skewY(var(--diagonal-angle)) translateY(-100%);
     }
     .loader-text {
+      transform: skewY(calc(-1 * var(--diagonal-angle)));
       font-size: 2rem;
       letter-spacing: 1px;
       font-weight: 700;

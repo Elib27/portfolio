@@ -68,11 +68,11 @@ const { languageLink } = Astro.props
         height: 50px;
         rect {
           fill: var(--text);
-          transition: fill 0.15s ease-out;
+          transition: fill var(--theme-transition);
         }
         path {
           fill: var(--background);
-          transition: fill 0.15s ease-out;
+          transition: fill var(--theme-transition);
         }
       }
       .nav-container {
