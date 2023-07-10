@@ -1,0 +1,168 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Logo from '../components/Logo.astro'
+import WavesBackground from '../components/WavesBackground.astro'
+---
+
+<Layout title="Page Introuvable">
+  <div class="logo-wrapper">
+    <Logo />
+  </div>
+  <div class="wrapper">
+    <h1>Page introuvable</h1>
+    <div class="container">
+      <div class="four-container">
+        <div class="four">4</div>
+        <div class="four">4</div>
+        <div class="four">4</div>
+        <div class="four">4</div>
+      </div>
+      <div class="zero">0</div>
+      <!-- <div class="ring ring1"></div>
+      <div class="ring ring2"></div> -->
+    </div>
+    <a class="home-link" href="/">Retour au site</a>
+  </div>
+  <WavesBackground />
+</Layout>
+
+<style lang="scss">
+  .logo-wrapper {
+    position: absolute;
+    top: 1rem;
+    left: 2rem;
+    z-index: 999;
+  }
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    h1 {
+      font-size: clamp(3rem, 5vw, 4rem);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 2rem;
+    }
+    .container {
+      width: 300px;
+      height: 300px;
+      color: var(--text);
+      font-size: 5rem;
+      font-weight: 800;
+      position: relative;
+      .four-container {
+        --rotationParams: 2s infinite cubic-bezier(0.75, 0, 0.25, 1);
+        --colorParams: 1s infinite cubic-bezier(0.75, 0, 0.25, 1) alternate -1s;
+        height: 100%;
+        width: 100%;
+        display: grid;
+        place-items: center;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        animation: fourContainerRotation var(--rotationParams);
+      }
+      .four {
+        &:nth-child(1) {
+          grid-area: 1 / 2 / 2 / 3;
+        }
+        &:nth-child(2) {
+          grid-area: 2 / 3 / 3 / 4;
+        }
+        &:nth-child(3) {
+          grid-area: 3 / 2 / 4 / 3;
+        }
+        &:nth-child(4) {
+          grid-area: 2 / 1 / 3 / 2;
+        }
+        &:nth-child(2n) {
+          animation: fourRotation var(--rotationParams),
+            colorChange var(--colorParams);
+        }
+        &:nth-child(2n + 1) {
+          animation: fourRotation var(--rotationParams),
+            colorChange var(--colorParams);
+        }
+      }
+    }
+    .zero {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: colorChange 1s infinite cubic-bezier(0.75, 0, 0.25, 1)
+        alternate;
+    }
+    // .ring {
+    //   border: 1px solid var(--accent);
+    //   border-radius: 100px;
+    //   position: absolute;
+    //   &.ring1 {
+    //     height: 33%;
+    //     width: 100%;
+    //     top: 50%;
+    //     transform: translateY(-50%);
+    //     animation: ringApparition 2s ease-out infinite alternate;
+    //   }
+    //   &.ring2 {
+    //     height: 100%;
+    //     width: 33%;
+    //     top: 0;
+    //     left: 50%;
+    //     transform: translateX(-50%);
+    //     animation: ringApparition 2s -2s ease-in infinite alternate;
+    //   }
+    // }
+    .home-link {
+      font-size: 1.6rem;
+      font-weight: 700;
+      padding: 1rem 2rem;
+      margin: 2rem 0;
+      color: var(--white);
+      border-radius: 1rem;
+      background-color: var(--accent);
+    }
+  }
+
+  @keyframes fourContainerRotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(90deg);
+    }
+  }
+  @keyframes fourRotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(-90deg);
+    }
+  }
+  // @keyframes ringApparition {
+  //   0% {
+  //     opacity: 0;
+  //   }
+  //   90% {
+  //     opacity: 0;
+  //   }
+  //   100% {
+  //     opacity: 1;
+  //   }
+  // }
+  @keyframes colorChange {
+    0% {
+      color: var(--text);
+    }
+    70% {
+      color: var(--text);
+    }
+    100% {
+      color: var(--accent);
+    }
+  }
+</style>
