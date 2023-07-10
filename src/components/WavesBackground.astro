@@ -1,58 +1,36 @@
 ---
-import WavesBackground from '../components/WavesBackground.astro'
 ---
 
-<section id="home">
-  <h1>
-    <span class="line animated">
-      <span class="color-transition">
-        Hello, je suis <span class="text-gradient">Eliot Bas</span>,
-      </span>
-    </span>
-    <br /><span class="bg-text line animated">développeur web freelance</span>
-  </h1>
-  <WavesBackground />
-</section>
+<div class="three-canvas-container animated">
+  <canvas class="three-canvas"></canvas>
+</div>
 
 <style lang="scss">
-  #home {
+  .three-canvas-container {
     height: 100vh;
     width: 100%;
-    display: flex;
-    align-items: center;
-    position: relative;
-    h1 {
-      padding-left: 10%;
-      transform: translateY(-50%);
-      font-size: clamp(1rem, 5vw, 4rem);
-      font-weight: 800;
-      line-height: 1.4;
-      margin: 0;
-      .color-transition {
-        transition: color var(--theme-transition);
-      }
-      .text-gradient {
-        color: var(--accent);
-      }
-      .bg-text {
-        background: linear-gradient(45deg, var(--accent), #6368f2);
-        color: var(--white);
-        padding: 0 1.6rem 0.2rem 1.6rem;
-      }
-      .line {
-        display: inline-block;
-        transform-origin: left center;
-        transition: transform 1s cubic-bezier(0, 0, 0.16, 1);
-        &:first-of-type {
-          transition-delay: 0.2s;
-        }
-        &:last-of-type {
-          transition-delay: 0.35s;
-        }
-      }
-      .animated {
-        transform: translateY(40px) rotate(15deg);
-      }
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 1) 50%,
+      transparent 60%
+    );
+    -webkit-mask-size: 250% 100%;
+    -webkit-mask-position: left;
+    transition: -webkit-mask-position 1s linear 0.4s;
+    pointer-events: none;
+    &.animated {
+      -webkit-mask-position: right;
+    }
+    .three-canvas {
+      -webkit-mask-image: linear-gradient(
+        rgba(0, 0, 0, 1) 80%,
+        transparent 100%
+      );
     }
   }
 </style>
