@@ -2,7 +2,12 @@
 ---
 
 <div class="loader">
-  <span class="loader-text">Loader</span>
+  <span class="loader-container">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </span>
 </div>
 <style lang="scss">
   .loader {
@@ -23,12 +28,55 @@
     &.hidden {
       transform: skewY(var(--diagonal-angle)) translateY(-100%);
     }
-    .loader-text {
+    .loader-container {
       transform: skewY(calc(-1 * var(--diagonal-angle)));
-      font-size: 2rem;
-      letter-spacing: 1px;
-      font-weight: 700;
-      color: var(--white);
+      display: flex;
+      .dot {
+        height: 2rem;
+        width: 2rem;
+        border-radius: 50%;
+        background-color: var(--background);
+        transform-origin: center -200%;
+        &:first-child {
+          animation: dotSwing1 2s infinite;
+        }
+        &:last-child {
+          animation: dotSwing2 2s infinite;
+        }
+      }
+    }
+  }
+
+  @keyframes dotSwing1 {
+    0% {
+      transform: rotate(0deg);
+      animation-timing-function: ease-out;
+    }
+    25% {
+      transform: rotate(70deg);
+      animation-timing-function: ease-in;
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+  @keyframes dotSwing2 {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(0deg);
+      animation-timing-function: ease-out;
+    }
+    75% {
+      transform: rotate(-70deg);
+      animation-timing-function: ease-in;
+    }
+    100% {
+      transform: rotate(0deg);
     }
   }
 </style>
