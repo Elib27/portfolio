@@ -1,4 +1,20 @@
 <svg width="81" height="81" viewBox="0 0 81 81" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect x="0.785522" y="0.959625" width="80" height="80" rx="10" fill="#121212"/>
   <path d="M31.1548 55.9596V26.8687H50.0753V31.2863H36.4247V39.1841H49.0952V43.6017H36.4247V51.542H50.1889V55.9596H31.1548Z" fill="#FCFCFC"/>
+  <style>
+    rect {
+      fill: #121212;
+    }
+    path {
+      fill: #FCFCFC;
+    }
+    @media (prefers-color-scheme: dark) {
+      rect {
+        fill: #FCFCFC;
+      }
+      path {
+        fill: #121212;
+      }
+    }
+  </style>
 </svg>
