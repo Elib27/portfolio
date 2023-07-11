@@ -9,7 +9,7 @@ import WavesBackground from '../components/WavesBackground.astro'
     <Logo />
   </div>
   <div class="wrapper">
-    <h1>Page introuvable</h1>
+    <h1>Page introuvable 🔭</h1>
     <div class="container">
       <div class="four-container">
         <div class="four">4</div>
@@ -18,8 +18,6 @@ import WavesBackground from '../components/WavesBackground.astro'
         <div class="four">4</div>
       </div>
       <div class="zero">0</div>
-      <!-- <div class="ring ring1"></div>
-      <div class="ring ring2"></div> -->
     </div>
     <a class="home-link" href="/">Retour au site</a>
   </div>
@@ -54,9 +52,9 @@ import WavesBackground from '../components/WavesBackground.astro'
       font-size: 5rem;
       font-weight: 800;
       position: relative;
+      --rotationParams: 2.2s infinite cubic-bezier(0.75, 0, 0.25, 1);
+      --colorParams: 2.2s infinite cubic-bezier(0.75, 0, 0.25, 1);
       .four-container {
-        --rotationParams: 2s infinite cubic-bezier(0.75, 0, 0.25, 1);
-        --colorParams: 1s infinite cubic-bezier(0.75, 0, 0.25, 1) alternate -1s;
         height: 100%;
         width: 100%;
         display: grid;
@@ -66,6 +64,7 @@ import WavesBackground from '../components/WavesBackground.astro'
         animation: fourContainerRotation var(--rotationParams);
       }
       .four {
+        animation: fourRotation var(--rotationParams);
         &:nth-child(1) {
           grid-area: 1 / 2 / 2 / 3;
         }
@@ -78,10 +77,6 @@ import WavesBackground from '../components/WavesBackground.astro'
         &:nth-child(4) {
           grid-area: 2 / 1 / 3 / 2;
         }
-        &:nth-child(2n) {
-          animation: fourRotation var(--rotationParams),
-            colorChange var(--colorParams);
-        }
         &:nth-child(2n + 1) {
           animation: fourRotation var(--rotationParams),
             colorChange var(--colorParams);
@@ -93,76 +88,57 @@ import WavesBackground from '../components/WavesBackground.astro'
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      animation: colorChange 1s infinite cubic-bezier(0.75, 0, 0.25, 1)
-        alternate;
+      animation: colorChange var(--colorParams);
     }
-    // .ring {
-    //   border: 1px solid var(--accent);
-    //   border-radius: 100px;
-    //   position: absolute;
-    //   &.ring1 {
-    //     height: 33%;
-    //     width: 100%;
-    //     top: 50%;
-    //     transform: translateY(-50%);
-    //     animation: ringApparition 2s ease-out infinite alternate;
-    //   }
-    //   &.ring2 {
-    //     height: 100%;
-    //     width: 33%;
-    //     top: 0;
-    //     left: 50%;
-    //     transform: translateX(-50%);
-    //     animation: ringApparition 2s -2s ease-in infinite alternate;
-    //   }
-    // }
     .home-link {
       font-size: 1.6rem;
       font-weight: 700;
       padding: 1rem 2rem;
       margin: 2rem 0;
       color: var(--white);
-      border-radius: 1rem;
+      border-radius: 0.8rem;
       background-color: var(--accent);
+      transition: transform 0.1s ease-out;
+      &:active {
+        transform: scale(0.98);
+      }
     }
   }
 
   @keyframes fourContainerRotation {
-    from {
+    0% {
       transform: rotate(0deg);
     }
-    to {
+    80% {
+      transform: rotate(90deg);
+    }
+    100% {
       transform: rotate(90deg);
     }
   }
   @keyframes fourRotation {
-    from {
+    0% {
       transform: rotate(0deg);
     }
-    to {
+    80% {
+      transform: rotate(-90deg);
+    }
+    100% {
       transform: rotate(-90deg);
     }
   }
-  // @keyframes ringApparition {
-  //   0% {
-  //     opacity: 0;
-  //   }
-  //   90% {
-  //     opacity: 0;
-  //   }
-  //   100% {
-  //     opacity: 1;
-  //   }
-  // }
   @keyframes colorChange {
     0% {
       color: var(--text);
     }
-    70% {
+    65% {
       color: var(--text);
     }
-    100% {
+    85% {
       color: var(--accent);
+    }
+    100% {
+      color: var(--text);
     }
   }
 </style>
