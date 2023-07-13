@@ -11,7 +11,7 @@ const OthelloProject: Component = () => {
   const technos = ["SolidJS", "WASM", "Web Worker"];
 
   return (
-    <Show when={isProjectOpen()} fallback={<button class={styles.projectButton} onClick={() => setIsProjectOpen(true)}>Tester un projet en LIVE</button>}>
+    <Show when={isProjectOpen()} fallback={<button class={styles.projectButton} onClick={() => setIsProjectOpen(true)}>Un dernier projet ?</button>}>
       <div class={styles.projectWrapper}>
         <h3 class={styles.projectTitle}>Othello AI</h3>
         <p class={styles.description}>Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetu 5 BC, making it over 2000 years old. Richard McClintock.</p>
