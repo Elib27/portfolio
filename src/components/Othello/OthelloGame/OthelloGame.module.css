@@ -21,6 +21,7 @@
   margin: 3rem 0 2rem 0;
   font-size: 1.5em;
   text-align: center;
+  transition: color var(--theme-transition);
 }
 
 .resetButton {
@@ -33,6 +34,7 @@
   border-radius: 0.5rem;
   cursor: pointer;
   border: none;
+  transition: background-color var(--theme-transition), color var(--theme-transition);
 }
 
 .resetButton:active {

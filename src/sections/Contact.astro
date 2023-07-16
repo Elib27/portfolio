@@ -3,7 +3,6 @@ import SectionLayout from '../layouts/SectionLayout.astro'
 import GravityButton from '../components/GravityButton.astro'
 import LinkedinLogo from '../assets/linkedin.svg?raw'
 import GithubLogo from '../assets/technologies/github.svg?raw'
-import WavesBackground from '../components/WavesBackground.astro'
 ---
 
 <SectionLayout title="Contact" id="contact">
@@ -19,6 +18,7 @@ import WavesBackground from '../components/WavesBackground.astro'
           href="https://www.linkedin.com/in/eliot-bas-749ba2253/"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Linkedin"
         >
           <Fragment set:html={LinkedinLogo} />
         </a>
@@ -28,13 +28,13 @@ import WavesBackground from '../components/WavesBackground.astro'
           href="https://github.com/Elib27"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Github"
         >
           <Fragment set:html={GithubLogo} />
         </a>
       </GravityButton>
     </div>
   </div>
-  <!-- width="849" height="376" -->
   <svg
     class="waves"
     viewBox="0 0 849 376"
@@ -122,6 +122,9 @@ import WavesBackground from '../components/WavesBackground.astro'
       margin-bottom: 1rem;
       align-items: center;
     }
+    // .social-media :global(path) {
+    //   transition: fill var(--theme-transition);
+    // }
   }
   .waves {
     stroke-width: 1px;

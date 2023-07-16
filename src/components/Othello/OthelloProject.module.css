@@ -14,6 +14,7 @@
   color: var(--text);
   font-size: 2rem;
   text-align: center;
+  transition: color var(--theme-transition);
 }
 
 .projectWrapper {
@@ -29,6 +30,7 @@
   background-color: var(--secondary);
   position: absolute;
   left: 25%;
+  transition: background-color var(--theme-transition);
 }
 
 .projectWrapper::before {
@@ -59,4 +61,5 @@
   border-radius: 6px;
   color: var(--background);
   background-color: var(--text);
+  transition: background-color var(--theme-transition), color var(--theme-transition);
 }

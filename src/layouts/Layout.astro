@@ -32,12 +32,11 @@ const { title } = Astro.props
 
 <style is:global>
 	:root {
-		color-scheme: light;
 		--secondary: #d2d4ff;
 		--accent: #585efb;
 		--black: #121212;
 		--gray: #e6e6f0;
-		--white: #f6f6f6;
+		--white: #fafafa;
 		--text: var(--black);
 		--background: var(--white);
 		--nav-background: var(--white);
@@ -75,8 +74,19 @@ const { title } = Astro.props
 	p {
 		font-size: 1rem;
 		margin: 0;
+		transition: color var(--theme-transition);
 	}
 	* {
 		box-sizing: border-box;
 	}
 </style>
+
+<script>
+	window.addEventListener('load', () => {
+		console.clear()
+		console.log(
+			'%c BAS Eliot - Portfolio ',
+			'color: #fafafa; background-color: #585efb; font-size: 30px; font-weight: 700'
+		)
+	})
+</script>

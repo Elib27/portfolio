@@ -48,6 +48,7 @@ const { languageLink } = Astro.props
         border-radius: 30px;
         box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
         pointer-events: all;
+        transition: background-color var(--theme-transition);
       }
     }
     nav {
@@ -65,6 +66,7 @@ const { languageLink } = Astro.props
           font-size: 1rem;
           padding: 0 0.2rem;
           white-space: nowrap;
+          transition: color var(--theme-transition);
         }
       }
     }
