@@ -3,6 +3,7 @@ import SectionLayout from '../layouts/SectionLayout.astro'
 import GravityButton from '../components/GravityButton.astro'
 import LinkedinLogo from '../assets/linkedin.svg?raw'
 import GithubLogo from '../assets/technologies/github.svg?raw'
+import WavesBackground from '../components/WavesBackground.astro'
 ---
 
 <SectionLayout title="Contact" id="contact">
@@ -33,6 +34,29 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
       </GravityButton>
     </div>
   </div>
+  <!-- width="849" height="376" -->
+  <svg
+    class="waves"
+    viewBox="0 0 849 376"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M0.999023 370.384C84.2455 272.876 196.679 88.9537 424.242 99.7312C564.009 106.351 737.113 57.9771 849 0.466797"
+      stroke="currentColor"></path>
+    <path
+      d="M57.6045 370.384C96.8937 299.29 250.245 119.5 370.729 129.485C547.247 144.114 723.649 91.0164 849 30.9375"
+      stroke="currentColor"></path>
+    <path
+      d="M126.34 370.383C127.303 323.487 273.269 170.278 386.06 184.473C512.591 200.397 688.088 155.441 849 112.452"
+      stroke="currentColor"></path>
+    <path
+      d="M222.763 375.251C225.739 346.021 309.168 248.317 447.601 248.317C587.329 248.317 752.787 206.393 849 171.316"
+      stroke="currentColor"></path>
+    <path
+      d="M304.147 373.384C495.039 330.368 595.292 286.042 849 270.112"
+      stroke="currentColor"></path>
+  </svg>
 </SectionLayout>
 
 <style lang="scss">
@@ -98,5 +122,15 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
       margin-bottom: 1rem;
       align-items: center;
     }
+  }
+  .waves {
+    stroke-width: 1px;
+    width: 45%;
+    color: var(--accent);
+    position: absolute;
+    right: 0;
+    bottom: -10px;
+    pointer-events: none;
+    z-index: -1;
   }
 </style>
