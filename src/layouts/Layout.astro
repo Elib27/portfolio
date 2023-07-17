@@ -46,7 +46,7 @@ const { title } = Astro.props
 		&.dark-theme {
 			--text: var(--white);
 			--background: #02031d;
-			--nav-background: #35357e;
+			--nav-background: #282870;
 			--highlight: var(--accent);
 		}
 	}
@@ -70,6 +70,10 @@ const { title } = Astro.props
 	a {
 		color: var(--text);
 		text-decoration: none;
+		line-height: 0;
+		outline-color: var(--accent);
+	}
+	button {
 	}
 	p {
 		font-size: 1rem;

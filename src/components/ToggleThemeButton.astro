@@ -64,6 +64,12 @@
       }
       .moon {
         transition: transform 0.25s ease;
+        & > circle {
+          transition: transform 0.25s ease-out;
+          @supports (cx: 1) {
+            transition: cx 0.25s ease-out;
+          }
+        }
       }
       .sun {
         transition: transform 0.25s ease;
@@ -77,15 +83,13 @@
         }
         & > .sun-beams {
           opacity: 0;
-          transform: rotate(45deg);
+          transform: rotate(60deg);
         }
         & > .moon > circle {
           transform: translateX(-7px);
-          transition: transform 0.25s ease-out;
           @supports (cx: 1) {
             transform: translateX(0);
             cx: 17;
-            transition: cx 0.25s ease-out;
           }
         }
       }
@@ -101,9 +105,7 @@
   initTheme()
 
   function initTheme() {
-    const theme = getLocalStorageTheme()
-      ? getLocalStorageTheme()
-      : getPreferredTheme()
+    const theme = getLocalStorageTheme() || getPreferredTheme()
     if (theme === 'dark') {
       document.documentElement.classList.add('dark-theme')
     } else {

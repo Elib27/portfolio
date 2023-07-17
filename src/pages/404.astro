@@ -2,11 +2,13 @@
 import Layout from '../layouts/Layout.astro'
 import Logo from '../components/Logo.astro'
 import WavesBackground from '../components/WavesBackground.astro'
+import ToggleThemeButton from '../components/ToggleThemeButton.astro'
 ---
 
 <Layout title="Page Introuvable">
-  <div class="logo-wrapper">
+  <div class="nav-wrapper">
     <Logo />
+    <ToggleThemeButton />
   </div>
   <div class="wrapper">
     <h1>Page introuvable 🔭</h1>
@@ -25,10 +27,15 @@ import WavesBackground from '../components/WavesBackground.astro'
 </Layout>
 
 <style lang="scss">
-  .logo-wrapper {
+  .nav-wrapper {
+    width: 100%;
     position: absolute;
     top: 1rem;
-    left: 2rem;
+    left: 0;
+    padding: 0 3rem 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     z-index: 999;
   }
   .wrapper {
@@ -44,6 +51,7 @@ import WavesBackground from '../components/WavesBackground.astro'
       font-weight: 800;
       color: var(--text);
       margin-bottom: 2rem;
+      transition: color var(--theme-transition);
     }
     .container {
       width: 300px;
@@ -65,6 +73,7 @@ import WavesBackground from '../components/WavesBackground.astro'
       }
       .four {
         animation: fourRotation var(--rotationParams);
+        transition: color var(--theme-transition);
         &:nth-child(1) {
           grid-area: 1 / 2 / 2 / 3;
         }
@@ -95,6 +104,7 @@ import WavesBackground from '../components/WavesBackground.astro'
       font-weight: 700;
       padding: 1rem 2rem;
       margin: 2rem 0;
+      line-height: 1;
       color: var(--white);
       border-radius: 0.8rem;
       background-color: var(--accent);
