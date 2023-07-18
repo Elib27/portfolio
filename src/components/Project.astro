@@ -131,6 +131,9 @@ const imagePosition = inverted ? 'left' : 'right'
         display: flex;
         align-items: center;
         transition: background-color var(--theme-transition);
+        span {
+          transition: color var(--theme-transition);
+        }
         &.website {
           padding: 0.6rem 1.2rem;
           background-color: var(--text);
@@ -141,7 +144,6 @@ const imagePosition = inverted ? 'left' : 'right'
             font-weight: 500;
             letter-spacing: 0.5px;
             font-size: 1.2rem;
-            transition: color var(--theme-transition);
           }
         }
         &.website :global(svg) {
@@ -163,6 +165,9 @@ const imagePosition = inverted ? 'left' : 'right'
           height: 22px;
           width: 22px;
           color: var(--text);
+        }
+        & :global(path) {
+          transition: color var(--theme-transition);
         }
       }
     }

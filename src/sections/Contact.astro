@@ -122,10 +122,10 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
       gap: 1rem;
       margin-bottom: 1rem;
       align-items: center;
+      & :global(path) {
+        transition: color var(--theme-transition);
+      }
     }
-    // .social-media :global(path) {
-    //   transition: fill var(--theme-transition);
-    // }
   }
   .waves {
     stroke-width: 1px;
