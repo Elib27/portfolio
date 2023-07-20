@@ -1,42 +1,28 @@
 ---
+import { getCollection } from 'astro:content'
 import SectionLayout from '../layouts/SectionLayout.astro'
 import Project from '../components/Project.astro'
-import SpotifyClone from '../assets/spotify_clone.jpg'
-import HestiaGenealogie from '../assets/hestia_genealogie.jpg'
-import MyPortfolio from '../assets/bas_eliot_portfolio.jpg'
 import OthelloProject from '../components/Othello/OthelloProject'
+
+const projects = await getCollection('projects')
 ---
 
 <SectionLayout title="Projets" id="projects">
   <div class="projects-container">
-    <Project
-      title="Spotify Clone"
-      description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum. consectetur adipisicing elit. Quisquam, voluptatum. fuga, voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum. consectetur adipisicing elit."
-      technologies={['Next.js', 'Redux', 'Spotify API']}
-      image={SpotifyClone}
-      imageAlt="spotify clone"
-      websiteLink="https://spotify-clone-nextjs-elib27.vercel.app/"
-      repositoryLink="https://github.com/Elib27/spotify-clone-nextjs"
-    />
-    <Project
-      title="Hestia Généalogie"
-      description="5 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetu 5 BC, making it over 2000 years old. Richard McClintock."
-      technologies={['Astro', 'SEO', 'SASS']}
-      image={HestiaGenealogie}
-      imageAlt="hestia genealogie"
-      websiteLink="https://estienne-genealogie.fr/"
-      repositoryLink="https://github.com/Elib27/site-genealogie"
-      inverted
-    />
-    <Project
-      title="Mon Porfolio"
-      description="Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetu 5 BC, making it over 2000 years old. Richard McClintock."
-      technologies={['Astro', 'SolidJS', 'Three.js']}
-      image={MyPortfolio}
-      imageAlt="portfolio de bas eliot"
-      websiteLink="https://eliotbas.fr/"
-      repositoryLink="https://github.com/Elib27/portfolio"
-    />
+    {
+      projects.map(async (project, index) => (
+        <Project
+          title={project.data.title}
+          description={project.body}
+          technologies={project.data.technologies.split(', ')}
+          image={project.data.image}
+          imageAlt={project.data.imageAlt}
+          demoLink={project.data.demoLink}
+          repoLink={project.data.repoLink}
+          inverted={index % 2 === 1}
+        />
+      ))
+    }
     <OthelloProject client:idle />
   </div>
 </SectionLayout>

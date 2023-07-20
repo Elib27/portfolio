@@ -9,8 +9,8 @@ export interface Props {
   technologies: string[]
   image: ImageMetadata
   imageAlt: string
-  websiteLink: string
-  repositoryLink: string
+  demoLink: string
+  repoLink: string
   inverted?: boolean
 }
 
@@ -20,8 +20,8 @@ const {
   technologies,
   image,
   imageAlt,
-  websiteLink,
-  repositoryLink,
+  demoLink,
+  repoLink,
   inverted,
 } = Astro.props
 
@@ -36,21 +36,23 @@ const imagePosition = inverted ? 'left' : 'right'
       {technologies.map((technology) => <li>{technology}</li>)}
     </ul>
   </div>
-  <a href={websiteLink} target="_blank">
+  <a href={demoLink} target="_blank">
     <Image
       class={'project-image ' + imagePosition}
       src={image}
+      height={270}
+      width={480}
       alt={imageAlt}
     />
   </a>
   <div
     class=`project-links ${inverted ? "right" : "left"} ${inverted && "inverted"}`
   >
-    <a class="link website" href={websiteLink} target="_blank">
+    <a class="link website" href={demoLink} target="_blank">
       <span>Voir</span>
       <Fragment set:html={LinkIcon} />
     </a>
-    <a class="link github" href={repositoryLink} target="_blank">
+    <a class="link github" href={repoLink} target="_blank">
       <Fragment set:html={GithubLogo} />
       <span>Github Repo</span>
     </a>
