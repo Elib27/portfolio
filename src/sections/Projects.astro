@@ -10,13 +10,13 @@ const projects = await getCollection('projects')
 <SectionLayout title="Projets" id="projects">
   <div class="projects-container">
     {
-      projects.map(async (project, index) => (
+      projects.map((project, index) => (
         <Project
           title={project.data.title}
           description={project.body}
           technologies={project.data.technologies.split(', ')}
-          image={project.data.image}
-          imageAlt={project.data.imageAlt}
+          cover={project.data.cover}
+          coverAlt={project.data.coverAlt}
           demoLink={project.data.demoLink}
           repoLink={project.data.repoLink}
           inverted={index % 2 === 1}

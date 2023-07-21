@@ -7,8 +7,8 @@ export interface Props {
   title: string
   description: string
   technologies: string[]
-  image: ImageMetadata
-  imageAlt: string
+  cover: ImageMetadata
+  coverAlt: string
   demoLink: string
   repoLink: string
   inverted?: boolean
@@ -18,14 +18,15 @@ const {
   title,
   description,
   technologies,
-  image,
-  imageAlt,
+  cover,
+  coverAlt,
   demoLink,
   repoLink,
   inverted,
 } = Astro.props
 
-const imagePosition = inverted ? 'left' : 'right'
+const coverPosition = inverted ? 'left' : 'right'
+console.log(cover)
 ---
 
 <div class="project-container">
@@ -38,11 +39,9 @@ const imagePosition = inverted ? 'left' : 'right'
   </div>
   <a href={demoLink} target="_blank">
     <Image
-      class={'project-image ' + imagePosition}
-      src={image}
-      height={270}
-      width={480}
-      alt={imageAlt}
+      class={'project-image ' + coverPosition}
+      src={cover}
+      alt={coverAlt}
     />
   </a>
   <div
