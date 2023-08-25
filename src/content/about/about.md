@@ -1,5 +1,7 @@
-Comment ça a commencé, mon parcours, ..., pas designer mais on dépanne. Richard McClintock, a Latin <span class="highlight">professor</span> at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem.
+Bienvenue sur mon site, dans mon monde à moi ! Je suis un <span class="highlight">développeur</span> web freelance avec une relation passionnelle pour le code, démarrée avec Arduino et ses petits robots. Depuis 2018, je cultive mon intérêt pour le développement web, m'efforçant toujours d'allier esthétique, fonctionnalité et <span class="highlight">performance</span> dans chacun de mes projets.
 
-Ipsum passage, and going through the cites of the word in classical literature, discovered the <span class="highlight">undoubtable</span> source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory.
+Mes compétences s'étendent sur un large éventail d'outils et de technologies, notamment React, Next.js, SolidJS, et le dernier en date, mon meta framework de coeur : Astro, auquel je <span class="highlight">contribue</span> activement en open source.
 
-Ethics, very popular during the <span class="highlight">Renaissance</span>. The first line of Lorem Ipsum "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+Ma philosophie inclut une conception réactive pour une expérience utilisateur optimale, une obsession pour les performances web et un engagement envers <span class="highlight">l'accessibilité</span> pour tous.
+
+Si vous recherchez un développeur web qui combine expertise technique, créativité et dévouement, vous êtes au bon endroit. Ensemble, transformons vos idées en réalité digitale !
