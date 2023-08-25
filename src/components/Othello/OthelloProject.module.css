@@ -42,6 +42,7 @@
 }
 
 .description {
+  line-height: 1.25;
   margin: 0 auto;
   margin-bottom: 2rem;
   width: clamp(400px, 60%, 800px);

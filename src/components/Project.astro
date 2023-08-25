@@ -61,7 +61,7 @@ const coverPosition = inverted ? 'left' : 'right'
   .project-container {
     --border-radius: 16px;
     aspect-ratio: 2;
-    width: 800px;
+    width: clamp(800px, 75%, 1000px);
     position: relative;
     .left {
       left: 0;
@@ -84,17 +84,19 @@ const coverPosition = inverted ? 'left' : 'right'
       h3 {
         color: var(--black);
         font-size: 1.5rem;
-        margin: 1rem 0 1.5rem 0;
+        margin: 1rem 0;
         text-align: center;
       }
       .description {
+        font-size: 0.9rem;
         color: var(--black);
         margin: 0 0 1rem 0;
       }
       .technologies {
         display: flex;
-        justify-content: space-evenly;
-        margin-top: auto;
+        justify-content: center;
+        gap: 2rem;
+        margin: 0 0 0.6rem 0;
         list-style: none;
         padding: 0;
         li {

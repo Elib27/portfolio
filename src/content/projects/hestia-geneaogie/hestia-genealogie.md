@@ -7,10 +7,4 @@ demoLink: "https://estienne-genealogie.fr"
 repoLink: "https://github.com/Elib27/site-genealogie"
 ---
 
-Ce projet est un site vitrine pour une généalogiste / historienne du bâti, lui permettant de présenter ses services et sa vision.
-
-Mon rôle fût de développer le site complet en visant le référencement et la performance tout en veillant à une expérience utilisateur fluide et attrayante.
-
-Les mots clefs ainsi que la performance du site ont été des points d’attention particulier pour positionner le site le plus haut possible dans les résultats de recherche.
-
-Le site obtient aisément une note de 100 au Lighthouse avec un FCP de 0.3s
+Un site vitrine conçu pour une généalogiste / historienne du bâti, mettant en avant ses services et sa vision. J'ai développé ce site en mettant l'accent sur le référencement, la performance et une expérience utilisateur fluide. Les mots clés et la performance ont été des priorités pour obtenir le meilleur classement possible dans les résultats de recherche. Le site atteint une note de 100 au Lighthouse, avec un temps de chargement initial de 0.3s.

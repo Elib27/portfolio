@@ -7,11 +7,14 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
 
 <SectionLayout title="Contact" id="contact">
   <div class="container">
-    <p>Une envie de discuter ?</p>
+    <p>
+      Les aventures web les plus épiques commencent par un simple clic. <br />
+      Qu'attendez-vous ? Contactez-moi et commençons l'aventure !
+    </p>
     <a class="bubble" href="mailto:eliot.bas.dev@gmail.com">
       <span class="email">eliot.bas.dev@gmail.com</span>
     </a>
-    <p class="social-media-msg">Ou bien me retrouver sur :</p>
+    <p class="social-media-msg">Retrouvez-moi également sur :</p>
     <div class="social-media">
       <GravityButton>
         <a
@@ -65,7 +68,9 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
     flex-direction: column;
     align-items: center;
     p {
-      font-size: 1.4rem;
+      width: min(80%, 800px);
+      font-size: 1.2rem;
+      line-height: 1.6;
       text-align: center;
       margin-bottom: 3rem;
     }
@@ -74,7 +79,7 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
       width: fit-content;
       padding: 3rem 5rem;
       margin-bottom: 5rem;
-      border-radius: 2rem;
+      border-radius: 1.8rem;
       line-height: 1;
       position: relative;
       &::after {
@@ -96,7 +101,7 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
         }
       }
       .email {
-        font-size: 3rem;
+        font-size: clamp(1rem, 4vw, 3rem);
         text-align: center;
         position: relative;
         padding-bottom: 0.6rem;
@@ -115,12 +120,10 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
       }
     }
     .social-media-msg {
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
     }
     .social-media {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
       align-items: center;
       & :global(path) {
         transition: color var(--theme-transition);

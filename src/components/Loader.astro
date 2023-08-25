@@ -23,7 +23,7 @@
     align-items: center;
     justify-content: center;
     transform: skewY(var(--diagonal-angle)) translateY(0);
-    transition: transform 0.65s cubic-bezier(0.63, 0.12, 0.87, 0.3);
+    transition: transform 0.65s cubic-bezier(0.63, 0.12, 0.87, 0.3) 0.05s;
     z-index: 9999;
     &.hidden {
       transform: skewY(var(--diagonal-angle)) translateY(-100%);
@@ -85,7 +85,7 @@
   const loader = document.querySelector<HTMLDivElement>('.loader')
   function animateLoader() {
     loader?.classList.add('hidden')
-    setTimeout(() => (loader!.style.display = 'none'), 650)
+    setTimeout(() => (loader!.style.display = 'none'), 700)
   }
 
   const animatedElements = document.querySelectorAll<Element>('.animated')
