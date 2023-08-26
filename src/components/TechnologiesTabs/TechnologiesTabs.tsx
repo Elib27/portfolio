@@ -56,79 +56,79 @@ export default function TechnologiesTabs() {
       <div class={styles.tab_container}>
         <Tab tabIndex={1} currentTab={tab()}>
           <div>
-            <img src={NextLogo.src} height="80px" width="80px" alt="next logo" />
+            <img src={NextLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="next logo" />
             <p class={styles.techno_title}>Next JS</p>
           </div>
           <div>
-            <img src={ReactLogo.src} height="80px" width="80px" alt="react logo" />
+            <img src={ReactLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="react logo" />
             <p class={styles.techno_title}>React</p>
           </div>
           <div>
-            <img src={AstroLogo.src} height="80px" width="80px" alt="astro logo" />
+            <img src={AstroLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="astro logo" />
             <p class={styles.techno_title}>Astro</p>
           </div>
           <div>
-            <img src={NodeLogo.src} height="80px" width="80px" alt="node logo" />
+            <img src={NodeLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="node logo" />
             <p class={styles.techno_title}>Node JS</p>
           </div>
           <div>
-            <img src={TypescriptLogo.src} height="80px" width="80px" alt="typescript logo" />
+            <img src={TypescriptLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="typescript logo" />
             <p class={styles.techno_title}>Typescript</p>
           </div>
           <div>
-            <img src={SassLogo.src} height="80px" width="80px" alt="sass logo" />
+            <img src={SassLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="sass logo" />
             <p class={styles.techno_title}>SASS</p>
           </div>
         </Tab>
         <Tab tabIndex={2} currentTab={tab()}>
           <div>
-            <img src={SolidjsLogo.src} height="80px" width="80px" alt="solid js logo" />
+            <img src={SolidjsLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="solid js logo" />
             <p class={styles.techno_title}>SolidJS</p>
           </div>
           <div>
-            <img src={WordpressLogo.src} height="80px" width="80px" alt="wordpress logo" />
+            <img src={WordpressLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="wordpress logo" />
             <p class={styles.techno_title}>WordPress</p>
           </div>
           <div>
-            <img src={Threejs.src} height="80px" width="80px" alt="wordpress logo" />
+            <img src={Threejs.src} class={styles.technoLogo} height="80px" width="80px" alt="wordpress logo" />
             <p class={styles.techno_title}>Three.js</p>
           </div>
           <div>
-            <img src={GsapLogo.src} height="80px" width="80px" alt="gsap logo" />
+            <img src={GsapLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="gsap logo" />
             <p class={styles.techno_title}>GSAP</p>
           </div>
           <div>
-            <img src={PrismaLogo.src} height="80px" width="80px" alt="prisma logo" />
+            <img src={PrismaLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="prisma logo" />
             <p class={styles.techno_title}>Prisma</p>
           </div>
           <div>
-            <img src={SqlLogo.src} height="80px" width="80px" alt="sql logo" />
+            <img src={SqlLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="sql logo" />
             <p class={styles.techno_title}>SQL</p>
           </div>
         </Tab>
         <Tab tabIndex={3} currentTab={tab()}>
           <div>
-            <img src={VercelLogo.src} height="80px" width="80px" alt="vercel logo" />
+            <img src={VercelLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="vercel logo" />
             <p class={styles.techno_title}>Vercel</p>
           </div>
           <div>
-            <img src={NetlifyLogo.src} height="80px" width="80px" alt="netlify logo" />
+            <img src={NetlifyLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="netlify logo" />
             <p class={styles.techno_title}>Netlify</p>
           </div>
           <div>
-            <img src={JestLogo.src} height="80px" width="80px" alt="jest logo" />
+            <img src={JestLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="jest logo" />
             <p class={styles.techno_title}>Jest</p>
           </div>
           <div>
-            <img src={GitLogo.src} height="80px" width="80px" alt="git logo" />
+            <img src={GitLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="git logo" />
             <p class={styles.techno_title}>Git</p>
           </div>
           <div>
-            <img src={GithubLogo.src} height="80px" width="80px" alt="github logo" />
+            <img src={GithubLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="github logo" />
             <p class={styles.techno_title}>Github</p>
           </div>
           <div>
-            <img src={GitlabLogo.src} height="80px" width="80px" alt="gitlab logo" />
+            <img src={GitlabLogo.src} class={styles.technoLogo} height="80px" width="80px" alt="gitlab logo" />
             <p class={styles.techno_title}>GitLab</p>
           </div>
         </Tab>

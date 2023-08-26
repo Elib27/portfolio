@@ -4,19 +4,5 @@ import TechnologiesTabs from '../components/TechnologiesTabs/TechnologiesTabs.js
 ---
 
 <SectionLayout title="Technologies" id="technologies">
-  <div class="container">
-    <TechnologiesTabs client:idle />
-  </div>
+  <TechnologiesTabs client:idle />
 </SectionLayout>
-
-<style lang="scss">
-  .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 1rem;
-    h2 {
-      margin-bottom: 3rem;
-    }
-  }
-</style>
