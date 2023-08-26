@@ -6,7 +6,8 @@
   border-collapse: collapse;
   position: relative;
   font-size: 2rem;
-  background-color: var(--light-gray);
+  background-color: var(--othello-gameboard-bg);
+  transition: background-color var(--theme-transition);
 }
 
 .cell {
@@ -22,6 +23,7 @@
   width: 85%;
   border-radius: 50%;
   margin: 0 auto;
+  transition: background-color var(--theme-transition);
 }
 
 .black {

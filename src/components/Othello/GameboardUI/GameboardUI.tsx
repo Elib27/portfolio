@@ -43,7 +43,7 @@ const GameboardUI: Component<Props> = (props) => {
               </Show>
             </td>
           }</Index>
-        </tr>
+        </tr> 
       }</Index>
     </tbody>
   </table>
