@@ -36,7 +36,7 @@ const coverPosition = inverted ? 'left' : 'right'
       {technologies.map((technology) => <li>{technology}</li>)}
     </ul>
   </div>
-  <a href={demoLink} target="_blank">
+  <a href={demoLink} class="project-image-link" target="_blank">
     <Image
       class={'project-image ' + coverPosition}
       src={cover}
@@ -60,8 +60,8 @@ const coverPosition = inverted ? 'left' : 'right'
 <style lang="scss">
   .project-container {
     --border-radius: 16px;
+    width: clamp(700px, 75%, 1000px);
     aspect-ratio: 2;
-    width: clamp(800px, 75%, 1000px);
     position: relative;
     .left {
       left: 0;
@@ -70,7 +70,7 @@ const coverPosition = inverted ? 'left' : 'right'
       right: 0;
     }
     .presentation {
-      width: 60%;
+      width: max(60%, 500px);
       position: absolute;
       top: 0;
       aspect-ratio: 16/9;
@@ -108,12 +108,15 @@ const coverPosition = inverted ? 'left' : 'right'
         }
       }
     }
-    .project-image {
-      height: auto;
+    .project-image-link {
       position: absolute;
       bottom: 0;
-      width: 60%;
+      width: max(60%, 500px);
       aspect-ratio: 16/9;
+    }
+    .project-image {
+      height: auto;
+      width: 100%;
       object-fit: cover;
       border-radius: var(--border-radius);
     }
@@ -171,6 +174,38 @@ const coverPosition = inverted ? 'left' : 'right'
         & :global(path) {
           transition: color var(--theme-transition);
         }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .project-container {
+      width: 100%;
+      aspect-ratio: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      .presentation {
+        position: static;
+        width: max(60%, 420px);
+      }
+      .project-image-link {
+        position: static;
+        width: max(60%, 420px);
+      }
+      .project-links {
+        position: static;
+      }
+    }
+  }
+  @media (max-width: 480px) {
+    .project-container {
+      .presentation {
+        width: 100%;
+      }
+      .project-image-link {
+        width: 100%;
       }
     }
   }
