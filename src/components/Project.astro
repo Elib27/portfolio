@@ -36,12 +36,12 @@ const coverPosition = inverted ? 'left' : 'right'
       {technologies.map((technology) => <li>{technology}</li>)}
     </ul>
   </div>
-  <a href={demoLink} class="project-image-link" target="_blank">
-    <Image
-      class={'project-image ' + coverPosition}
-      src={cover}
-      alt={coverAlt}
-    />
+  <a
+    href={demoLink}
+    class={'project-image-link ' + coverPosition}
+    target="_blank"
+  >
+    <Image class="project-image" src={cover} alt={coverAlt} />
   </a>
   <div
     class=`project-links ${inverted ? "right" : "left"} ${inverted && "inverted"}`
@@ -60,7 +60,7 @@ const coverPosition = inverted ? 'left' : 'right'
 <style lang="scss">
   .project-container {
     --border-radius: 16px;
-    width: clamp(700px, 75%, 1000px);
+    width: clamp(700px, 75%, 940px);
     aspect-ratio: 2;
     position: relative;
     .left {
@@ -101,6 +101,7 @@ const coverPosition = inverted ? 'left' : 'right'
         padding: 0;
         li {
           font-size: 1rem;
+          white-space: nowrap;
           padding: 0.5rem 1rem;
           border-radius: 6px;
           color: var(--white);
@@ -125,6 +126,7 @@ const coverPosition = inverted ? 'left' : 'right'
       position: absolute;
       bottom: 2%;
       display: flex;
+      white-space: nowrap;
       justify-content: center;
       align-items: center;
       column-gap: 2rem;
@@ -188,14 +190,16 @@ const coverPosition = inverted ? 'left' : 'right'
       gap: 1rem;
       .presentation {
         position: static;
-        width: max(60%, 420px);
+        width: max(60%, 450px);
       }
       .project-image-link {
         position: static;
-        width: max(60%, 420px);
+        width: max(60%, 450px);
       }
       .project-links {
         position: static;
+        margin-top: 1rem;
+        width: 100%;
       }
     }
   }
@@ -206,6 +210,16 @@ const coverPosition = inverted ? 'left' : 'right'
       }
       .project-image-link {
         width: 100%;
+      }
+      .presentation {
+        .technologies {
+          flex-wrap: wrap;
+          gap: 1rem;
+          justify-content: space-evenly;
+          li {
+            font-size: 0.9rem;
+          }
+        }
       }
     }
   }
