@@ -12,8 +12,7 @@ import { Content as AboutContent } from '../content/about/about.md'
 <style lang="scss">
   .content {
     --highlight-padding: 1px;
-    max-width: 800px;
-    width: 80%;
+    width: min(80%, 800px);
     margin: auto;
     & :global(p) {
       margin: 0 0 1rem 0;
@@ -32,6 +31,17 @@ import { Content as AboutContent } from '../content/about/about.md'
       left: calc(-1 * var(--highlight-padding));
       z-index: -1;
       transition: background-color var(--theme-transition);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .content {
+      width: 90%;
+    }
+  }
+  @media (max-width: 480px) {
+    .content {
+      width: 100%;
     }
   }
 </style>
