@@ -471,4 +471,19 @@ const words = [
       transform: translateX(-50%);
     }
   }
+
+  @media (max-width: 480px) {
+    .wrapper {
+      .text-scroll {
+        font-size: 2rem;
+      }
+      .tech-logos {
+        --gap: 1rem;
+        padding: 0.5rem 0;
+        & > svg {
+          transform: scale(0.6);
+        }
+      }
+    }
+  }
 </style>
