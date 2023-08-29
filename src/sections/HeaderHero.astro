@@ -5,11 +5,9 @@ import WavesBackground from '../components/WavesBackground.astro'
 <section id="home">
   <h1>
     <span class="line animated">
-      <span class="color-transition">
-        Hello, je suis <span class="text-gradient">Eliot Bas</span>,
-      </span>
+      Hello, je suis <span class="text-gradient">Eliot Bas</span>,
     </span>
-    <br /><span class="bg-text line animated">développeur web freelance</span>
+    <span class="bg-text line animated">développeur web freelance</span>
   </h1>
   <WavesBackground />
 </section>
@@ -22,15 +20,12 @@ import WavesBackground from '../components/WavesBackground.astro'
     align-items: center;
     position: relative;
     h1 {
-      padding-left: 10%;
+      padding: 0 10%;
       transform: translateY(-50%);
-      font-size: clamp(1rem, 5vw, 5rem);
+      font-size: clamp(3rem, 5vw, 5rem);
       font-weight: 800;
       line-height: 1.4;
       margin: 0;
-      .color-transition {
-        transition: color var(--theme-transition);
-      }
       .text-gradient {
         color: var(--accent);
       }
@@ -42,16 +37,26 @@ import WavesBackground from '../components/WavesBackground.astro'
       .line {
         display: inline-block;
         transform-origin: left center;
-        transition: transform 1s cubic-bezier(0, 0, 0.16, 1);
         &:first-of-type {
+          margin-bottom: 0.2rem;
           transition-delay: 0.2s;
+          transition: color var(--theme-transition),
+            transform 1s cubic-bezier(0, 0, 0.16, 1) 0.2s;
         }
         &:last-of-type {
-          transition-delay: 0.35s;
+          transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.35s;
         }
       }
       .animated {
         transform: translateY(40px) rotate(15deg);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    #home {
+      h1 {
+        transform: translateY(-20%);
       }
     }
   }
