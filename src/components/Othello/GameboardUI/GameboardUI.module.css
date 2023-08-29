@@ -46,7 +46,14 @@
 
 @media screen and (max-width: 960px) {
   .gameboard {
-    height: clamp(200px, 80vmin, 1000px);
-    width: clamp(200px, 80vmin, 1000px);
+    height: max(80vmin, 430px);
+    width: max(80vmin, 430px);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .gameboard {
+    height: 90vmin;
+    width: 90vmin;
   }
 }
