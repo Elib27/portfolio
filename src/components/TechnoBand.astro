@@ -451,8 +451,7 @@ const words = [
       align-items: center;
       gap: var(--gap);
       width: fit-content;
-      padding: 1rem 0;
-      padding-right: var(--gap);
+      padding: 1rem var(--gap) 1rem 0;
       color: var(--text);
       user-select: none;
       animation: slide 10.5s linear infinite;
@@ -479,7 +478,7 @@ const words = [
       }
       .tech-logos {
         --gap: 1rem;
-        padding: 0.5rem 0;
+        padding: 0.5rem var(--gap) 0.5rem 0;
         & > svg {
           transform: scale(0.6);
         }
