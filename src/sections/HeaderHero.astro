@@ -56,7 +56,19 @@ import WavesBackground from '../components/WavesBackground.astro'
   @media (max-width: 768px) {
     #home {
       h1 {
+        font-size: min(12vw, 3.5rem);
         transform: translateY(-20%);
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    #home {
+      h1 {
+        padding: 0 5%;
+        .bg-text {
+          padding: 0 1rem 0.2rem 1rem;
+        }
       }
     }
   }
