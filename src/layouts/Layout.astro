@@ -30,7 +30,7 @@ const { title } = Astro.props
   </body>
 </html>
 
-<style is:global>
+<style lang="scss" is:global>
   :root {
     --secondary: #d2d4ff;
     --accent: #585efb;
@@ -62,6 +62,9 @@ const { title } = Astro.props
   body {
     margin: 0;
     overflow-x: hidden;
+    &.no-scroll {
+      overflow: hidden;
+    }
   }
   h1,
   h2,

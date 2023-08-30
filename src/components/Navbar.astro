@@ -10,55 +10,93 @@ const { languageLink } = Astro.props
 
 <div class="nav-wrapper">
   <Logo />
-  <div class="nav-container animated">
-    <nav>
-      <ul>
-        <li>
-          <a href="#about">A propos</a>
-        </li>
-        <li>
-          <a href="#projects">Projets</a>
-          <li>
-            <a href="#contact">Contact</a>
-          </li>
-        </li>
-      </ul>
-      <!-- <a class="lang" href=`/${languageLink}`>{languageLink}</a> -->
-      <ToggleThemeButton />
-    </nav>
-  </div>
+  <button class="hamburger" aria-expanded="false">
+    <span class="line"></span>
+    <span class="line"></span>
+    <span class="line"></span>
+  </button>
+  <nav class="desktop animated" aria-label="Navigation sur ordinateur">
+    <ul>
+      <li><a href="#about">A propos</a></li>
+      <li><a href="#projects">Projets</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <!-- <a class="lang" href=`/${languageLink}`>{languageLink}</a> -->
+    <ToggleThemeButton />
+  </nav>
+</div>
+<nav class="mobile" aria-label="Navigation sur mobile">
+  <ul>
+    <li><a href="#about">A propos</a></li>
+    <li><a href="#projects">Projets</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
 
-  <style lang="scss">
-    .nav-wrapper {
-      position: fixed;
-      top: 1rem;
-      left: 0;
-      height: 60px;
-      width: 100%;
+<style lang="scss">
+  .nav-wrapper {
+    position: fixed;
+    top: 1rem;
+    left: 0;
+    height: 60px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    z-index: 999;
+    pointer-events: none;
+    .hamburger {
+      height: 34px;
+      width: 40px;
+      background: transparent;
+      border: none;
+      padding: 0;
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
-      align-items: center;
-      gap: 4rem;
-      padding: 0 2rem;
-      z-index: 999;
-      pointer-events: none;
-      .nav-container {
-        padding: 0 1.6rem;
-        background-color: var(--nav-background);
-        border-radius: 30px;
-        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
-        pointer-events: all;
-        transform-origin: left center;
-        transition: background-color var(--theme-transition),
-          transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
-        &.animated {
-          transform: translateY(20px) rotate(8deg);
+      cursor: pointer;
+      pointer-events: all;
+      display: none;
+      .line {
+        height: 4px;
+        width: 100%;
+        background-color: var(--text);
+        transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+      }
+      &.is-open {
+        .line {
+          &:nth-child(1) {
+            transform: translateY(15px) rotate(45deg);
+          }
+          &:nth-child(2) {
+            opacity: 0;
+          }
+          &:nth-child(3) {
+            transform: translateY(-15px) rotate(-45deg);
+          }
         }
       }
     }
-    nav {
-      display: flex;
-      align-items: center;
+  }
+  .lang {
+    text-transform: uppercase;
+    font-size: 1rem;
+    font-weight: 400;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &.desktop {
+      padding: 0 1.6rem;
+      background-color: var(--nav-background);
+      border-radius: 30px;
+      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
+      pointer-events: all;
+      transform-origin: left center;
+      transition: background-color var(--theme-transition),
+        transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
       gap: 1.4rem;
       ul {
         display: flex;
@@ -74,11 +112,74 @@ const { languageLink } = Astro.props
           transition: color var(--theme-transition);
         }
       }
+      &.animated {
+        transform: translateY(20px) rotate(8deg);
+      }
     }
-    .lang {
-      text-transform: uppercase;
-      font-size: 1rem;
-      font-weight: 400;
+    &.mobile {
+      height: 100vh;
+      width: 100%;
+      position: fixed;
+      background-color: var(--nav-background);
+      justify-content: center;
+      display: none;
+      z-index: 10;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0, 0, 0.16, 1),
+        opacity 0.2s cubic-bezier(0, 0, 0.16, 1);
+      &.is-open {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        a {
+          font-size: 2.4rem;
+          line-height: 1.8;
+        }
+      }
     }
-  </style>
-</div>
+  }
+
+  @media (max-width: 768px) {
+    .nav-wrapper {
+      .hamburger {
+        display: flex;
+      }
+    }
+    nav {
+      &.desktop {
+        display: none;
+      }
+      &.mobile {
+        display: flex;
+      }
+    }
+  }
+</style>
+
+<script>
+  const hamburger = document.querySelector<HTMLButtonElement>('.hamburger')
+  const mobileNav = document.querySelector<HTMLElement>('nav.mobile')
+  console.log('mobileNav', mobileNav)
+
+  function toggleHamburger(hamburger: HTMLButtonElement) {
+    hamburger.classList.toggle('is-open')
+    hamburger.ariaExpanded = hamburger.ariaExpanded =
+      hamburger.ariaExpanded === 'true' ? 'false' : 'true'
+  }
+
+  const toggleMobileNav = (mobileNav: HTMLElement) =>
+    mobileNav.classList.toggle('is-open')
+
+  const togglePageScroll = () => document.body.classList.toggle('no-scroll')
+
+  hamburger?.addEventListener('click', () => {
+    if (!mobileNav) return
+    toggleHamburger(hamburger)
+    toggleMobileNav(mobileNav)
+    togglePageScroll()
+  })
+</script>
