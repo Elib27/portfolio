@@ -73,7 +73,7 @@
 
 @media (max-width: 480px) {
   .description {
-    width: 90%;
+    width: 100%;
   }
   .techno {
     font-size: 0.9rem;
