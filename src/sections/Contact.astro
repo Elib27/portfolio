@@ -114,7 +114,7 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
         color: var(--black);
         &::after {
           content: '';
-          height: 3px;
+          height: 0.18rem;
           width: 100%;
           background-color: var(--black);
           position: absolute;
@@ -151,7 +151,6 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
     .container {
       .bubble {
         padding: 2.8rem 4rem;
-        margin-bottom: 5rem;
         border-radius: 1.6rem;
         &::after {
           border-top: 6rem solid var(--secondary);
@@ -167,18 +166,25 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
 
   @media (max-width: 480px) {
     .container {
+      p {
+        width: 100%;
+      }
       .bubble {
-        padding: 2.4rem 3.2rem;
-        margin-bottom: 5rem;
+        padding: 0;
+        width: 100%;
+        aspect-ratio: 11/3;
         border-radius: 1.4rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         &::after {
           border-top: 6rem solid var(--secondary);
           border-right: 8rem solid transparent;
           bottom: -2.6rem;
         }
-        // .email {
-        //   font-size: clamp(1rem, 6vw, 2rem);
-        // }
+        .email::after {
+          height: 0.15rem;
+        }
       }
     }
   }
