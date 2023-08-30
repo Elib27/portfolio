@@ -161,25 +161,40 @@ const { languageLink } = Astro.props
 </style>
 
 <script>
-  const hamburger = document.querySelector<HTMLButtonElement>('.hamburger')
-  const mobileNav = document.querySelector<HTMLElement>('nav.mobile')
-  console.log('mobileNav', mobileNav)
-
-  function toggleHamburger(hamburger: HTMLButtonElement) {
+  function toggleHamburger(hamburger: HTMLButtonElement | null) {
+    if (!hamburger) return
     hamburger.classList.toggle('is-open')
     hamburger.ariaExpanded = hamburger.ariaExpanded =
       hamburger.ariaExpanded === 'true' ? 'false' : 'true'
   }
 
-  const toggleMobileNav = (mobileNav: HTMLElement) =>
-    mobileNav.classList.toggle('is-open')
+  const toggleMobileNav = (mobileNav: HTMLElement | null) =>
+    mobileNav?.classList.toggle('is-open')
 
   const togglePageScroll = () => document.body.classList.toggle('no-scroll')
 
-  hamburger?.addEventListener('click', () => {
-    if (!mobileNav) return
+  function toggleMobileNavigation(
+    hamburger: HTMLButtonElement | null,
+    mobileNav: HTMLElement | null
+  ) {
     toggleHamburger(hamburger)
     toggleMobileNav(mobileNav)
     togglePageScroll()
-  })
+  }
+
+  const hamburger = document.querySelector<HTMLButtonElement>('.hamburger')
+  const mobileNav = document.querySelector<HTMLElement>('nav.mobile')
+
+  hamburger?.addEventListener('click', () =>
+    toggleMobileNavigation(hamburger, mobileNav)
+  )
+
+  const mobileNavLinks =
+    document.querySelectorAll<HTMLAnchorElement>('nav.mobile a')
+
+  mobileNavLinks.forEach((link) =>
+    link.addEventListener('click', () =>
+      toggleMobileNavigation(hamburger, mobileNav)
+    )
+  )
 </script>
