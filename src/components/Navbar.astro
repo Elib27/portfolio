@@ -10,7 +10,7 @@ const { languageLink } = Astro.props
 
 <div class="nav-wrapper">
   <Logo />
-  <div class="mobile-buttons">
+  <div class="mobile-buttons animated">
     <ToggleThemeButton id="mobile" />
     <button class="hamburger" aria-expanded="false">
       <span class="line"></span>
@@ -54,6 +54,7 @@ const { languageLink } = Astro.props
       display: none;
       align-items: center;
       gap: 2rem;
+      transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
     }
     .hamburger {
       height: 30px;
@@ -64,6 +65,7 @@ const { languageLink } = Astro.props
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      -webkit-tap-highlight-color: transparent;
       cursor: pointer;
       .line {
         height: 4px;
@@ -93,6 +95,9 @@ const { languageLink } = Astro.props
     font-size: 1rem;
     font-weight: 400;
   }
+  .animated {
+    transform: translateY(20px) rotate(8deg);
+  }
   nav {
     display: flex;
     align-items: center;
@@ -121,9 +126,6 @@ const { languageLink } = Astro.props
           white-space: nowrap;
           transition: color var(--theme-transition);
         }
-      }
-      &.animated {
-        transform: translateY(20px) rotate(8deg);
       }
     }
     &.mobile {
@@ -168,6 +170,12 @@ const { languageLink } = Astro.props
       &.mobile {
         display: flex;
       }
+    }
+  }
+  @media (max-width: 480px) {
+    .nav-wrapper {
+      top: 0.6rem;
+      padding: 0 2rem 0 1.2rem;
     }
   }
 </style>
