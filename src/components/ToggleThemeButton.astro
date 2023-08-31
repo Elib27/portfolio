@@ -1,4 +1,5 @@
 ---
+
 ---
 
 <button class="toggle-theme" aria-label="toggle theme">
@@ -75,7 +76,9 @@
         transition: transform 0.25s ease;
       }
       .sun-beams {
-        transition: opacity 0.15s ease, transform 0.25s ease;
+        transition:
+          opacity 0.15s ease,
+          transform 0.25s ease;
       }
       &[data-theme='light'] {
         & > .sun {
@@ -98,11 +101,9 @@
 </style>
 
 <script>
-  const toggleThemeButton =
-    document.querySelector<HTMLButtonElement>('.toggle-theme')
-  const themeIcon = document.querySelector<SVGElement>('.theme-icon')
-
-  initTheme()
+  const toggleThemeButtons =
+    document.querySelectorAll<HTMLButtonElement>('.toggle-theme')
+  const themeIcons = document.querySelectorAll<SVGElement>('.theme-icon')
 
   function initTheme() {
     const theme = getLocalStorageTheme() || getPreferredTheme()
@@ -114,10 +115,7 @@
     updateDataTheme()
   }
 
-  function getLocalStorageTheme() {
-    const storedTheme = localStorage.getItem('theme')
-    return storedTheme ? storedTheme : null
-  }
+  const getLocalStorageTheme = () => localStorage.getItem('theme')
 
   function getPreferredTheme() {
     const isDarkTheme = window.matchMedia(
@@ -127,22 +125,12 @@
   }
 
   function updateDataTheme() {
-    if (themeIcon) {
-      const currentTheme = document.documentElement.classList.contains(
-        'dark-theme'
-      )
-        ? 'dark'
-        : 'light'
-      themeIcon.setAttribute('data-theme', currentTheme)
-    }
-  }
-
-  toggleThemeButton?.addEventListener('click', toggleTheme)
-
-  function toggleTheme() {
-    document.documentElement.classList.toggle('dark-theme')
-    updateDataTheme()
-    updatePreferredTheme()
+    const currentTheme = document.documentElement.classList.contains(
+      'dark-theme'
+    )
+      ? 'dark'
+      : 'light'
+    themeIcons.forEach((icon) => icon?.setAttribute('data-theme', currentTheme))
   }
 
   function updatePreferredTheme() {
@@ -152,4 +140,16 @@
       localStorage.setItem('theme', 'light')
     }
   }
+
+  function toggleTheme() {
+    document.documentElement.classList.toggle('dark-theme')
+    updateDataTheme()
+    updatePreferredTheme()
+  }
+
+  toggleThemeButtons.forEach((button) =>
+    button.addEventListener('click', toggleTheme)
+  )
+
+  initTheme()
 </script>

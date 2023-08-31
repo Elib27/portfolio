@@ -10,11 +10,14 @@ const { languageLink } = Astro.props
 
 <div class="nav-wrapper">
   <Logo />
-  <button class="hamburger" aria-expanded="false">
-    <span class="line"></span>
-    <span class="line"></span>
-    <span class="line"></span>
-  </button>
+  <div class="mobile-buttons">
+    <ToggleThemeButton />
+    <button class="hamburger" aria-expanded="false">
+      <span class="line"></span>
+      <span class="line"></span>
+      <span class="line"></span>
+    </button>
+  </div>
   <nav class="desktop animated" aria-label="Navigation sur ordinateur">
     <ul>
       <li><a href="#about">A propos</a></li>
@@ -46,34 +49,40 @@ const { languageLink } = Astro.props
     padding: 0 2rem;
     z-index: 999;
     pointer-events: none;
+    .mobile-buttons {
+      cursor: pointer;
+      pointer-events: all;
+      display: none;
+      align-items: center;
+      gap: 2rem;
+    }
     .hamburger {
-      height: 34px;
-      width: 40px;
+      height: 30px;
+      width: 36px;
       background: transparent;
       border: none;
       padding: 0;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      cursor: pointer;
-      pointer-events: all;
-      display: none;
       .line {
         height: 4px;
         width: 100%;
         background-color: var(--text);
-        transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+        transition:
+          transform 0.2s ease-out,
+          opacity 0.2s ease-out;
       }
       &.is-open {
         .line {
           &:nth-child(1) {
-            transform: translateY(15px) rotate(45deg);
+            transform: translateY(13px) rotate(45deg);
           }
           &:nth-child(2) {
             opacity: 0;
           }
           &:nth-child(3) {
-            transform: translateY(-15px) rotate(-45deg);
+            transform: translateY(-13px) rotate(-45deg);
           }
         }
       }
@@ -95,7 +104,8 @@ const { languageLink } = Astro.props
       box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
       pointer-events: all;
       transform-origin: left center;
-      transition: background-color var(--theme-transition),
+      transition:
+        background-color var(--theme-transition),
         transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
       gap: 1.4rem;
       ul {
@@ -126,7 +136,8 @@ const { languageLink } = Astro.props
       z-index: 10;
       transform: translateX(100%);
       opacity: 0;
-      transition: transform 0.3s cubic-bezier(0, 0, 0.16, 1),
+      transition:
+        transform 0.3s cubic-bezier(0, 0, 0.16, 1),
         opacity 0.2s cubic-bezier(0, 0, 0.16, 1);
       &.is-open {
         transform: translateX(0);
@@ -145,7 +156,7 @@ const { languageLink } = Astro.props
 
   @media (max-width: 768px) {
     .nav-wrapper {
-      .hamburger {
+      .mobile-buttons {
         display: flex;
       }
     }

@@ -1,4 +1,5 @@
 ---
+
 ---
 
 <a class="link animated" href="/" aria-label="Homepage">
@@ -40,6 +41,14 @@
       path {
         fill: var(--background);
         transition: fill var(--theme-transition);
+      }
+    }
+  }
+  @media (max-width: 480px) {
+    .link {
+      .logo {
+        width: 46px;
+        height: 46px;
       }
     }
   }
