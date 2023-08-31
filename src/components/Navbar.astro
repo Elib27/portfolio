@@ -11,7 +11,7 @@ const { languageLink } = Astro.props
 <div class="nav-wrapper">
   <Logo />
   <div class="mobile-buttons">
-    <ToggleThemeButton />
+    <ToggleThemeButton id="mobile" />
     <button class="hamburger" aria-expanded="false">
       <span class="line"></span>
       <span class="line"></span>
@@ -25,7 +25,7 @@ const { languageLink } = Astro.props
       <li><a href="#contact">Contact</a></li>
     </ul>
     <!-- <a class="lang" href=`/${languageLink}`>{languageLink}</a> -->
-    <ToggleThemeButton />
+    <ToggleThemeButton id="desktop" />
   </nav>
 </div>
 <nav class="mobile" aria-label="Navigation sur mobile">
@@ -50,7 +50,6 @@ const { languageLink } = Astro.props
     z-index: 999;
     pointer-events: none;
     .mobile-buttons {
-      cursor: pointer;
       pointer-events: all;
       display: none;
       align-items: center;
@@ -65,6 +64,7 @@ const { languageLink } = Astro.props
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      cursor: pointer;
       .line {
         height: 4px;
         width: 100%;
@@ -102,12 +102,12 @@ const { languageLink } = Astro.props
       background-color: var(--nav-background);
       border-radius: 30px;
       box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
-      pointer-events: all;
       transform-origin: left center;
       transition:
         background-color var(--theme-transition),
         transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
       gap: 1.4rem;
+      pointer-events: all;
       ul {
         display: flex;
         gap: 1.2rem;
@@ -138,7 +138,8 @@ const { languageLink } = Astro.props
       opacity: 0;
       transition:
         transform 0.3s cubic-bezier(0, 0, 0.16, 1),
-        opacity 0.2s cubic-bezier(0, 0, 0.16, 1);
+        opacity 0.2s cubic-bezier(0, 0, 0.16, 1),
+        background-color var(--theme-transition);
       &.is-open {
         transform: translateX(0);
         opacity: 1;
