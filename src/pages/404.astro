@@ -5,10 +5,14 @@ import WavesBackground from '../components/WavesBackground.astro'
 import ToggleThemeButton from '../components/ToggleThemeButton.astro'
 ---
 
-<Layout title="Page Introuvable">
+<Layout
+  title="BAS Eliot Portfolio - Page Introuvable"
+  metaDescription="La page que vous cherchez n'existe pas."
+  noIndex
+>
   <div class="nav-wrapper">
     <Logo />
-    <ToggleThemeButton />
+    <ToggleThemeButton id="desktop" />
   </div>
   <div class="wrapper">
     <h1>Page introuvable 🔭</h1>
@@ -89,7 +93,8 @@ import ToggleThemeButton from '../components/ToggleThemeButton.astro'
           grid-area: 2 / 1 / 3 / 2;
         }
         &:nth-child(2n + 1) {
-          animation: fourRotation var(--rotationParams),
+          animation:
+            fourRotation var(--rotationParams),
             colorChange var(--colorParams);
         }
       }

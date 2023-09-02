@@ -3,17 +3,20 @@ import Loader from '../components/Loader.astro'
 
 export interface Props {
   title: string
+  metaDescription: string
+  noIndex?: boolean
 }
 
-const { title } = Astro.props
+const { title, metaDescription, noIndex } = Astro.props
 ---
 
 <!doctype html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
     <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={metaDescription} />
+    {noIndex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
