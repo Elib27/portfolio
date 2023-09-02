@@ -40,7 +40,8 @@ import WavesBackground from '../components/WavesBackground.astro'
         &:first-of-type {
           margin-bottom: 0.2rem;
           transition-delay: 0.2s;
-          transition: color var(--theme-transition),
+          transition:
+            color var(--theme-transition),
             transform 1s cubic-bezier(0, 0, 0.16, 1) 0.2s;
         }
         &:last-of-type {
@@ -53,10 +54,18 @@ import WavesBackground from '../components/WavesBackground.astro'
     }
   }
 
+  @media (max-width: 870px) {
+    #home {
+      h1 {
+        transform: translateY(-30%);
+      }
+    }
+  }
+
   @media (max-width: 768px) {
     #home {
       h1 {
-        font-size: min(12vw, 3.5rem);
+        font-size: min(12vw, 3rem);
         transform: translateY(-20%);
       }
     }

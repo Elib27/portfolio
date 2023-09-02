@@ -129,7 +129,7 @@ const coverPosition = inverted ? 'left' : 'right'
       white-space: nowrap;
       justify-content: center;
       align-items: center;
-      column-gap: 2rem;
+      gap: 2rem;
       &.inverted {
         flex-direction: row-reverse;
       }
@@ -211,6 +211,7 @@ const coverPosition = inverted ? 'left' : 'right'
         margin-top: 1rem;
         width: 100%;
         flex-direction: row-reverse;
+        flex-wrap: wrap;
         transform: translateX(0);
       }
     }
