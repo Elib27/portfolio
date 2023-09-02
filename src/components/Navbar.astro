@@ -73,7 +73,8 @@ const { languageLink } = Astro.props
         background-color: var(--text);
         transition:
           transform 0.2s ease-out,
-          opacity 0.2s ease-out;
+          opacity 0.2s ease-out,
+          background-color var(--theme-transition);
       }
       &.is-open {
         .line {
