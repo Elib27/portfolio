@@ -484,6 +484,7 @@ const words = [
   .wrapper {
     width: 100%;
     padding: 2rem 0;
+    overflow-x: hidden;
     position: relative;
     .text-scroll {
       width: fit-content;
@@ -525,7 +526,6 @@ const words = [
           }
         }
         &.launch {
-          position: sticky;
           animation:
             launch 4s cubic-bezier(0.8, 0, 0.42, 0.42) 0.2s forwards,
             horizontalShaking 1s ease-out;
