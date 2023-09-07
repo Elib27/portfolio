@@ -485,7 +485,6 @@ const words = [
     width: 100%;
     padding: 2rem 0;
     position: relative;
-    overflow-x: hidden;
     .text-scroll {
       width: fit-content;
       white-space: nowrap;
@@ -515,6 +514,27 @@ const words = [
         flex-shrink: 0;
         transform: scale(0.8);
       }
+      .astro {
+        path:first-of-type {
+          transition: color 0.15s ease-in;
+        }
+        &:hover {
+          path:first-of-type {
+            transition: color 0.15s ease-out;
+            color: #ff5e00;
+          }
+        }
+        &.launch {
+          position: sticky;
+          animation:
+            launch 4s cubic-bezier(0.8, 0, 0.42, 0.42) 0.2s forwards,
+            horizontalShaking 1s ease-out;
+          animation-composition: add;
+          path:first-of-type {
+            color: #ff5e00;
+          }
+        }
+      }
     }
   }
 
@@ -524,6 +544,42 @@ const words = [
     }
     100% {
       transform: translateX(-50%);
+    }
+  }
+
+  @keyframes launch {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-300vh);
+    }
+  }
+
+  @keyframes horizontalShaking {
+    0% {
+      transform: translateX(0);
+    }
+    15% {
+      transform: translateX(3px);
+    }
+    30% {
+      transform: translateX(-4px);
+    }
+    45% {
+      transform: translateX(3px);
+    }
+    60% {
+      transform: translateX(-3px);
+    }
+    75% {
+      transform: translateX(4px);
+    }
+    90% {
+      transform: translateX(-2px);
+    }
+    100% {
+      transform: translateX(0);
     }
   }
 
@@ -542,3 +598,32 @@ const words = [
     }
   }
 </style>
+
+<script>
+  const astroLogos = document.querySelectorAll<SVGElement>('.astro')
+
+  function isInViewport(el: SVGElement) {
+    const rect = el.getBoundingClientRect()
+    return rect.bottom <= window.innerHeight && rect.right <= window.innerWidth
+  }
+
+  function resetLaunchWhenNotVisible(el: SVGElement) {
+    const intervalId = setInterval(() => {
+      if (!isInViewport(el)) {
+        el?.classList.remove('launch')
+        clearInterval(intervalId)
+      }
+    }, 1000)
+  }
+
+  function launchRocket(astroLogo: SVGElement) {
+    astroLogo?.classList.add('launch')
+    setTimeout(() => resetLaunchWhenNotVisible(astroLogo), 5000)
+  }
+
+  astroLogos?.forEach((astroLogo) => {
+    astroLogo?.addEventListener('click', () =>
+      astroLogos.forEach((logo) => launchRocket(logo))
+    )
+  })
+</script>
