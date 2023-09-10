@@ -34,7 +34,7 @@ export const ui = {
     'nav.about': 'About',
     'nav.projects': 'Projects',
     'nav.contact': 'Contact',
-    'header.title-1': 'Hello, I am ',
+    'header.title-1': 'Hello, I\'m ',
     'header.title-2': 'a freelance web developer',
     'about.title': 'About',
     'technologies.title': 'Technologies',
