@@ -1,7 +1,6 @@
 ---
 import { getLangFromUrl, useTranslations } from '../i18n/utils'
-
-import { getCollection } from 'astro:content'
+import { getCollection, getEntry } from 'astro:content'
 import SectionLayout from '../layouts/SectionLayout.astro'
 import Project from '../components/Project.astro'
 import OthelloProject from '../components/Othello/OthelloProject'
@@ -12,9 +11,10 @@ const t = useTranslations(lang)
 const projects = await getCollection('projects', ({ id }) =>
   id.startsWith(`${lang}/`)
 )
+const othelloDescription = await getEntry('othello', `${lang}/othello`)
 ---
 
-<SectionLayout title={t('section.title.projects')} id="projects">
+<SectionLayout title={t('projects.title') as string} id="projects">
   <div class="projects-container">
     {
       projects.map((project, index) => (
@@ -30,7 +30,11 @@ const projects = await getCollection('projects', ({ id }) =>
         />
       ))
     }
-    <OthelloProject client:idle />
+    <OthelloProject
+      client:idle
+      buttonTitle={t('projects.last-project') as string}
+      description= {othelloDescription.body}
+    />
   </div>
 </SectionLayout>
 

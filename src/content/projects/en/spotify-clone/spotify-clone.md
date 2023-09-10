@@ -7,4 +7,4 @@ demoLink: "https://spotify-clone-nextjs-elib27.vercel.app"
 repoLink: "https://github.com/Elib27/spotify-clone-nextjs"
 ---
 
-Ce projet est une reproduction du site de Spotify. Les fonctionnalités et le design étant déjà définis pour ce site, j'ai pu me concentrer sur leur implémentation. J'ai utilisé le framework Next.js pour le développement. Les défis majeurs furent la gestion de l'interaction avec l'API de Spotify via un gestionnaire d'état côté serveur : React Query, la gestion de l'état côté client avec Zustand, la création du lecteur ainsi que l'authentification, réalisée avec NextAuth.
+This project is a reproduction of the Spotify website. The features and design being already defined for this site, I was able to focus on their implementation. I used the Next.js framework for development. The major challenges were the management of the interaction with the Spotify API via a server-side state manager: React Query, the management of the client-side state with Zustand, the creation of the player as well as the authentication, carried out with NextAuth.

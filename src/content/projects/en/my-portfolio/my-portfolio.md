@@ -7,4 +7,4 @@ demoLink: "https://eliotbas.fr"
 repoLink: "https://github.com/Elib27/portfolio"
 ---
 
-Ce projet est tout simplement mon portfolio actuel, où vous vous trouvez en ce moment même ! Je l'ai construit en mettant l'accent sur le référencement, la performance et le design. L'expérience utilisateur, caractérisée par la fluidité, le design et l'accessibilité, était primordiale. J'ai utilisé Astro pour ce site, implémenté un thème clair et sombre, et exploité la bibliothèque SolidJS pour les éléments dynamiques et Three.js pour l’animation du header. Bien entendu, un easter egg est caché quelque part !
+This project is simply my current portfolio, where you are right now! I built it by focusing on SEO, performance and design. The user experience, characterized by fluidity, design and accessibility, was paramount. I used Astro for this website, implemented a light and dark theme, and used the SolidJS library for the dynamic elements and Three.js for the header animation. Of course, an easter egg is hidden somewhere!

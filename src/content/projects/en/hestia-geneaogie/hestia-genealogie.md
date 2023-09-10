@@ -7,4 +7,4 @@ demoLink: "https://estienne-genealogie.fr"
 repoLink: "https://github.com/Elib27/site-genealogie"
 ---
 
-It is a vitrine website conçu pour une généalogiste / historienne du bâti, mettant en avant ses services et sa vision. J'ai développé ce site en mettant l'accent sur le référencement, la performance et une expérience utilisateur fluide. Les mots clés et la performance ont été des priorités pour obtenir le meilleur classement possible dans les résultats de recherche. Le site atteint une note de 100 au Lighthouse, avec un temps de chargement initial de 0.3s.
+It is a showcase website designed for a genealogist / historian of the built heritage, highlighting her services and vision. I developed this site by focusing on SEO, performance and a smooth user experience. Keywords and performance were priorities to get the best possible ranking in search results. The site reaches a score of 100 on Lighthouse, with an initial loading time of 0.3s.

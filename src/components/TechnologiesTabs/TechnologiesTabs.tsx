@@ -23,8 +23,6 @@ import VercelLogo from "../../assets/technologies/vercel.svg"
 import GithubLogo from "../../assets/technologies/github.svg"
 import GitlabLogo from "../../assets/technologies/gitlab.svg"
 
-const tab_links = ["Technos principales", "Autres technos", "Outils"];
-
 function Tab(props: { tabIndex: number, currentTab: number, children: JSXElement}) {
   return (
     <div classList={{
@@ -39,14 +37,14 @@ function Tab(props: { tabIndex: number, currentTab: number, children: JSXElement
   )
 }
 
-export default function TechnologiesTabs() {
+export default function TechnologiesTabs(props: {tab_links: string[]}) {
 
   const [tab, setTab] = createSignal(1);
 
   return (
     <div class={styles.container}>
       <div class={styles.tab_links_container}>
-        {tab_links.map((link, index) => (
+        {props.tab_links.map((link, index) => (
           <button
             onClick={() => setTab(index + 1)}
             classList={{ [styles.tab_link]: true, [styles.tab_link_active]: tab() === index + 1 }}

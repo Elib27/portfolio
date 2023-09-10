@@ -10,7 +10,7 @@ const entry = await getEntry('about', `${lang}/about`)
 const { Content: AboutContent } = await entry.render()
 ---
 
-<SectionLayout title={t('section.title.about')} id="about">
+<SectionLayout title={t('about.title') as string} id="about">
   <div class="content">
     <AboutContent />
   </div>

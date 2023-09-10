@@ -1,7 +1,7 @@
-Welcome on my website, in my world ! I am a freelance web <span class="highlight">developer</span> with a passional relation with the code, started in my childhood with Arduino and DIY. Depuis 2018, je cultive mon intérêt pour le développement web, m'efforçant toujours d'allier esthétique, fonctionnalité et <span class="highlight">performance</span> dans chacun de mes projets.
+Welcome to my site, in my own world! I am a freelance web <span class="highlight">developer</span> with a passionate relationship for code, started in my childhood with Arduino and its hacks. Since 2018, I have been cultivating my interest in web development, always striving to combine aesthetics, functionality and <span class="highlight">performance</span> in each of my projects.
 
-Mes compétences s'étendent sur un large éventail d'outils et de technologies, notamment React, Next.js, SolidJS, et le dernier en date : Astro, auquel je <span class="highlight">contribue</span> activement en open source.
+My skills extend over a wide range of tools and technologies, including React, Next.js, SolidJS, and the latest in date: Astro, to which I actively <span class="highlight">contribute</span> in open source.
 
-Ma philosophie inclut une conception réactive pour une expérience utilisateur optimale, une obsession pour les performances web et un engagement envers <span class="highlight">l'accessibilité</span> pour tous.
+My philosophy includes a responsive design for an optimal user experience, an obsession with web performance and a commitment to <span class="highlight">accessibility</span> for all.
 
-Si vous recherchez un développeur web qui combine expertise technique, créativité et dévouement, vous êtes au bon endroit !
+If you are looking for a web developer who combines technical expertise, creativity and commitment, you have come to the right place!

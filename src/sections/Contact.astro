@@ -9,7 +9,7 @@ const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 ---
 
-<SectionLayout title={t('section.title.about')} id="contact">
+<SectionLayout title={t('contact.title') as string} id="contact">
   <div class="container">
     <p>
       <span>{t('contact.cta-1')}</span>
