@@ -1,9 +1,16 @@
 ---
+import { getLangFromUrl, useTranslations } from '../i18n/utils.js'
+import { getEntry } from 'astro:content'
 import SectionLayout from '../layouts/SectionLayout.astro'
-import { Content as AboutContent } from '../content/about/about.md'
+
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
+
+const entry = await getEntry('about', `${lang}/about`)
+const { Content: AboutContent } = await entry.render()
 ---
 
-<SectionLayout title="A propos" id="about">
+<SectionLayout title={t('section.title.about')} id="about">
   <div class="content">
     <AboutContent />
   </div>

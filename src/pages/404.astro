@@ -1,21 +1,23 @@
 ---
+import { getLangFromUrl, useTranslations } from '../i18n/utils'
 import Layout from '../layouts/Layout.astro'
 import Logo from '../components/Logo.astro'
 import WavesBackground from '../components/WavesBackground.astro'
 import ToggleThemeButton from '../components/ToggleThemeButton.astro'
+
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
+
+const homeLink = lang === 'fr' ? '/' : `/${lang}`
 ---
 
-<Layout
-  title="BAS Eliot Portfolio - Page Introuvable"
-  metaDescription="La page que vous cherchez n'existe pas."
-  noIndex
->
+<Layout noIndex>
   <div class="nav-wrapper">
     <Logo />
     <ToggleThemeButton id="desktop" />
   </div>
   <div class="wrapper">
-    <h1>Page introuvable 🔭</h1>
+    <h1>{t('pageNotFound.title')} 🔭</h1>
     <div class="container">
       <div class="four-container">
         <div class="four">4</div>
@@ -25,7 +27,7 @@ import ToggleThemeButton from '../components/ToggleThemeButton.astro'
       </div>
       <div class="zero">0</div>
     </div>
-    <a class="home-link" href="/">Retour au site</a>
+    <a class="home-link" href={homeLink}>{t('pageNotFound.button')}</a>
   </div>
   <WavesBackground />
 </Layout>

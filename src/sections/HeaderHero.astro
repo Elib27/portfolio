@@ -1,13 +1,18 @@
 ---
+import { getLangFromUrl, useTranslations } from '../i18n/utils'
 import WavesBackground from '../components/WavesBackground.astro'
+
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
 ---
 
 <section id="home">
   <h1>
     <span class="line animated">
-      Hello, je suis <span class="text-gradient">Eliot Bas</span>,
+      {t('header.title-1')}
+      <span class="text-gradient">Eliot Bas</span>,
     </span>
-    <span class="bg-text line animated">développeur web freelance</span>
+    <span class="bg-text line animated">{t('header.title-2')}</span>
   </h1>
   <WavesBackground />
 </section>

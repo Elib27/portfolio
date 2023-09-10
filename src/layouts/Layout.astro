@@ -1,21 +1,23 @@
 ---
+import { getLangFromUrl, useTranslations } from '../i18n/utils'
 import Loader from '../components/Loader.astro'
 
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
+
 export interface Props {
-  title: string
-  metaDescription: string
   noIndex?: boolean
 }
 
-const { title, metaDescription, noIndex } = Astro.props
+const { noIndex } = Astro.props
 ---
 
 <!doctype html>
-<html lang="fr">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={metaDescription} />
+    <meta name="description" content={t('site.metaDescription')} />
     {noIndex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -25,7 +27,7 @@ const { title, metaDescription, noIndex } = Astro.props
       rel="stylesheet"
     />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <title>{t('site.title')}</title>
   </head>
   <body>
     <Loader />

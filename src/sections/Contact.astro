@@ -1,22 +1,24 @@
 ---
+import { getLangFromUrl, useTranslations } from '../i18n/utils'
 import SectionLayout from '../layouts/SectionLayout.astro'
 import GravityButton from '../components/GravityButton.astro'
 import LinkedinLogo from '../assets/linkedin.svg?raw'
 import GithubLogo from '../assets/technologies/github.svg?raw'
+
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
 ---
 
-<SectionLayout title="Contact" id="contact">
+<SectionLayout title={t('section.title.about')} id="contact">
   <div class="container">
     <p>
-      <span>
-        Les aventures web les plus épiques commencent par un simple clic.
-      </span>
-      <span> Qu'attendez-vous ? Contactez-moi et commençons l'aventure !</span>
+      <span>{t('contact.cta-1')}</span>
+      <span>{t('contact.cta-2')}</span>
     </p>
     <a class="bubble" href="mailto:eliot.bas.dev@gmail.com">
       <span class="email">contact@eliotbas.com</span>
     </a>
-    <p class="social-media-msg">Retrouvez-moi également sur :</p>
+    <p class="social-media-msg">{t('contact.findMeOn')}</p>
     <div class="social-media">
       <GravityButton>
         <a

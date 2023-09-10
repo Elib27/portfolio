@@ -1,8 +1,12 @@
 ---
+import { getLangFromUrl, useTranslations } from '../i18n/utils'
 import SectionLayout from '../layouts/SectionLayout.astro'
 import TechnologiesTabs from '../components/TechnologiesTabs/TechnologiesTabs.jsx'
+
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
 ---
 
-<SectionLayout title="Technologies" id="technologies">
+<SectionLayout title={t('section.title.technologies')} id="technologies">
   <TechnologiesTabs client:idle />
 </SectionLayout>
