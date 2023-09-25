@@ -1,9 +1,16 @@
 ---
+import { getLangFromUrl, useTranslations } from '../i18n/utils'
+
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
+
 const year = new Date().getFullYear()
 ---
 
 <footer>
+  <span class="hidden"></span>
   <span class="copyright">©{year} Designed & Built by BAS Eliot</span>
+  <a href="/mentions-legales" class="legal">{t('footer.legal')}</a>
 </footer>
 
 <style lang="scss">
@@ -11,10 +18,36 @@ const year = new Date().getFullYear()
     height: 100px;
     background-color: var(--black);
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
+    & > * {
+      flex-grow: 1;
+      display: block;
+      text-align: center;
+    }
     .copyright {
       color: var(--white);
+      flex-basis: 40%;
+    }
+    .legal {
+      color: var(--white);
+      flex-basis: 30%;
+      line-height: 1;
+      font-size: 0.8rem;
+    }
+    .hidden {
+      flex-basis: 30%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    footer {
+      height: 120px;
+      flex-direction: column;
+      justify-content: center;
+      & > * {
+        flex-grow: 0;
+      }
     }
   }
 </style>

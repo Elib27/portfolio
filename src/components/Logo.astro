@@ -1,8 +1,12 @@
 ---
+export interface Props {
+  link: string
+}
 
+const { link } = Astro.props
 ---
 
-<a class="link animated" href="#" aria-label="Homepage">
+<a class="link animated" href={link} aria-label="Homepage">
   <svg
     class="logo"
     width="81"

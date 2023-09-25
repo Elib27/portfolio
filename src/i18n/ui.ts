@@ -24,6 +24,7 @@ export const ui = {
     'contact.cta-1': 'Les aventures web les plus épiques commencent par un simple clic.',
     'contact.cta-2': 'Qu\'attendez-vous ? Contactez-moi et commençons l\'aventure !',
     'contact.findMeOn': 'Retrouvez moi également sur :',
+    'footer.legal': 'Mentions légales',
     'pageNotFound.title': 'Page introuvable',
     'pageNotFound.button': 'Retour au site',
 
@@ -46,6 +47,7 @@ export const ui = {
     'contact.cta-1': 'Most epic web adventures start with a simple click.',
     'contact.cta-2': 'What are you waiting for? Contact me and let\'s start the adventure!',
     'contact.findMeOn': 'Find me also on :',
+    'footer.legal': 'Legal notice',
     'pageNotFound.title': 'Page not found',
     'pageNotFound.button': 'Back to website',
   }

@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Logo from '../components/Logo.astro'
+import ToggleThemeButton from '../components/ToggleThemeButton.astro'
+import WavesBackground from '../components/WavesBackground.astro'
+import { Content } from '../content/mention-legales/fr/mentions-legales.md'
+---
+
+<Layout noIndex>
+  <div class="nav-wrapper">
+    <Logo link="/" />
+    <ToggleThemeButton id="legal-fr" />
+  </div>
+  <div class="container">
+    <Content />
+  </div>
+  <WavesBackground />
+</Layout>
+
+<style lang="scss">
+  .nav-wrapper {
+    width: 100%;
+    position: absolute;
+    top: 1rem;
+    left: 0;
+    padding: 0 3rem 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 999;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    :global(h1) {
+      margin: 5rem 0 3rem 0;
+      text-align: center;
+      font-size: 3rem;
+    }
+    :global(h2) {
+      margin-top: 3rem;
+    }
+    :global(p) {
+      line-height: 1.6;
+    }
+  }
+</style>
