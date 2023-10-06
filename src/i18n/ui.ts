@@ -31,7 +31,7 @@ export const ui = {
   },
   en: {
     'site.title': 'Eliot Bas - Freelance Web Developer',
-    'site.metaDescription': 'Freelance Web Developer based in Grenoble / Valence, France, Eliot Bas, I place my skills at your service to carry out any type of web project.',
+    'site.metaDescription': 'Freelance Web Developer based in Grenoble / Valence, France, Eliot Bas, I put my skills at your service to carry out any type of web project.',
     'nav.about': 'About',
     'nav.projects': 'Projects',
     'nav.contact': 'Contact',
