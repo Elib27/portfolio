@@ -2,7 +2,7 @@
 import { getLangFromUrl, useTranslations } from '../i18n/utils'
 import Layout from '../layouts/Layout.astro'
 import Logo from '../components/Logo.astro'
-import WavesBackground from '../components/WavesBackground.astro'
+import TopographicBackground from '../components/TopographicBackground.astro'
 import ToggleThemeButton from '../components/ToggleThemeButton.astro'
 
 const lang = getLangFromUrl(Astro.url)
@@ -29,7 +29,7 @@ const homeLink = lang === 'fr' ? '/' : `/${lang}`
     </div>
     <a class="home-link" href={homeLink}>{t('pageNotFound.button')}</a>
   </div>
-  <WavesBackground />
+  <TopographicBackground />
 </Layout>
 
 <style lang="scss">

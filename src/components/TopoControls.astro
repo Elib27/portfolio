@@ -1,0 +1,148 @@
+---
+---
+
+<div class="topo-controls">
+  <div class="topo-panel" role="region" aria-label="Animation controls">
+    <p class="topo-panel-title">Animation</p>
+
+    <div class="slider-row">
+      <label for="tc-speed">Speed</label>
+      <input id="tc-speed" type="range" data-key="timeSpeed"
+             min="0" max="0.0001" step="0.00001" value="0.00005" />
+      <span class="val" data-for="tc-speed">0.0001</span>
+    </div>
+
+    <div class="slider-row">
+      <label for="tc-noise">Noise scale</label>
+      <input id="tc-noise" type="range" data-key="noiseScale"
+             min="0.0005" max="0.008" step="0.0001" value="0.0028" />
+      <span class="val" data-for="tc-noise">0.0028</span>
+    </div>
+
+    <div class="slider-row">
+      <label for="tc-levels">Lines</label>
+      <input id="tc-levels" type="range" data-key="levels"
+             min="4" max="32" step="1" value="16" />
+      <span class="val" data-for="tc-levels">16</span>
+    </div>
+
+    <div class="slider-row">
+      <label for="tc-mradius">Mouse radius</label>
+      <input id="tc-mradius" type="range" data-key="mouseRadius"
+             min="0.01" max="0.15" step="0.01" value="0.10" />
+      <span class="val" data-for="tc-mradius">0.10</span>
+    </div>
+
+    <div class="slider-row">
+      <label for="tc-mstrength">Mouse strength</label>
+      <input id="tc-mstrength" type="range" data-key="mouseStrength"
+             min="0" max="1.5" step="0.01" value="0.72" />
+      <span class="val" data-for="tc-mstrength">0.72</span>
+    </div>
+
+    <div class="slider-row">
+      <label for="tc-lwidth">Line width</label>
+      <input id="tc-lwidth" type="range" data-key="lineWidth"
+             min="0.3" max="3" step="0.1" value="0.9" />
+      <span class="val" data-for="tc-lwidth">0.9</span>
+    </div>
+
+    <div class="slider-row">
+      <label for="tc-opacity">Opacity</label>
+      <input id="tc-opacity" type="range" data-key="opacityDeep"
+             min="0.05" max="1" step="0.01" value="0.55" />
+      <span class="val" data-for="tc-opacity">0.55</span>
+    </div>
+  </div>
+</div>
+
+<style lang="scss">
+  .topo-controls {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+    font-family: var(--font-family, inherit);
+  }
+
+  .topo-panel {
+    background: var(--bg, #f5f5f7);
+    border: 1px solid rgba(88, 94, 251, 0.15);
+    border-radius: 1rem;
+    padding: 1rem 1.2rem 1.1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .topo-panel-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent, #585efb);
+    margin: 0 0 0.2rem;
+  }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 8rem 1fr 3.5rem;
+    align-items: center;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #000;
+      white-space: nowrap;
+    }
+
+    input[type='range'] {
+      width: 100%;
+      accent-color: var(--accent, #585efb);
+      cursor: pointer;
+      height: 3px;
+    }
+
+    .val {
+      font-size: 0.65rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent, #585efb);
+      text-align: right;
+      opacity: 0.9;
+    }
+  }
+</style>
+
+<script>
+  // Wire up all sliders
+  const sliders = document.querySelectorAll<HTMLInputElement>('.topo-panel input[type="range"]')
+
+  sliders.forEach((slider) => {
+    const key     = slider.dataset.key!
+    const valSpan = document.querySelector<HTMLSpanElement>(`.val[data-for="${slider.id}"]`)
+
+    function dispatch() {
+      const raw   = parseFloat(slider.value)
+      const value = key === 'levels' ? Math.round(raw) : raw
+
+      if (valSpan) {
+        valSpan.textContent =
+          key === 'levels'
+            ? String(value)
+            : value < 0.01
+              ? value.toExponential(1)
+              : value.toFixed(value < 0.1 ? 4 : value < 1 ? 2 : 1)
+      }
+
+      window.dispatchEvent(
+        new CustomEvent('topo-params-change', { detail: { key, value } })
+      )
+    }
+
+    slider.addEventListener('input', dispatch)
+    dispatch()
+  })
+</script>

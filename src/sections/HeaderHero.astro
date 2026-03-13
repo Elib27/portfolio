@@ -1,6 +1,7 @@
 ---
 import { getLangFromUrl, useTranslations } from '../i18n/utils'
-import WavesBackground from '../components/WavesBackground.astro'
+import TopographicBackground from '../components/TopographicBackground.astro'
+import TopoControls from '../components/TopoControls.astro'
 
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
@@ -14,7 +15,8 @@ const t = useTranslations(lang)
     </span>
     <span class="bg-text line animated">{t('header.title-2')}</span>
   </h1>
-  <WavesBackground />
+  <TopographicBackground />
+  <TopoControls />
 </section>
 
 <style lang="scss">

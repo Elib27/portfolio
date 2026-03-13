@@ -1,0 +1,344 @@
+---
+---
+
+<div class="three-canvas-container animated">
+  <canvas class="three-canvas"></canvas>
+</div>
+
+<style lang="scss">
+  .three-canvas-container {
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 1) 50%,
+      transparent 60%
+    );
+    -webkit-mask-size: 250% 100%;
+    -webkit-mask-position: left;
+    transition: -webkit-mask-position 1s linear 0.4s;
+    pointer-events: none;
+    &.animated {
+      -webkit-mask-position: right;
+    }
+    .three-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      -webkit-mask-image: linear-gradient(
+        rgba(0, 0, 0, 1) 80%,
+        transparent 100%
+      );
+    }
+  }
+</style>
+
+<script>
+  // == Simplex noise (2D) =====================================================
+  // Self-contained implementation, no dependencies.
+  // F2/G2 are the skewing factors for 2D simplex noise, computed once.
+
+  const F2 = 0.5 * (Math.sqrt(3) - 1)
+  const G2 = (3 - Math.sqrt(3)) / 6
+
+  // Build a shuffled permutation table (seeded randomly per page load)
+  const _p = new Uint8Array(256)
+  for (let i = 0; i < 256; i++) _p[i] = i
+  for (let i = 255; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [_p[i], _p[j]] = [_p[j], _p[i]]
+  }
+  // Double the table to avoid index wrapping
+  const _perm = new Uint8Array(512)
+  for (let i = 0; i < 512; i++) _perm[i] = _p[i & 255]
+
+  // 8 gradient directions stored as flat typed arrays for cache efficiency
+  const _gx = new Float32Array([ 1, -1,  1, -1, 1, -1, 0,  0])
+  const _gy = new Float32Array([ 1,  1, -1, -1, 0,  0, 1, -1])
+
+  function simplex2(xin: number, yin: number): number {
+    // Skew input space to determine which simplex cell we're in
+    const s  = (xin + yin) * F2
+    const i  = Math.floor(xin + s)
+    const j  = Math.floor(yin + s)
+
+    // Unskew back to get distances from cell origin
+    const t  = (i + j) * G2
+    const x0 = xin - (i - t)
+    const y0 = yin - (j - t)
+
+    // Determine which triangle of the simplex we're in
+    const i1 = x0 > y0 ? 1 : 0
+    const j1 = x0 > y0 ? 0 : 1
+
+    // Offsets for the other two corners
+    const x1 = x0 - i1 + G2,     y1 = y0 - j1 + G2
+    const x2 = x0 - 1 + 2 * G2,  y2 = y0 - 1 + 2 * G2
+
+    // Gradient indices for the three corners (mod 8)
+    const ii  = i & 255
+    const jj  = j & 255
+    const gi0 = _perm[ii +      _perm[jj     ]] & 7
+    const gi1 = _perm[ii + i1 + _perm[jj + j1]] & 7
+    const gi2 = _perm[ii + 1  + _perm[jj + 1 ]] & 7
+
+    // Compute contributions from each corner (kernel radius = 0.5)
+    let n0 = 0, n1 = 0, n2 = 0
+    let t0 = 0.5 - x0 * x0 - y0 * y0
+    if (t0 >= 0) { t0 *= t0; n0 = t0 * t0 * (_gx[gi0] * x0 + _gy[gi0] * y0) }
+    let t1 = 0.5 - x1 * x1 - y1 * y1
+    if (t1 >= 0) { t1 *= t1; n1 = t1 * t1 * (_gx[gi1] * x1 + _gy[gi1] * y1) }
+    let t2 = 0.5 - x2 * x2 - y2 * y2
+    if (t2 >= 0) { t2 *= t2; n2 = t2 * t2 * (_gx[gi2] * x2 + _gy[gi2] * y2) }
+
+    return 70 * (n0 + n1 + n2) // scaled to roughly [-1, 1]
+  }
+
+  // == Config =================================================================
+
+  const GRID_RES = 4  // px per field cell — lower = finer but slower
+
+  const params = {
+    timeSpeed:     0.0001,  // drift speed of the noise field
+    noiseScale:    0.0028,  // spatial zoom (small = wide hills, large = jagged)
+    levels:        16,      // number of contour iso-lines
+    mouseRadius:   0.10,    // Gaussian bump radius as fraction of canvas width
+    mouseStrength: 0.72,    // peak height added to the field by the mouse
+    lineWidth:     0.9,     // stroke width in logical px
+    opacityDeep:   0.55,    // max line opacity (shallow end = opacityDeep × 0.18)
+  }
+
+  // Purple palette: shallow contours fade toward COLOR_SHALLOW, deep toward COLOR_DEEP
+  const COLOR_DEEP    = [88,  94,  251]   // #585efb
+  const COLOR_SHALLOW = [165, 180, 252]   // #a5b4fc
+
+  window.addEventListener('topo-params-change', (e: Event) => {
+    const { key, value } = (e as CustomEvent<{ key: string; value: number }>).detail
+    if (key in params) (params as Record<string, number>)[key] = value
+  })
+
+  // == Canvas =================================================================
+
+  const container = document.querySelector('.three-canvas-container') as HTMLDivElement
+  const canvas    = document.querySelector('.three-canvas') as HTMLCanvasElement
+  const ctx       = canvas.getContext('2d')!
+
+  // Pre-allocated field buffer — resized only when the canvas dimensions change
+  let cols  = 0
+  let rows  = 0
+  let field = new Float32Array(0)
+
+  let canvasRect = canvas.getBoundingClientRect()
+
+  function resize() {
+    canvas.width  = container.clientWidth  * window.devicePixelRatio
+    canvas.height = container.clientHeight * window.devicePixelRatio
+    canvas.style.width  = container.clientWidth  + 'px'
+    canvas.style.height = container.clientHeight + 'px'
+    cols  = Math.ceil(container.clientWidth  / GRID_RES) + 1
+    rows  = Math.ceil(container.clientHeight / GRID_RES) + 1
+    field = new Float32Array(cols * rows)
+    canvasRect = canvas.getBoundingClientRect()
+  }
+  resize()
+  window.addEventListener('resize', resize)
+
+  // == Mouse ==================================================================
+
+  let mouseX = -9999, mouseY = -9999   // raw cursor position in canvas px
+  let smoothX = -9999, smoothY = -9999 // lerped position for smooth tracking
+  let mouseStrength = 0                // [0, 1] — fades in/out as cursor enters/leaves
+  let isInside = false
+
+  const section = document.querySelector('#home') as HTMLElement
+
+  section?.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX - canvasRect.left
+    mouseY = e.clientY - canvasRect.top
+    isInside = true
+  })
+  section?.addEventListener('mouseleave', () => { isInside = false })
+
+  function advanceMouse() {
+    mouseStrength += isInside
+      ? Math.min(0.04,   1 - mouseStrength)
+      : -Math.min(0.025, mouseStrength)
+    mouseStrength = Math.max(0, Math.min(1, mouseStrength))
+
+    if (smoothX === -9999) { smoothX = mouseX; smoothY = mouseY }
+    smoothX += (mouseX - smoothX) * 0.055
+    smoothY += (mouseY - smoothY) * 0.055
+  }
+
+  // == Height field ===========================================================
+
+  function buildField(t: number, logW: number) {
+    const mouseActive = mouseStrength > 0.001
+    const mouseR2     = (logW * params.mouseRadius) ** 2
+
+    // Bounding box for the mouse Gaussian bump (2.5× radius covers >99% of it)
+    const bumpHalfSpanCells = (logW * params.mouseRadius * 2.5) / GRID_RES
+    const mouseCenterCol    = smoothX / GRID_RES
+    const mouseCenterRow    = smoothY / GRID_RES
+    const bumpColMin = mouseCenterCol - bumpHalfSpanCells
+    const bumpColMax = mouseCenterCol + bumpHalfSpanCells
+    const bumpRowMin = mouseCenterRow - bumpHalfSpanCells
+    const bumpRowMax = mouseCenterRow + bumpHalfSpanCells
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const px = col * GRID_RES
+        const py = row * GRID_RES
+
+        // Two-octave noise normalised to [0, 1]
+        let h = simplex2(px * params.noiseScale + t,             py * params.noiseScale + t * 0.7) * 0.65
+              + simplex2(px * params.noiseScale * 2.1 + t * 1.3, py * params.noiseScale * 2.1)     * 0.35
+        h = h * 0.5 + 0.5
+
+        // Mouse Gaussian bump — only computed inside the bounding box
+        if (mouseActive
+            && col >= bumpColMin && col <= bumpColMax
+            && row >= bumpRowMin && row <= bumpRowMax) {
+          const dx = px - smoothX
+          const dy = py - smoothY
+          h += params.mouseStrength * Math.exp(-(dx * dx + dy * dy) / mouseR2) * mouseStrength
+        }
+
+        field[row * cols + col] = h < 0 ? 0 : h > 1 ? 1 : h
+      }
+    }
+  }
+
+  // == Marching squares =======================================================
+  // Each cell is classified into one of 16 cases based on which of its four
+  // corners exceed the iso-level. The lookup table maps each case to the
+  // edge pair(s) that the contour line crosses.
+  // Corner bit weights: TL=8, TR=4, BR=2, BL=1  (edges: 0=top 1=right 2=bottom 3=left)
+
+  const MS_SEGS: Array<Array<[number, number]>> = [
+    [],               // 0000 — all below
+    [[2, 3]],         // 0001 — BL above
+    [[1, 2]],         // 0010 — BR above
+    [[1, 3]],         // 0011 — BR + BL above
+    [[0, 1]],         // 0100 — TR above
+    [[0, 3], [1, 2]], // 0101 — TR + BL above (saddle)
+    [[0, 2]],         // 0110 — TR + BR above
+    [[0, 3]],         // 0111 — TR + BR + BL above
+    [[0, 3]],         // 1000 — TL above
+    [[0, 2]],         // 1001 — TL + BL above
+    [[0, 1], [2, 3]], // 1010 — TL + BR above (saddle)
+    [[0, 1]],         // 1011 — TL + BR + BL above
+    [[1, 3]],         // 1100 — TL + TR above
+    [[1, 2]],         // 1101 — TL + TR + BL above
+    [[2, 3]],         // 1110 — TL + TR + BR above
+    [],               // 1111 — all above
+  ]
+
+  function lerpEdge(a: number, b: number, level: number): number {
+    // Find where the field value equals `level` along the edge from a to b
+    return Math.abs(b - a) < 1e-6 ? 0.5 : (level - a) / (b - a)
+  }
+
+  function drawContours() {
+    const levels         = Math.round(params.levels)
+    const opacityShallow = params.opacityDeep * 0.18
+
+    for (let li = 0; li < levels; li++) {
+      const lt    = li / (levels - 1)  // 0 = shallowest, 1 = deepest
+      const level = 0.08 + lt * 0.84   // iso-value within the field [0.08, 0.92]
+
+      // Interpolate color and opacity between shallow and deep ends
+      const r     = Math.round(COLOR_SHALLOW[0] + (COLOR_DEEP[0] - COLOR_SHALLOW[0]) * lt)
+      const g     = Math.round(COLOR_SHALLOW[1] + (COLOR_DEEP[1] - COLOR_SHALLOW[1]) * lt)
+      const b     = Math.round(COLOR_SHALLOW[2] + (COLOR_DEEP[2] - COLOR_SHALLOW[2]) * lt)
+      const alpha = opacityShallow + (params.opacityDeep - opacityShallow) * lt
+
+      ctx.beginPath()
+      ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`
+      ctx.lineWidth   = params.lineWidth
+
+      for (let row = 0; row < rows - 1; row++) {
+        for (let col = 0; col < cols - 1; col++) {
+          const tl = field[ row      * cols + col    ]
+          const tr = field[ row      * cols + col + 1]
+          const br = field[(row + 1) * cols + col + 1]
+          const bl = field[(row + 1) * cols + col    ]
+
+          // Classify the cell (TL=8, TR=4, BR=2, BL=1)
+          const TL   = tl > level ? 8 : 0
+          const TR   = tr > level ? 4 : 0
+          const BR   = br > level ? 2 : 0
+          const BL   = bl > level ? 1 : 0
+          const segs = MS_SEGS[TL | TR | BR | BL]
+          if (!segs.length) continue
+
+          // Crossing point on each edge (inline — no array allocation per cell)
+          const x   = col * GRID_RES
+          const y   = row * GRID_RES
+          const ex0 = x + lerpEdge(tl, tr, level) * GRID_RES,  ey0 = y
+          const ex1 = x + GRID_RES,                             ey1 = y + lerpEdge(tr, br, level) * GRID_RES
+          const ex2 = x + lerpEdge(bl, br, level) * GRID_RES,  ey2 = y + GRID_RES
+          const ex3 = x,                                        ey3 = y + lerpEdge(tl, bl, level) * GRID_RES
+
+          const edgeX = [ex0, ex1, ex2, ex3]
+          const edgeY = [ey0, ey1, ey2, ey3]
+
+          for (const [eA, eB] of segs) {
+            ctx.moveTo(edgeX[eA], edgeY[eA])
+            ctx.lineTo(edgeX[eB], edgeY[eB])
+          }
+        }
+      }
+
+      ctx.stroke()
+    }
+  }
+
+  // == Render loop ============================================================
+
+  const startTime = performance.now()
+
+  function frame() {
+    const dpr  = window.devicePixelRatio
+    const logW = canvas.width / dpr
+    const t    = (performance.now() - startTime) * params.timeSpeed
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.save()
+    ctx.scale(dpr, dpr)
+
+    advanceMouse()
+    buildField(t, logW)
+    drawContours()
+
+    ctx.restore()
+    requestAnimationFrame(frame)
+  }
+
+  // == Startup ================================================================
+  // Wait for the Loader to remove the .animated class before fading the canvas in
+
+  function startAnimation() {
+    canvas.style.opacity = '1'
+    requestAnimationFrame(frame)
+  }
+
+  if (!container.classList.contains('animated')) {
+    startAnimation()
+  } else {
+    const observer = new MutationObserver(() => {
+      if (!container.classList.contains('animated')) {
+        observer.disconnect()
+        startAnimation()
+      }
+    })
+    observer.observe(container, { attributes: true, attributeFilter: ['class'] })
+  }
+</script>
