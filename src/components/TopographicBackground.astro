@@ -156,7 +156,7 @@
 
   section?.addEventListener('mousemove', (e) => {
     mouseX = e.clientX - canvasRect.left
-    mouseY = e.clientY - canvasRect.top
+    mouseY = e.clientY - canvasRect.top + window.scrollY;
     isInside = true
   })
   section?.addEventListener('mouseleave', () => { isInside = false })

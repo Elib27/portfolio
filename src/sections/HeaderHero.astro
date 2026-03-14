@@ -7,15 +7,34 @@ const t = useTranslations(lang)
 ---
 
 <section id="home">
-  <h1>
-    <span class="line animated">
-      {t('header.title-1')}
-      <span class="text-gradient">Eliot Bas</span>,
-    </span>
-    <span class="bg-text line animated">{t('header.title-2')}</span>
-  </h1>
+  <div class="hero-content">
+    <div class="line-wrapper animated">
+      <p class="greeting line">{t('header.title-1')}<span class="name">Eliot</span></p>
+    </div>
+    <div class="line-wrapper animated">
+      <h1 class="role line">{t('header.title-2')}</h1>
+    </div>
+    <div class="line-wrapper animated">
+      <p class="tagline line">{t('header.tagline')}</p>
+    </div>
+  </div>
+
+  <a class="scroll-arrow" href="#about" aria-label="Scroll down">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </a>
+
   <TopographicBackground />
 </section>
+
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelector('.scroll-arrow')?.classList.add('visible')
+    }, 500)
+  })
+</script>
 
 <style lang="scss">
   #home {
@@ -23,67 +42,109 @@ const t = useTranslations(lang)
     width: 100%;
     display: flex;
     align-items: center;
+    justify-content: center;
     position: relative;
-    h1 {
-      padding: 0 10%;
-      transform: translateY(-50%);
-      font-size: clamp(3rem, 5vw, 5rem);
-      font-weight: 800;
-      line-height: 1.4;
-      margin: 0;
-      .text-gradient {
-        color: var(--accent);
-      }
-      .bg-text {
-        background: linear-gradient(45deg, var(--accent), #6368f2);
-        color: var(--white);
-        padding: 0 1.6rem 0.2rem 1.6rem;
-      }
-      .line {
-        display: inline-block;
-        transform-origin: left center;
-        &:first-of-type {
-          margin-bottom: 0.2rem;
-          transition-delay: 0.2s;
-          transition:
-            color var(--theme-transition),
-            transform 1s cubic-bezier(0, 0, 0.16, 1) 0.2s;
-        }
-        &:last-of-type {
-          transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.35s;
-        }
-      }
-      .animated {
-        transform: translateY(40px) rotate(15deg);
-      }
+  }
+
+  .hero-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 5%;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  .line-wrapper {
+    &.animated {
+      transform: translateY(30px);
+      opacity: 0.3;
+    }
+    &:nth-child(1) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.2s, opacity 1s ease 0.2s; }
+    &:nth-child(2) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s, opacity 1s ease 0.4s; }
+    &:nth-child(3) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.5s, opacity 1s ease 0.5s; }
+  }
+
+  .greeting {
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: 0.02em;
+
+    .name {
+      color: var(--accent);
+      font-weight: 700;
     }
   }
 
-  @media (max-width: 870px) {
-    #home {
-      h1 {
-        transform: translateY(-30%);
-      }
+  .role {
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .tagline {
+    font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+    opacity: 0.8;
+    font-weight: 400;
+    margin: 0.25rem 0 0;
+  }
+
+  .line {
+    display: block;
+    transform-origin: center center;
+  }
+
+  .scroll-arrow {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    color: color-mix(in srgb, var(--text) 40%, transparent);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
+    transition: color 0.2s ease, border-color 0.2s ease, opacity 0.9s ease 1s;
+    opacity: 0;
+
+    svg {
+      width: 18px;
+      height: 18px;
     }
+
+    &:hover {
+      color: color-mix(in srgb, var(--text) 80%, transparent);
+      border-color: color-mix(in srgb, var(--text) 40%, transparent); 
+    }
+
+    &.visible {
+      opacity: 1;
+      animation: bounce 2.2s ease-in-out 1.6s infinite;
+    }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%       { transform: translateX(-50%) translateY(6px); }
   }
 
   @media (max-width: 768px) {
-    #home {
-      h1 {
-        font-size: min(12vw, 3rem);
-        transform: translateY(-20%);
-      }
+    .role {
+      font-size: min(11vw, 2.8rem);
     }
   }
 
   @media (max-width: 480px) {
-    #home {
-      h1 {
-        padding: 0 5%;
-        .bg-text {
-          padding: 0 1rem 0.2rem 1rem;
-        }
-      }
+    .hero-content {
+      gap: 0.75rem;
     }
   }
 </style>
