@@ -1,12 +1,12 @@
 ---
 ---
 
-<div class="three-canvas-container animated">
-  <canvas class="three-canvas"></canvas>
+<div class="animation-canvas-container animated">
+  <canvas class="animation-canvas"></canvas>
 </div>
 
 <style lang="scss">
-  .three-canvas-container {
+  .animation-canvas-container {
     height: 100vh;
     width: 100%;
     overflow: hidden;
@@ -26,7 +26,7 @@
     &.animated {
       -webkit-mask-position: right;
     }
-    .three-canvas {
+    .animation-canvas {
       display: block;
       width: 100%;
       height: 100%;
@@ -82,7 +82,7 @@
     const x1 = x0 - i1 + G2,     y1 = y0 - j1 + G2
     const x2 = x0 - 1 + 2 * G2,  y2 = y0 - 1 + 2 * G2
 
-    // Gradient indices for the three corners (mod 8)
+    // Gradient indices for the animation corners (mod 8)
     const ii  = i & 255
     const jj  = j & 255
     const gi0 = _perm[ii +      _perm[jj     ]] & 7
@@ -106,28 +106,23 @@
   const GRID_RES = 4  // px per field cell — lower = finer but slower
 
   const params = {
-    timeSpeed:     0.0001,  // drift speed of the noise field
+    timeSpeed:     0.00003, // drift speed of the noise field
     noiseScale:    0.0028,  // spatial zoom (small = wide hills, large = jagged)
     levels:        16,      // number of contour iso-lines
-    mouseRadius:   0.10,    // Gaussian bump radius as fraction of canvas width
+    mouseRadius:   0.08,    // Gaussian bump radius as fraction of canvas width
     mouseStrength: 0.72,    // peak height added to the field by the mouse
     lineWidth:     0.9,     // stroke width in logical px
-    opacityDeep:   0.55,    // max line opacity (shallow end = opacityDeep × 0.18)
+    opacityDeep:   0.7,     // max line opacity (shallow end = opacityDeep × 0.18)
   }
 
   // Purple palette: shallow contours fade toward COLOR_SHALLOW, deep toward COLOR_DEEP
   const COLOR_DEEP    = [88,  94,  251]   // #585efb
   const COLOR_SHALLOW = [165, 180, 252]   // #a5b4fc
 
-  window.addEventListener('topo-params-change', (e: Event) => {
-    const { key, value } = (e as CustomEvent<{ key: string; value: number }>).detail
-    if (key in params) (params as Record<string, number>)[key] = value
-  })
-
   // == Canvas =================================================================
 
-  const container = document.querySelector('.three-canvas-container') as HTMLDivElement
-  const canvas    = document.querySelector('.three-canvas') as HTMLCanvasElement
+  const container = document.querySelector('.animation-canvas-container') as HTMLDivElement
+  const canvas    = document.querySelector('.animation-canvas') as HTMLCanvasElement
   const ctx       = canvas.getContext('2d')!
 
   // Pre-allocated field buffer — resized only when the canvas dimensions change
