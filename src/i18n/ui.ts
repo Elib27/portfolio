@@ -7,14 +7,15 @@ export const defaultLang = "fr";
 
 export const ui = {
   fr: {
-    "site.title": "Eliot Bas - Développeur Web Freelance",
+    "site.title": "Eliot Bas - Étudiant Ingénieur Logiciel",
     "site.metaDescription":
-      "Développeur Web Freelance à Grenoble / Valence, Eliot Bas, je mets mes compétences à votre service pour réaliser tout type de projet web.",
+      "Étudiant ingénieur en informatique à Grenoble INP - ESISAR, actuellement en stage chez Botpress à Montréal. Disponible en septembre 2026.",
     "nav.about": "À propos",
     "nav.projects": "Projets",
     "nav.contact": "Contact",
     "header.title-1": "Hello, je suis ",
-    "header.title-2": "développeur web freelance",
+    "header.title-2": "étudiant ingénieur logiciel",
+    "header.tagline": "Je conçois des expériences web rapides et soignées.",
     "about.title": "À propos",
     "technologies.title": "Technologies",
     "technlogies.tab-links": [
@@ -36,14 +37,15 @@ export const ui = {
     "pageNotFound.button": "Retour au site",
   },
   en: {
-    "site.title": "Eliot Bas - Freelance Web Developer",
+    "site.title": "Eliot Bas - Software Engineering Student",
     "site.metaDescription":
-      "Freelance Web Developer based in Grenoble / Valence, France, Eliot Bas, I put my skills at your service to carry out any type of web project.",
+      "Software engineering student at Grenoble INP - ESISAR, currently interning at Botpress in Montréal. Available September 2026.",
     "nav.about": "About",
     "nav.projects": "Projects",
     "nav.contact": "Contact",
-    "header.title-1": "Hello, I'm ",
-    "header.title-2": "a freelance web developer",
+    "header.title-1": "Hi, I'm ",
+    "header.title-2": "a software engineering student",
+    "header.tagline": "Building fast, beautiful software experiences.",
     "about.title": "About",
     "technologies.title": "Technologies",
     "technlogies.tab-links": ["Main technos", "Other technos", "Tools"],

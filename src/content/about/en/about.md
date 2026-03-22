@@ -1,7 +1,7 @@
-Welcome to my site, in my own world! I am a freelance web <span class="highlight">developer</span> with a passionate relationship for code, started in my childhood with Arduino and its hacks. Since 2018, I have been cultivating my interest in web development, always striving to combine aesthetics, functionality and <span class="highlight">performance</span> in each of my projects.
+I'm a software engineering student at Grenoble INP - ESISAR, currently interning at <span class="highlight">Botpress</span> in Montréal as a Product Engineering Intern, where I'm building AI agent workflows. My relationship with code started in childhood with Arduino experiments, and since 2018 I've been deepening my passion for web development — always aiming to combine <span class="highlight">engineering rigor</span>, clean architecture and <span class="highlight">performance</span>.
 
-My skills extend over a wide range of tools and technologies, including React, Next.js, Node.js, or even Astro, to which I actively <span class="highlight">contribute</span> in open source.
+I've had the chance to work as a fullstack engineer at companies like <span class="highlight">Upflow</span> (YC-backed startup, Paris) and <span class="highlight">Koesio</span> (Valence), building real-world features that handle millions in transactions and high-stakes business logic.
 
-My philosophy includes a responsive design for an optimal user experience, an obsession with web performance and a commitment to <span class="highlight">accessibility</span> for all.
+My stack spans the full spectrum: React, Next.js, Node.js, Vue.js, Laravel, PostgreSQL, Docker — and I'm always curious to <span class="highlight">learn</span> new technologies and paradigms.
 
-If you are looking for a web developer who combines technical expertise, creativity and commitment, you have come to the right place!
+I'm actively looking for a full-time position starting September 2026. If you're hiring engineers who care about <span class="highlight">quality</span>, ownership and impact, let's talk!
