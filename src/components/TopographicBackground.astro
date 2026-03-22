@@ -41,299 +41,250 @@
 </style>
 
 <script>
-  // == Simplex noise (2D) =====================================================
-  // Self-contained implementation, no dependencies.
-  // F2/G2 are the skewing factors for 2D simplex noise, computed once.
+  import * as THREE from 'three';
 
-  const F2 = 0.5 * (Math.sqrt(3) - 1)
-  const G2 = (3 - Math.sqrt(3)) / 6
+  // == GLSL Shaders ===========================================================
 
-  // Build a shuffled permutation table (seeded randomly per page load)
-  const _p = new Uint8Array(256)
-  for (let i = 0; i < 256; i++) _p[i] = i
-  for (let i = 255; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [_p[i], _p[j]] = [_p[j], _p[i]]
-  }
-  // Double the table to avoid index wrapping
-  const _perm = new Uint8Array(512)
-  for (let i = 0; i < 512; i++) _perm[i] = _p[i & 255]
+  const vertexShader = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `;
 
-  // 8 gradient directions stored as flat typed arrays for cache efficiency
-  const _gx = new Float32Array([ 1, -1,  1, -1, 1, -1, 0,  0])
-  const _gy = new Float32Array([ 1,  1, -1, -1, 0,  0, 1, -1])
+  const fragmentShader = `
+    uniform float uTime;
+    uniform vec2 uResolution;
+    uniform vec2 uMouse;
+    uniform float uMouseStrength;
+    uniform float uMouseRadius;
+    uniform float uNoiseScale;
+    uniform int uLevels;
+    uniform float uLineWidth;
+    uniform float uOpacityDeep;
+    uniform vec3 uColorDeep;
+    uniform vec3 uColorShallow;
+    uniform float uDpr;
 
-  function simplex2(xin: number, yin: number): number {
-    // Skew input space to determine which simplex cell we're in
-    const s  = (xin + yin) * F2
-    const i  = Math.floor(xin + s)
-    const j  = Math.floor(yin + s)
+    varying vec2 vUv;
 
-    // Unskew back to get distances from cell origin
-    const t  = (i + j) * G2
-    const x0 = xin - (i - t)
-    const y0 = yin - (j - t)
+    // Simplex 2D noise
+    vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
 
-    // Determine which triangle of the simplex we're in
-    const i1 = x0 > y0 ? 1 : 0
-    const j1 = x0 > y0 ? 0 : 1
+    float snoise(vec2 v) {
+      const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+               -0.577350269189626, 0.024390243902439);
+      vec2 i  = floor(v + dot(v, C.yy) );
+      vec2 x0 = v -   i + dot(i, C.xx);
+      vec2 i1;
+      i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+      vec4 x12 = x0.xyxy + C.xxzz;
+      x12.xy -= i1;
+      i = mod(i, 289.0);
+      vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+        + i.x + vec3(0.0, i1.x, 1.0 ));
+      vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+        dot(x12.zw,x12.zw)), 0.0);
+      m = m*m ;
+      m = m*m ;
+      vec3 x = 2.0 * fract(p * C.www) - 1.0;
+      vec3 h = abs(x) - 0.5;
+      vec3 ox = floor(x + 0.5);
+      vec3 a0 = x - ox;
+      m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+      vec3 g;
+      g.x  = a0.x  * x0.x  + h.x  * x0.y;
+      g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+      return 130.0 * dot(m, g);
+    }
 
-    // Offsets for the other two corners
-    const x1 = x0 - i1 + G2,     y1 = y0 - j1 + G2
-    const x2 = x0 - 1 + 2 * G2,  y2 = y0 - 1 + 2 * G2
+    void main() {
+      vec2 st = vUv * uResolution; // Physical pixels
+      vec2 stLog = st / uDpr;      // Logical pixels
+      
+      // Calculate height field using logical pixels to match original scale
+      float h = snoise(vec2(stLog.x * uNoiseScale + uTime, stLog.y * uNoiseScale + uTime * 0.7)) * 0.65;
+      h += snoise(vec2(stLog.x * uNoiseScale * 2.1 + uTime * 1.3, stLog.y * uNoiseScale * 2.1)) * 0.35;
+      h = h * 0.5 + 0.5;
 
-    // Gradient indices for the animation corners (mod 8)
-    const ii  = i & 255
-    const jj  = j & 255
-    const gi0 = _perm[ii +      _perm[jj     ]] & 7
-    const gi1 = _perm[ii + i1 + _perm[jj + j1]] & 7
-    const gi2 = _perm[ii + 1  + _perm[jj + 1 ]] & 7
+      // Mouse Gaussian bump (using logical pixels for distance and radius)
+      vec2 mousePosLog = uMouse / uDpr;
+      float dLog = distance(stLog, mousePosLog);
+      float mouseRLog = (uResolution.x / uDpr) * uMouseRadius;
+      h += 0.72 * exp(-(dLog * dLog) / (mouseRLog * mouseRLog)) * uMouseStrength;
 
-    // Compute contributions from each corner (kernel radius = 0.5)
-    let n0 = 0, n1 = 0, n2 = 0
-    let t0 = 0.5 - x0 * x0 - y0 * y0
-    if (t0 >= 0) { t0 *= t0; n0 = t0 * t0 * (_gx[gi0] * x0 + _gy[gi0] * y0) }
-    let t1 = 0.5 - x1 * x1 - y1 * y1
-    if (t1 >= 0) { t1 *= t1; n1 = t1 * t1 * (_gx[gi1] * x1 + _gy[gi1] * y1) }
-    let t2 = 0.5 - x2 * x2 - y2 * y2
-    if (t2 >= 0) { t2 *= t2; n2 = t2 * t2 * (_gx[gi2] * x2 + _gy[gi2] * y2) }
+      // Define contour ranges
+      float minLevel = 0.08;
+      float maxLevel = 0.92;
+      float range = maxLevel - minLevel;
+      float stepSize = range / float(uLevels - 1);
 
-    return 70 * (n0 + n1 + n2) // scaled to roughly [-1, 1]
-  }
+      vec4 finalColor = vec4(0.0);
+
+      // We calculate how much h changes per physical pixel for accurate line width
+      float grad = length(vec2(dFdx(h), dFdy(h)));
+
+      // Optimized: find the nearest contour level
+      float levelIndex = floor((h - minLevel) / stepSize + 0.5);
+      
+      if (levelIndex >= 0.0 && levelIndex < float(uLevels)) {
+        float lt = levelIndex / float(uLevels - 1);
+        float level = minLevel + levelIndex * stepSize;
+
+        // Distance to the iso-value in physical pixels
+        float dist = abs(h - level) / grad;
+        
+        // Line mask using smoothstep for antialiasing
+        float lineMask = 1.0 - smoothstep(uLineWidth * 0.5, uLineWidth * 0.5 + 1.0, dist);
+
+        if (lineMask > 0.0) {
+          vec3 color = mix(uColorShallow, uColorDeep, lt);
+          float opacityShallow = uOpacityDeep * 0.18;
+          float alpha = mix(opacityShallow, uOpacityDeep, lt);
+          
+          finalColor = vec4(color, lineMask * alpha);
+        }
+      }
+
+      gl_FragColor = finalColor;
+    }
+  `;
 
   // == Config =================================================================
 
-  const GRID_RES = 4  // px per field cell — lower = finer but slower
-
   const params = {
-    timeSpeed:     0.00003, // drift speed of the noise field
-    noiseScale:    0.0028,  // spatial zoom (small = wide hills, large = jagged)
-    levels:        16,      // number of contour iso-lines
-    mouseRadius:   0.08,    // Gaussian bump radius as fraction of canvas width
-    mouseStrength: 0.72,    // peak height added to the field by the mouse
-    lineWidth:     0.9,     // stroke width in logical px
-    opacityDeep:   0.7,     // max line opacity (shallow end = opacityDeep × 0.18)
+    timeSpeed:     0.00003,
+    noiseScale:    0.0028,
+    levels:        16,
+    mouseRadius:   0.08,
+    mouseStrength: 0.72,
+    lineWidth:     0.9,
+    opacityDeep:   0.7,
   }
 
-  // Purple palette: shallow contours fade toward COLOR_SHALLOW, deep toward COLOR_DEEP
-  const COLOR_DEEP    = [88,  94,  251]   // #585efb
-  const COLOR_SHALLOW = [165, 180, 252]   // #a5b4fc
+  const COLOR_DEEP    = new THREE.Color(0x585efb);
+  const COLOR_SHALLOW = new THREE.Color(0xa5b4fc);
 
-  // == Canvas =================================================================
+  // == Three.js Setup =========================================================
 
-  const container = document.querySelector('.animation-canvas-container') as HTMLDivElement
-  const canvas    = document.querySelector('.animation-canvas') as HTMLCanvasElement
-  const ctx       = canvas.getContext('2d')!
+  const container = document.querySelector('.animation-canvas-container') as HTMLDivElement;
+  const canvas    = document.querySelector('.animation-canvas') as HTMLCanvasElement;
 
-  // Pre-allocated field buffer — resized only when the canvas dimensions change
-  let cols  = 0
-  let rows  = 0
-  let field = new Float32Array(0)
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: true,
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
 
-  let canvasRect = canvas.getBoundingClientRect()
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+  const geometry = new THREE.PlaneGeometry(2, 2);
+  const uniforms = {
+    uTime: { value: 0 },
+    uResolution: { value: new THREE.Vector2() },
+    uMouse: { value: new THREE.Vector2(-9999, -9999) },
+    uMouseStrength: { value: 0 },
+    uMouseRadius: { value: params.mouseRadius },
+    uNoiseScale: { value: params.noiseScale },
+    uLevels: { value: params.levels },
+    uLineWidth: { value: params.lineWidth },
+    uOpacityDeep: { value: params.opacityDeep },
+    uColorDeep: { value: COLOR_DEEP },
+    uColorShallow: { value: COLOR_SHALLOW },
+    uDpr: { value: renderer.getPixelRatio() },
+  };
+
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader,
+    fragmentShader,
+    transparent: true,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
 
   function resize() {
-    canvas.width  = container.clientWidth  * window.devicePixelRatio
-    canvas.height = container.clientHeight * window.devicePixelRatio
-    canvas.style.width  = container.clientWidth  + 'px'
-    canvas.style.height = container.clientHeight + 'px'
-    cols  = Math.ceil(container.clientWidth  / GRID_RES) + 1
-    rows  = Math.ceil(container.clientHeight / GRID_RES) + 1
-    field = new Float32Array(cols * rows)
-    canvasRect = canvas.getBoundingClientRect()
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    renderer.setSize(width, height, true);
+    
+    // Get actual pixel dimensions for the shader
+    const pixelWidth = canvas.width;
+    const pixelHeight = canvas.height;
+    uniforms.uResolution.value.set(pixelWidth, pixelHeight);
   }
-  resize()
-  window.addEventListener('resize', resize)
+  resize();
+  window.addEventListener('resize', resize);
 
   // == Mouse ==================================================================
 
-  let mouseX = -9999, mouseY = -9999   // raw cursor position in canvas px
-  let smoothX = -9999, smoothY = -9999 // lerped position for smooth tracking
-  let mouseStrength = 0                // [0, 1] — fades in/out as cursor enters/leaves
-  let isInside = false
+  let mouseX = -9999, mouseY = -9999;
+  let smoothX = -9999, smoothY = -9999;
+  let mouseStrength = 0;
+  let isInside = false;
 
-  const section = document.querySelector('#home') as HTMLElement
+  const section = document.querySelector('#home') as HTMLElement;
 
   section?.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX - canvasRect.left
-    mouseY = e.clientY - canvasRect.top + window.scrollY;
-    isInside = true
-  })
-  section?.addEventListener('mouseleave', () => { isInside = false })
+    const rect = canvas.getBoundingClientRect();
+    const dpr = renderer.getPixelRatio();
+    mouseX = (e.clientX - rect.left) * dpr;
+    mouseY = (rect.height - (e.clientY - rect.top)) * dpr; // Flip Y for GLSL
+    isInside = true;
+  });
+  section?.addEventListener('mouseleave', () => { isInside = false; });
 
   function advanceMouse() {
     mouseStrength += isInside
-      ? Math.min(0.04,   1 - mouseStrength)
-      : -Math.min(0.025, mouseStrength)
-    mouseStrength = Math.max(0, Math.min(1, mouseStrength))
+      ? Math.min(0.04, 1 - mouseStrength)
+      : -Math.min(0.025, mouseStrength);
+    mouseStrength = Math.max(0, Math.min(1, mouseStrength));
 
-    if (smoothX === -9999) { smoothX = mouseX; smoothY = mouseY }
-    smoothX += (mouseX - smoothX) * 0.055
-    smoothY += (mouseY - smoothY) * 0.055
-  }
+    if (smoothX === -9999) { smoothX = mouseX; smoothY = mouseY; }
+    smoothX += (mouseX - smoothX) * 0.055;
+    smoothY += (mouseY - smoothY) * 0.055;
 
-  // == Height field ===========================================================
-
-  function buildField(t: number, logW: number) {
-    const mouseActive = mouseStrength > 0.001
-    const mouseR2     = (logW * params.mouseRadius) ** 2
-
-    // Bounding box for the mouse Gaussian bump (2.5× radius covers >99% of it)
-    const bumpHalfSpanCells = (logW * params.mouseRadius * 2.5) / GRID_RES
-    const mouseCenterCol    = smoothX / GRID_RES
-    const mouseCenterRow    = smoothY / GRID_RES
-    const bumpColMin = mouseCenterCol - bumpHalfSpanCells
-    const bumpColMax = mouseCenterCol + bumpHalfSpanCells
-    const bumpRowMin = mouseCenterRow - bumpHalfSpanCells
-    const bumpRowMax = mouseCenterRow + bumpHalfSpanCells
-
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const px = col * GRID_RES
-        const py = row * GRID_RES
-
-        // Two-octave noise normalised to [0, 1]
-        let h = simplex2(px * params.noiseScale + t,             py * params.noiseScale + t * 0.7) * 0.65
-              + simplex2(px * params.noiseScale * 2.1 + t * 1.3, py * params.noiseScale * 2.1)     * 0.35
-        h = h * 0.5 + 0.5
-
-        // Mouse Gaussian bump — only computed inside the bounding box
-        if (mouseActive
-            && col >= bumpColMin && col <= bumpColMax
-            && row >= bumpRowMin && row <= bumpRowMax) {
-          const dx = px - smoothX
-          const dy = py - smoothY
-          h += params.mouseStrength * Math.exp(-(dx * dx + dy * dy) / mouseR2) * mouseStrength
-        }
-
-        field[row * cols + col] = h < 0 ? 0 : h > 1 ? 1 : h
-      }
-    }
-  }
-
-  // == Marching squares =======================================================
-  // Each cell is classified into one of 16 cases based on which of its four
-  // corners exceed the iso-level. The lookup table maps each case to the
-  // edge pair(s) that the contour line crosses.
-  // Corner bit weights: TL=8, TR=4, BR=2, BL=1  (edges: 0=top 1=right 2=bottom 3=left)
-
-  const MS_SEGS: Array<Array<[number, number]>> = [
-    [],               // 0000 — all below
-    [[2, 3]],         // 0001 — BL above
-    [[1, 2]],         // 0010 — BR above
-    [[1, 3]],         // 0011 — BR + BL above
-    [[0, 1]],         // 0100 — TR above
-    [[0, 3], [1, 2]], // 0101 — TR + BL above (saddle)
-    [[0, 2]],         // 0110 — TR + BR above
-    [[0, 3]],         // 0111 — TR + BR + BL above
-    [[0, 3]],         // 1000 — TL above
-    [[0, 2]],         // 1001 — TL + BL above
-    [[0, 1], [2, 3]], // 1010 — TL + BR above (saddle)
-    [[0, 1]],         // 1011 — TL + BR + BL above
-    [[1, 3]],         // 1100 — TL + TR above
-    [[1, 2]],         // 1101 — TL + TR + BL above
-    [[2, 3]],         // 1110 — TL + TR + BR above
-    [],               // 1111 — all above
-  ]
-
-  function lerpEdge(a: number, b: number, level: number): number {
-    // Find where the field value equals `level` along the edge from a to b
-    return Math.abs(b - a) < 1e-6 ? 0.5 : (level - a) / (b - a)
-  }
-
-  function drawContours() {
-    const levels         = Math.round(params.levels)
-    const opacityShallow = params.opacityDeep * 0.18
-
-    for (let li = 0; li < levels; li++) {
-      const lt    = li / (levels - 1)  // 0 = shallowest, 1 = deepest
-      const level = 0.08 + lt * 0.84   // iso-value within the field [0.08, 0.92]
-
-      // Interpolate color and opacity between shallow and deep ends
-      const r     = Math.round(COLOR_SHALLOW[0] + (COLOR_DEEP[0] - COLOR_SHALLOW[0]) * lt)
-      const g     = Math.round(COLOR_SHALLOW[1] + (COLOR_DEEP[1] - COLOR_SHALLOW[1]) * lt)
-      const b     = Math.round(COLOR_SHALLOW[2] + (COLOR_DEEP[2] - COLOR_SHALLOW[2]) * lt)
-      const alpha = opacityShallow + (params.opacityDeep - opacityShallow) * lt
-
-      ctx.beginPath()
-      ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`
-      ctx.lineWidth   = params.lineWidth
-
-      for (let row = 0; row < rows - 1; row++) {
-        for (let col = 0; col < cols - 1; col++) {
-          const tl = field[ row      * cols + col    ]
-          const tr = field[ row      * cols + col + 1]
-          const br = field[(row + 1) * cols + col + 1]
-          const bl = field[(row + 1) * cols + col    ]
-
-          // Classify the cell (TL=8, TR=4, BR=2, BL=1)
-          const TL   = tl > level ? 8 : 0
-          const TR   = tr > level ? 4 : 0
-          const BR   = br > level ? 2 : 0
-          const BL   = bl > level ? 1 : 0
-          const segs = MS_SEGS[TL | TR | BR | BL]
-          if (!segs.length) continue
-
-          // Crossing point on each edge (inline — no array allocation per cell)
-          const x   = col * GRID_RES
-          const y   = row * GRID_RES
-          const ex0 = x + lerpEdge(tl, tr, level) * GRID_RES,  ey0 = y
-          const ex1 = x + GRID_RES,                             ey1 = y + lerpEdge(tr, br, level) * GRID_RES
-          const ex2 = x + lerpEdge(bl, br, level) * GRID_RES,  ey2 = y + GRID_RES
-          const ex3 = x,                                        ey3 = y + lerpEdge(tl, bl, level) * GRID_RES
-
-          const edgeX = [ex0, ex1, ex2, ex3]
-          const edgeY = [ey0, ey1, ey2, ey3]
-
-          for (const [eA, eB] of segs) {
-            ctx.moveTo(edgeX[eA], edgeY[eA])
-            ctx.lineTo(edgeX[eB], edgeY[eB])
-          }
-        }
-      }
-
-      ctx.stroke()
-    }
+    uniforms.uMouse.value.set(smoothX, smoothY);
+    uniforms.uMouseStrength.value = mouseStrength;
   }
 
   // == Render loop ============================================================
 
-  const startTime = performance.now()
+  const startTime = performance.now();
 
   function frame() {
-    const dpr  = window.devicePixelRatio
-    const logW = canvas.width / dpr
-    const t    = (performance.now() - startTime) * params.timeSpeed
+    const t = (performance.now() - startTime) * params.timeSpeed;
+    uniforms.uTime.value = t;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.save()
-    ctx.scale(dpr, dpr)
+    // Update uLineWidth with current DPR (in case it changes or for consistency)
+    const dpr = renderer.getPixelRatio();
+    uniforms.uLineWidth.value = params.lineWidth * dpr;
 
-    advanceMouse()
-    buildField(t, logW)
-    drawContours()
-
-    ctx.restore()
-    requestAnimationFrame(frame)
+    advanceMouse();
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
   }
 
   // == Startup ================================================================
-  // Wait for the Loader to remove the .animated class before fading the canvas in
 
   function startAnimation() {
-    canvas.style.opacity = '1'
-    requestAnimationFrame(frame)
+    canvas.style.opacity = '1';
+    requestAnimationFrame(frame);
   }
 
   if (!container.classList.contains('animated')) {
-    startAnimation()
+    startAnimation();
   } else {
     const observer = new MutationObserver(() => {
       if (!container.classList.contains('animated')) {
-        observer.disconnect()
-        startAnimation()
+        observer.disconnect();
+        startAnimation();
       }
-    })
-    observer.observe(container, { attributes: true, attributeFilter: ['class'] })
+    });
+    observer.observe(container, { attributes: true, attributeFilter: ['class'] });
   }
 </script>
