@@ -5,6 +5,39 @@
   <canvas class="animation-canvas"></canvas>
 </div>
 
+<div class="controls-panel">
+  <div class="controls-content visible">
+    <div class="control-group">
+      <label>Speed</label>
+      <input type="range" id="param-timeSpeed" min="0" max="20" step="0.1" value="3">
+    </div>
+    <div class="control-group">
+      <label>Noise Scale</label>
+      <input type="range" id="param-noiseScale" min="1" max="100" step="1" value="28">
+    </div>
+    <div class="control-group">
+      <label>Levels</label>
+      <input type="range" id="param-levels" min="2" max="40" step="1" value="16">
+    </div>
+    <div class="control-group">
+      <label>Mouse Radius</label>
+      <input type="range" id="param-mouseRadius" min="1" max="30" step="1" value="8">
+    </div>
+    <div class="control-group">
+      <label>Mouse Strength</label>
+      <input type="range" id="param-mouseStrength" min="0" max="200" step="1" value="72">
+    </div>
+    <div class="control-group">
+      <label>Line Width</label>
+      <input type="range" id="param-lineWidth" min="1" max="50" step="1" value="9">
+    </div>
+    <div class="control-group">
+      <label>Opacity</label>
+      <input type="range" id="param-opacityDeep" min="1" max="100" step="1" value="70">
+    </div>
+  </div>
+</div>
+
 <style lang="scss">
   .animation-canvas-container {
     height: 100vh;
@@ -14,6 +47,7 @@
     top: 0;
     left: 0;
     z-index: -1;
+    // ... rest of mask styles
     -webkit-mask-image: linear-gradient(
       to right,
       rgba(0, 0, 0, 1) 50%,
@@ -26,6 +60,7 @@
     &.animated {
       -webkit-mask-position: right;
     }
+
     .animation-canvas {
       display: block;
       width: 100%;
@@ -36,6 +71,47 @@
         rgba(0, 0, 0, 1) 80%,
         transparent 100%
       );
+    }
+  }
+
+  .controls-panel {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    pointer-events: auto;
+
+    .controls-content {
+      background: rgba(15, 15, 25, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1.25rem;
+      border-radius: 1rem;
+      width: 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      label {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        cursor: pointer;
+        accent-color: #585efb;
+      }
     }
   }
 </style>
@@ -274,6 +350,41 @@
   function startAnimation() {
     canvas.style.opacity = '1';
     requestAnimationFrame(frame);
+    initControls();
+  }
+
+  function initControls() {
+    const bindParam = (id: string, callback: (val: number) => void) => {
+      const input = document.getElementById(id) as HTMLInputElement;
+      input?.addEventListener('input', (e) => {
+        callback(parseFloat((e.target as HTMLInputElement).value));
+      });
+    };
+
+    bindParam('param-timeSpeed', (v) => params.timeSpeed = v * 0.00001);
+    bindParam('param-noiseScale', (v) => {
+      params.noiseScale = v * 0.0001;
+      uniforms.uNoiseScale.value = params.noiseScale;
+    });
+    bindParam('param-levels', (v) => {
+      params.levels = v;
+      uniforms.uLevels.value = params.levels;
+    });
+    bindParam('param-mouseRadius', (v) => {
+      params.mouseRadius = v * 0.01;
+      uniforms.uMouseRadius.value = params.mouseRadius;
+    });
+    bindParam('param-mouseStrength', (v) => {
+      params.mouseStrength = v * 0.01;
+      uniforms.uMouseStrength.value = params.mouseStrength;
+    });
+    bindParam('param-lineWidth', (v) => {
+      params.lineWidth = v * 0.1;
+    });
+    bindParam('param-opacityDeep', (v) => {
+      params.opacityDeep = v * 0.01;
+      uniforms.uOpacityDeep.value = params.opacityDeep;
+    });
   }
 
   if (!container.classList.contains('animated')) {
