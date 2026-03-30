@@ -16,15 +16,60 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
+
     .button-container {
+      position: relative;
       transform: translate(var(--tX, 0), var(--tY, 0));
-      transition: transform 0.2s ease-out;
+      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+      :global(svg) {
+        transition: transform 0.3s ease-out, color 0.3s ease-out;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        width: 4rem;
+        height: 4rem;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--accent) 10%, transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        pointer-events: none;
+        z-index: -1;
+      }
+    }
+
+    &.tracking .button-container {
+      transition: transform 0.08s ease-out;
+    }
+
+    &:hover .button-container {
+      &::before {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      :global(svg) {
+        transform: scale(1.12);
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+          color 0.25s ease-out;
+      }
+
+      :global(svg path) {
+        color: var(--accent);
+      }
     }
   }
 </style>
 
 <script>
   function updateButtonPosition(e: MouseEvent, gravityZone: HTMLDivElement) {
+    gravityZone.classList.add('tracking')
     const {
       left: offsetLeft,
       top: offsetTop,
@@ -47,6 +92,7 @@
   }
 
   function resetButtonPosition(gravityZone: HTMLDivElement) {
+    gravityZone.classList.remove('tracking')
     gravityZone.style.setProperty('--tX', '0px')
     gravityZone.style.setProperty('--tY', '0px')
   }
