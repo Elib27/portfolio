@@ -28,12 +28,12 @@
       <input type="range" id="param-mouseStrength" min="0" max="200" step="1" value="72">
     </div>
     <div class="control-group">
-      <label>Line Width <span class="param-value" id="value-lineWidth">9</span></label>
-      <input type="range" id="param-lineWidth" min="1" max="50" step="1" value="9">
+      <label>Line Width <span class="param-value" id="value-lineWidth">7</span></label>
+      <input type="range" id="param-lineWidth" min="1" max="50" step="1" value="7">
     </div>
     <div class="control-group">
-      <label>Opacity <span class="param-value" id="value-opacityDeep">70</span></label>
-      <input type="range" id="param-opacityDeep" min="1" max="100" step="1" value="70">
+      <label>Opacity <span class="param-value" id="value-opacityDeep">80</span></label>
+      <input type="range" id="param-opacityDeep" min="1" max="100" step="1" value="80">
     </div>
   </div>
 </div>
@@ -67,10 +67,10 @@
       height: 100%;
       opacity: 0;
       transition: opacity 0.8s ease;
-      -webkit-mask-image: linear-gradient(
-        rgba(0, 0, 0, 1) 80%,
-        transparent 100%
-      );
+      -webkit-mask-image:
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0,0,0, 0.1) 30%, rgba(0, 0, 0, 1) 70%),
+        linear-gradient(rgba(0, 0, 0, 1) 80%, transparent 100%);
+      mask-composite: intersect;
     }
   }
 
@@ -226,7 +226,7 @@
 
         if (lineMask > 0.0) {
           vec3 color = mix(uColorShallow, uColorDeep, lt);
-          float opacityShallow = uOpacityDeep * 0.18;
+          float opacityShallow = uOpacityDeep * 0.4;
           float alpha = mix(opacityShallow, uOpacityDeep, lt);
           
           finalColor = vec4(color, lineMask * alpha);
@@ -245,8 +245,8 @@
     levels:        16,
     mouseRadius:   0.08,
     mouseStrength: 0.72,
-    lineWidth:     0.9,
-    opacityDeep:   0.7,
+    lineWidth:     0.7,
+    opacityDeep:   0.8,
   }
 
   const COLOR_DEEP    = new THREE.Color(0x585efb);
