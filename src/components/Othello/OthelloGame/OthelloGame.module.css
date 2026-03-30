@@ -1,40 +1,86 @@
 .layout {
   width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  flex-direction: column;
   align-items: center;
+  gap: 1rem;
 }
 
 .centerWrapper {
   position: relative;
 }
 
-.sideWrapper {
-  flex: 1 1 0px;
-  display: flex;
-  justify-content: center;
-  padding: 0 1rem;
-}
-
 .playerRound {
   color: var(--text);
-  margin: 3rem 0 2rem 0;
+  margin: 3rem 0 0 0;
   font-size: 1.5em;
+  font-weight: 700;
   text-align: center;
   transition: color var(--theme-transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.statusDot {
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.statusDotPlayer {
+  background-color: var(--accent);
+}
+
+.statusDotAI {
+  background-color: var(--text);
+  transition: background-color var(--theme-transition);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.aiThinking {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.controlRow {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .resetButton {
   color: var(--background);
   background-color: var(--text);
-  font-family: "Figtree", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-size: 1.25em;
   font-weight: 600;
   padding: 0.5em 1em;
-  border-radius: 0.5rem;
+  border-radius: 8px;
   cursor: pointer;
   border: none;
-  transition: background-color var(--theme-transition), color var(--theme-transition);
+  transition:
+    background-color var(--theme-transition),
+    color var(--theme-transition),
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.resetButton:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
 }
 
 .resetButton:active {
@@ -43,18 +89,4 @@
 
 .resetButtonAccent {
   background-color: var(--accent);
-}
-
-@media screen and (max-width: 960px) {
-  .layout {
-    flex-direction: column;
-    justify-content: center;
-    gap: 2rem;
-  }
-  .centerWrapper {
-    order: -1;
-  }
-  .sideWrapper {
-    flex-grow: 0;
-  }
 }
