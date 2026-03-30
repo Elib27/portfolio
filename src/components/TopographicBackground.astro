@@ -341,8 +341,10 @@
   // == Render loop ============================================================
 
   const startTime = performance.now();
+  let isVisible = false;
 
   function frame() {
+    if (!isVisible) return;
     const t = (performance.now() - startTime) * params.timeSpeed;
     uniforms.uTime.value = t;
 
@@ -355,11 +357,22 @@
     requestAnimationFrame(frame);
   }
 
+  const visibilityObserver = new IntersectionObserver(
+    ([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) {
+        requestAnimationFrame(frame);
+      }
+    },
+    { threshold: 0 }
+  );
+  visibilityObserver.observe(container);
+
   // == Startup ================================================================
 
   function startAnimation() {
     canvas.style.opacity = '1';
-    requestAnimationFrame(frame);
+    if (isVisible) requestAnimationFrame(frame);
     initControls();
   }
 
