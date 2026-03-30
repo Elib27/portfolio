@@ -8,31 +8,31 @@
 <div class="controls-panel">
   <div class="controls-content visible">
     <div class="control-group">
-      <label>Speed</label>
+      <label>Speed <span class="param-value" id="value-timeSpeed">3</span></label>
       <input type="range" id="param-timeSpeed" min="0" max="20" step="0.1" value="3">
     </div>
     <div class="control-group">
-      <label>Noise Scale</label>
-      <input type="range" id="param-noiseScale" min="1" max="100" step="1" value="28">
+      <label>Noise Scale <span class="param-value" id="value-noiseScale">22</span></label>
+      <input type="range" id="param-noiseScale" min="1" max="100" step="1" value="22">
     </div>
     <div class="control-group">
-      <label>Levels</label>
+      <label>Levels <span class="param-value" id="value-levels">16</span></label>
       <input type="range" id="param-levels" min="2" max="40" step="1" value="16">
     </div>
     <div class="control-group">
-      <label>Mouse Radius</label>
+      <label>Mouse Radius <span class="param-value" id="value-mouseRadius">8</span></label>
       <input type="range" id="param-mouseRadius" min="1" max="30" step="1" value="8">
     </div>
     <div class="control-group">
-      <label>Mouse Strength</label>
+      <label>Mouse Strength <span class="param-value" id="value-mouseStrength">72</span></label>
       <input type="range" id="param-mouseStrength" min="0" max="200" step="1" value="72">
     </div>
     <div class="control-group">
-      <label>Line Width</label>
+      <label>Line Width <span class="param-value" id="value-lineWidth">9</span></label>
       <input type="range" id="param-lineWidth" min="1" max="50" step="1" value="9">
     </div>
     <div class="control-group">
-      <label>Opacity</label>
+      <label>Opacity <span class="param-value" id="value-opacityDeep">70</span></label>
       <input type="range" id="param-opacityDeep" min="1" max="100" step="1" value="70">
     </div>
   </div>
@@ -105,6 +105,16 @@
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .param-value {
+          font-variant-numeric: tabular-nums;
+          color: rgba(255, 255, 255, 0.5);
+          font-size: 0.7rem;
+          text-transform: none;
+        }
       }
 
       input[type="range"] {
@@ -231,7 +241,7 @@
 
   const params = {
     timeSpeed:     0.00003,
-    noiseScale:    0.0028,
+    noiseScale:    0.0022,
     levels:        16,
     mouseRadius:   0.08,
     mouseStrength: 0.72,
@@ -356,8 +366,11 @@
   function initControls() {
     const bindParam = (id: string, callback: (val: number) => void) => {
       const input = document.getElementById(id) as HTMLInputElement;
+      const valueEl = document.getElementById(id.replace('param-', 'value-'));
       input?.addEventListener('input', (e) => {
-        callback(parseFloat((e.target as HTMLInputElement).value));
+        const val = parseFloat((e.target as HTMLInputElement).value);
+        if (valueEl) valueEl.textContent = (e.target as HTMLInputElement).value;
+        callback(val);
       });
     };
 
