@@ -32,6 +32,7 @@ export const ui = {
     "contact.cta-2":
       "Qu'attendez-vous ? Contactez-moi et commençons l'aventure !",
     "contact.findMeOn": "Retrouvez moi également sur :",
+    "contact.copied": "Copié !",
     "footer.legal": "Mentions légales",
     "pageNotFound.title": "Page introuvable",
     "pageNotFound.button": "Retour au site",
@@ -57,6 +58,7 @@ export const ui = {
     "contact.cta-2":
       "What are you waiting for? Contact me and let's start the adventure!",
     "contact.findMeOn": "Find me also on :",
+    "contact.copied": "Copied!",
     "footer.legal": "Legal notice",
     "pageNotFound.title": "Page not found",
     "pageNotFound.button": "Back to website",

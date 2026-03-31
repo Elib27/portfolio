@@ -7,6 +7,7 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
 
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
+const copiedText = t('contact.copied') as string
 ---
 
 <SectionLayout title={t('contact.title') as string} id="contact">
@@ -15,9 +16,18 @@ const t = useTranslations(lang)
       <span>{t('contact.cta-1')}</span>
       <span>{t('contact.cta-2')}</span>
     </p>
-    <a class="bubble" href="mailto:eliot.bas.dev@gmail.com">
-      <span class="email">contact@eliotbas.com</span>
-    </a>
+    <div class="email-card">
+      <a class="email-link" href="mailto:eliot.bas.dev@gmail.com">
+        <span class="email">contact@eliotbas.com</span>
+      </a>
+      <button class="copy-btn" data-copied-text={copiedText} aria-label="Copy email">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        <span class="copy-tooltip">{copiedText}</span>
+      </button>
+    </div>
     <p class="social-media-msg">{t('contact.findMeOn')}</p>
     <div class="social-media">
       <GravityButton>
@@ -66,6 +76,14 @@ const t = useTranslations(lang)
   </svg>
 </SectionLayout>
 
+<style is:global>
+  @property --border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+</style>
+
 <style lang="scss">
   .container {
     display: flex;
@@ -82,51 +100,116 @@ const t = useTranslations(lang)
         margin-bottom: 0.4rem;
       }
     }
-    .bubble {
-      background-color: var(--secondary);
-      width: fit-content;
-      padding: 3rem 5rem;
-      margin-bottom: 5rem;
-      border-radius: clamp(1rem, 5vw, 1.8rem);
-      line-height: 1;
+
+    .email-card {
       position: relative;
-      &::after {
-        content: '';
-        height: 0;
-        width: 0;
-        border-top: clamp(1.5rem, 15vw, 6rem) solid var(--secondary);
-        border-right: clamp(2rem, 20vw, 8rem) solid transparent;
-        position: absolute;
-        bottom: clamp(-3rem, calc(-1 * 9vw), -0.5rem);
-        left: 0;
-        z-index: -1;
-      }
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 2.5rem 4rem;
+      margin-bottom: 5rem;
+      border-radius: clamp(1rem, 5vw, 1.5rem);
+      border: 2px solid transparent;
+      background:
+        linear-gradient(var(--background), var(--background)) padding-box,
+        conic-gradient(
+            from var(--border-angle),
+            var(--accent) 0%,
+            var(--secondary) 8%,
+            color-mix(in srgb, var(--secondary) 30%, transparent) 16%,
+            transparent 24%,
+            transparent 76%,
+            color-mix(in srgb, var(--secondary) 30%, transparent) 84%,
+            var(--secondary) 92%,
+            var(--accent) 100%
+          )
+          border-box;
+      animation: spin-border 4s linear infinite;
+      transition: box-shadow 0.4s ease;
+
       &:hover {
+        box-shadow: 0 0 2rem color-mix(in srgb, var(--accent) 25%, transparent);
+
+        .email-link .email::after {
+          transform: scaleX(0.5);
+        }
+      }
+
+      .email-link {
         .email {
+          font-size: clamp(2.4rem, 4vw, 3rem);
+          text-align: center;
+          position: relative;
+          padding-bottom: 0.5rem;
+          color: var(--text);
+          transition: color var(--theme-transition);
           &::after {
-            transform: scaleX(50%);
+            content: '';
+            height: 0.15rem;
+            width: 100%;
+            background-color: var(--text);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transform-origin: left center;
+            transition:
+              transform 0.3s cubic-bezier(0, 0, 0.25, 1),
+              background-color var(--theme-transition);
           }
         }
       }
-      .email {
-        font-size: clamp(2.4rem, 4vw, 3rem);
-        text-align: center;
+
+      .copy-btn {
         position: relative;
-        padding-bottom: 0.6rem;
-        color: var(--black);
-        &::after {
-          content: '';
-          height: 0.18rem;
-          width: 100%;
-          background-color: var(--black);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border: none;
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+        border-radius: 0.5rem;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
+        flex-shrink: 0;
+
+        &:hover {
+          background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+          color: var(--accent);
+        }
+
+        .copy-tooltip {
           position: absolute;
-          bottom: 0;
-          left: 0;
-          transform-origin: left center;
-          transition: transform 0.3s cubic-bezier(0, 0, 0.25, 1);
+          top: -2.2rem;
+          left: 50%;
+          transform: translateX(-50%) translateY(4px);
+          background-color: var(--text);
+          color: var(--background);
+          font-size: 0.75rem;
+          padding: 0.25rem 0.6rem;
+          border-radius: 0.3rem;
+          white-space: nowrap;
+          opacity: 0;
+          pointer-events: none;
+          transition:
+            opacity 0.2s ease,
+            transform 0.2s ease;
+        }
+
+        &.copied .copy-tooltip {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+
+        &.copied {
+          color: var(--accent);
         }
       }
     }
+
     .social-media-msg {
       margin-bottom: 1rem;
     }
@@ -138,6 +221,13 @@ const t = useTranslations(lang)
       }
     }
   }
+
+  @keyframes spin-border {
+    to {
+      --border-angle: 360deg;
+    }
+  }
+
   .waves {
     stroke-width: 1px;
     width: 45%;
@@ -151,10 +241,10 @@ const t = useTranslations(lang)
 
   @media (max-width: 768px) {
     .container {
-      .bubble {
-        padding: 2.8rem 4rem;
-        .email {
-          font-size: clamp(1rem, 6vw, 2.4rem);
+      .email-card {
+        padding: 2rem 3rem;
+        .email-link .email {
+          font-size: clamp(1.2rem, 5vw, 2.4rem);
         }
       }
     }
@@ -165,17 +255,24 @@ const t = useTranslations(lang)
       p {
         width: 100%;
       }
-      .bubble {
-        padding: 0;
+      .email-card {
+        padding: 1.5rem 1.5rem;
         width: 100%;
-        aspect-ratio: 11/3;
-        display: flex;
         justify-content: center;
-        align-items: center;
-        .email::after {
+        .email-link .email::after {
           height: 0.1rem;
         }
       }
     }
   }
 </style>
+
+<script>
+  const copyBtn = document.querySelector<HTMLButtonElement>('.copy-btn')
+
+  copyBtn?.addEventListener('click', async () => {
+    await navigator.clipboard.writeText('contact@eliotbas.com')
+    copyBtn.classList.add('copied')
+    setTimeout(() => copyBtn.classList.remove('copied'), 1000)
+  })
+</script>
