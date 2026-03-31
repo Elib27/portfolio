@@ -7,226 +7,482 @@ const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 
 const langLink = lang === 'fr' ? 'en' : 'fr'
+
+const navItems = [
+  { href: '#about', label: t('nav.about'), section: 'about' },
+  { href: '#projects', label: t('nav.projects'), section: 'projects' },
+  { href: '#contact', label: t('nav.contact'), section: 'contact' },
+]
 ---
 
-<div class="nav-wrapper">
-  <Logo link="#" />
-  <div class="mobile-buttons animated">
-    <a class="lang" href=`/${langLink === 'fr' ? '' : langLink}`>
-      {langLink}
-    </a>
-    <ToggleThemeButton id="mobile" />
-    <button class="hamburger" aria-expanded="false">
-      <span class="line"></span>
-      <span class="line"></span>
-      <span class="line"></span>
-    </button>
+<header class="navbar">
+  <div class="navbar__inner">
+    <Logo link="#" />
+
+    <nav class="navbar__desktop animated" aria-label="Main navigation">
+      <div class="navbar__indicator"></div>
+      <ul>
+        {navItems.map(({ href, label, section }) => (
+          <li>
+            <a href={href} data-section={section}>{label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="navbar__actions animated">
+      <a class="navbar__lang" href={`/${langLink === 'fr' ? '' : langLink}`} aria-label={`Switch to ${langLink}`}>
+        {langLink}
+      </a>
+      <ToggleThemeButton id="desktop" />
+    </div>
+
+    <div class="navbar__mobile-actions animated">
+      <a class="navbar__lang" href={`/${langLink === 'fr' ? '' : langLink}`} aria-label={`Switch to ${langLink}`}>
+        {langLink}
+      </a>
+      <ToggleThemeButton id="mobile" />
+      <button class="navbar__hamburger" aria-expanded="false" aria-label="Toggle menu">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </button>
+    </div>
   </div>
-  <nav class="desktop animated" aria-label="Navigation sur ordinateur">
-    <ul>
-      <li><a href="#about">{t('nav.about')}</a></li>
-      <li><a href="#projects">{t('nav.projects')}</a></li>
-      <li><a href="#contact">{t('nav.contact')}</a></li>
-    </ul>
-    <a class="lang" href=`/${langLink === 'fr' ? '' : langLink}`>
+</header>
+
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <ul>
+    {navItems.map(({ href, label }, i) => (
+      <li style={`--delay: ${0.05 + i * 0.05}s`}>
+        <a href={href}>{label}</a>
+      </li>
+    ))}
+  </ul>
+  <div class="mobile-nav__footer" style="--delay: 0.2s">
+    <a class="navbar__lang" href={`/${langLink === 'fr' ? '' : langLink}`}>
       {langLink}
     </a>
-    <ToggleThemeButton id="desktop" />
-  </nav>
-</div>
-<nav class="mobile" aria-label="Navigation sur mobile">
-  <ul>
-    <li><a href="#about">{t('nav.about')}</a></li>
-    <li><a href="#projects">{t('nav.projects')}</a></li>
-    <li><a href="#contact">{t('nav.contact')}</a></li>
-  </ul>
+    <ToggleThemeButton id="mobile-nav" />
+  </div>
 </nav>
 
 <style lang="scss">
-  .nav-wrapper {
+  .navbar {
     position: fixed;
-    top: 1rem;
+    top: 0;
     left: 0;
-    height: 60px;
     width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 2rem;
     z-index: 999;
+    padding: 1rem 2rem;
     pointer-events: none;
-    .mobile-buttons {
-      pointer-events: all;
-      display: none;
+    transform: translateY(0);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &.is-hidden {
+      transform: translateY(-100%);
+    }
+
+    &__inner {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      gap: 2rem;
-      transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
-    }
-    .hamburger {
-      height: 30px;
-      width: 36px;
-      background: transparent;
-      border: none;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      -webkit-tap-highlight-color: transparent;
-      cursor: pointer;
-      .line {
-        height: 4px;
-        width: 100%;
-        background-color: var(--text);
-        transition:
-          transform 0.2s ease-out,
-          opacity 0.2s ease-out,
-          background-color var(--theme-transition);
-      }
-      &.is-open {
-        .line {
-          &:nth-child(1) {
-            transform: translateY(13px) rotate(45deg);
-          }
-          &:nth-child(2) {
-            opacity: 0;
-          }
-          &:nth-child(3) {
-            transform: translateY(-13px) rotate(-45deg);
-          }
-        }
-      }
+      max-width: 1400px;
+      margin: 0 auto;
     }
   }
-  .lang {
-    text-transform: uppercase;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1;
-  }
+
   .animated {
     transform: translateY(20px);
+    transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
   }
-  nav {
+
+  // Desktop nav pill
+  .navbar__desktop {
+    pointer-events: all;
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
-    &.desktop {
-      padding: 0 1.8rem;
-      background-color: var(--nav-background);
-      border-radius: 30px;
-      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.25);
-      transform-origin: left center;
-      transition:
-        background-color var(--theme-transition),
-        transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
-      gap: 1.4rem;
-      pointer-events: all;
-      ul {
-        display: flex;
-        gap: 1.2rem;
-        list-style: none;
-        padding: 0;
-        letter-spacing: 0.5px;
-        a {
-          font-weight: 600;
-          letter-spacing: 0;
-          font-size: 1rem;
-          padding: 0 0.2rem;
-          white-space: nowrap;
-          transition: color var(--theme-transition);
-        }
-      }
+    padding: 0.35rem 0.4rem;
+    background: color-mix(in srgb, var(--nav-background) 70%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
+    border-radius: 50px;
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.06),
+      0 1px 2px rgba(0, 0, 0, 0.04);
+    transition:
+      background-color var(--theme-transition),
+      border-color var(--theme-transition),
+      box-shadow var(--theme-transition),
+      transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
+
+    ul {
+      display: flex;
+      gap: 0.2rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      position: relative;
     }
-    &.mobile {
-      height: 100vh;
-      width: 100%;
-      position: fixed;
-      background-color: var(--nav-background);
-      justify-content: center;
-      display: none;
-      z-index: 10;
-      transform: translateX(100%);
-      opacity: 0;
+
+    li a {
+      display: block;
+      font-weight: 600;
+      font-size: 0.88rem;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      white-space: nowrap;
+      line-height: 1.2;
+      color: color-mix(in srgb, var(--text) 85%, transparent);
       transition:
-        transform 0.3s cubic-bezier(0, 0, 0.16, 1),
-        opacity 0.2s cubic-bezier(0, 0, 0.16, 1),
+        color var(--theme-transition),
         background-color var(--theme-transition);
-      &.is-open {
-        transform: translateX(0);
-        opacity: 1;
+
+      &:hover {
+        color: var(--text);
+        background: color-mix(in srgb, var(--text) 6%, transparent);
       }
-      ul {
-        list-style: none;
-        padding: 0;
-        li {
-          margin: 2rem 0;
-        }
-        a {
-          font-size: 2.4rem;
-          line-height: 2;
-        }
+
+      &.is-active {
+        color: var(--text);
       }
     }
   }
 
-  @media (max-width: 768px) {
-    .nav-wrapper {
-      .mobile-buttons {
-        display: flex;
-      }
+  // Sliding active indicator
+  .navbar__indicator {
+    position: absolute;
+    height: calc(100% - 0.7rem);
+    border-radius: 50px;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.2s ease;
+
+    &.is-visible {
+      opacity: 1;
     }
-    nav {
-      &.desktop {
-        display: none;
+  }
+
+  // Right side actions (desktop)
+  .navbar__actions {
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    gap: 1rem;
+    padding: 0.5rem 0.8rem;
+    background: color-mix(in srgb, var(--nav-background) 70%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
+    border-radius: 50px;
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.06),
+      0 1px 2px rgba(0, 0, 0, 0.04);
+    transition:
+      background-color var(--theme-transition),
+      border-color var(--theme-transition),
+      transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
+  }
+
+  // Language toggle
+  .navbar__lang {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 0.4rem;
+    border-radius: 6px;
+    transition:
+      color var(--theme-transition),
+      background-color var(--theme-transition);
+
+    &:hover {
+      background: color-mix(in srgb, var(--text) 8%, transparent);
+    }
+  }
+
+  // Mobile actions (hamburger group)
+  .navbar__mobile-actions {
+    pointer-events: all;
+    display: none;
+    align-items: center;
+    justify-self: end;
+    gap: 1.2rem;
+    transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
+  }
+
+  // Hamburger
+  .navbar__hamburger {
+    height: 28px;
+    width: 32px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    .line {
+      height: 3px;
+      width: 100%;
+      background-color: var(--text);
+      border-radius: 2px;
+      transition:
+        transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.2s ease,
+        background-color var(--theme-transition);
+      transform-origin: center;
+    }
+
+    &.is-open {
+      .line:nth-child(1) {
+        transform: translateY(12.5px) rotate(45deg);
       }
-      &.mobile {
-        display: flex;
+      .line:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+      .line:nth-child(3) {
+        transform: translateY(-12.5px) rotate(-45deg);
       }
     }
   }
+
+  // Mobile full-screen nav
+  .mobile-nav {
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: color-mix(in srgb, var(--nav-background) 95%, transparent);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.35s ease,
+      visibility 0.35s ease,
+      background var(--theme-transition);
+
+    &.is-open {
+      opacity: 1;
+      visibility: visible;
+
+      ul li {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .mobile-nav__footer {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: center;
+
+      li {
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--delay),
+          transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--delay);
+      }
+
+      a {
+        display: inline-block;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.6rem;
+        font-weight: 600;
+        line-height: 1;
+        padding: 0.8rem 1rem;
+        border-radius: 12px;
+        transition:
+          color var(--theme-transition),
+          background-color var(--theme-transition);
+
+        &:hover {
+          background: color-mix(in srgb, var(--text) 6%, transparent);
+        }
+      }
+    }
+
+    &__footer {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 3rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition:
+        opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--delay),
+        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--delay);
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    .navbar__desktop,
+    .navbar__actions {
+      display: none;
+    }
+    .navbar__mobile-actions {
+      display: flex;
+    }
+    .mobile-nav {
+      display: flex;
+    }
+  }
+
   @media (max-width: 480px) {
-    .nav-wrapper {
-      top: 0.6rem;
-      padding: 0 2rem 0 1.2rem;
+    .navbar {
+      padding: 0.6rem 1.2rem;
     }
   }
 </style>
 
 <script>
-  function toggleHamburger(hamburger: HTMLButtonElement | null) {
-    if (!hamburger) return
-    hamburger.classList.toggle('is-open')
-    hamburger.ariaExpanded = hamburger.ariaExpanded =
-      hamburger.ariaExpanded === 'true' ? 'false' : 'true'
-  }
+  // --- Hamburger & mobile nav ---
+  const hamburger = document.querySelector<HTMLButtonElement>('.navbar__hamburger')
+  const mobileNav = document.querySelector<HTMLElement>('.mobile-nav')
 
-  const toggleMobileNav = (mobileNav: HTMLElement | null) =>
+  function toggleMobileNavigation() {
+    hamburger?.classList.toggle('is-open')
     mobileNav?.classList.toggle('is-open')
+    document.body.classList.toggle('no-scroll')
 
-  const togglePageScroll = () => document.body.classList.toggle('no-scroll')
-
-  function toggleMobileNavigation(
-    hamburger: HTMLButtonElement | null,
-    mobileNav: HTMLElement | null
-  ) {
-    toggleHamburger(hamburger)
-    toggleMobileNav(mobileNav)
-    togglePageScroll()
+    const expanded = hamburger?.getAttribute('aria-expanded') === 'true'
+    hamburger?.setAttribute('aria-expanded', String(!expanded))
   }
 
-  const hamburger = document.querySelector<HTMLButtonElement>('.hamburger')
-  const mobileNav = document.querySelector<HTMLElement>('nav.mobile')
+  hamburger?.addEventListener('click', toggleMobileNavigation)
 
-  hamburger?.addEventListener('click', () =>
-    toggleMobileNavigation(hamburger, mobileNav)
+  document.querySelectorAll<HTMLAnchorElement>('.mobile-nav a[href^="#"]')
+    .forEach((link) => link.addEventListener('click', toggleMobileNavigation))
+
+  // --- Hide on scroll down, show on scroll up ---
+  const navbar = document.querySelector<HTMLElement>('.navbar')
+  let lastScrollY = window.scrollY
+  let ticking = false
+
+  function updateNavbarVisibility() {
+    const currentScrollY = window.scrollY
+    if (currentScrollY > 100 && currentScrollY > lastScrollY) {
+      navbar?.classList.add('is-hidden')
+    } else {
+      navbar?.classList.remove('is-hidden')
+    }
+    lastScrollY = currentScrollY
+    ticking = false
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(updateNavbarVisibility)
+      ticking = true
+    }
+  }, { passive: true })
+
+  // --- Active section tracking ---
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>('.navbar__desktop a[data-section]')
+  const indicator = document.querySelector<HTMLElement>('.navbar__indicator')
+  const sections = document.querySelectorAll<HTMLElement>('section[id], div[id="about"], div[id="projects"], div[id="contact"]')
+
+  function updateIndicator(activeLink: HTMLAnchorElement | null) {
+    if (!indicator || !activeLink) {
+      indicator?.classList.remove('is-visible')
+      return
+    }
+
+    const nav = indicator.parentElement!
+    const navRect = nav.getBoundingClientRect()
+    const linkRect = activeLink.getBoundingClientRect()
+
+    indicator.style.left = `${linkRect.left - navRect.left}px`
+    indicator.style.width = `${linkRect.width}px`
+    indicator.classList.add('is-visible')
+  }
+
+  function setActiveLink(sectionId: string | null) {
+    navLinks.forEach((link) => {
+      const isActive = link.dataset.section === sectionId
+      link.classList.toggle('is-active', isActive)
+      if (isActive) updateIndicator(link)
+    })
+
+    if (!sectionId) updateIndicator(null)
+  }
+
+  // IntersectionObserver for sections
+  const sectionIds = ['about', 'projects', 'contact']
+  const sectionElements = sectionIds
+    .map((id) => document.getElementById(id))
+    .filter(Boolean) as HTMLElement[]
+
+  // Track which sections are currently visible
+  const visibleSections = new Set<string>()
+  let currentSection: string | null = null
+
+  function pickActiveSection() {
+    if (visibleSections.size === 0) {
+      const firstSection = sectionElements[0]
+      if (firstSection && window.scrollY < firstSection.offsetTop - 200) {
+        if (currentSection !== null) {
+          currentSection = null
+          setActiveLink(null)
+        }
+      }
+      return
+    }
+
+    // Pick the first (topmost) visible section in DOM order
+    const newSection = sectionIds.find((id) => visibleSections.has(id)) ?? null
+    if (newSection !== currentSection) {
+      currentSection = newSection
+      setActiveLink(newSection)
+    }
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          visibleSections.add(entry.target.id)
+        } else {
+          visibleSections.delete(entry.target.id)
+        }
+      }
+      pickActiveSection()
+    },
+    {
+      threshold: [0, 0.15],
+      rootMargin: '-20% 0px -40% 0px',
+    }
   )
 
-  const mobileNavLinks =
-    document.querySelectorAll<HTMLAnchorElement>('nav.mobile a')
+  sectionElements.forEach((section) => observer.observe(section))
 
-  mobileNavLinks.forEach((link) =>
-    link.addEventListener('click', () =>
-      toggleMobileNavigation(hamburger, mobileNav)
-    )
-  )
+  // Also update indicator on resize
+  window.addEventListener('resize', () => {
+    const active = document.querySelector<HTMLAnchorElement>('.navbar__desktop a.is-active')
+    if (active) updateIndicator(active)
+  })
 </script>
