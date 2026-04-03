@@ -5,38 +5,6 @@
   <canvas class="animation-canvas"></canvas>
 </div>
 
-<div class="controls-panel">
-  <div class="controls-content visible">
-    <div class="control-group">
-      <label>Speed <span class="param-value" id="value-timeSpeed">3</span></label>
-      <input type="range" id="param-timeSpeed" min="0" max="20" step="0.1" value="3">
-    </div>
-    <div class="control-group">
-      <label>Noise Scale <span class="param-value" id="value-noiseScale">22</span></label>
-      <input type="range" id="param-noiseScale" min="1" max="100" step="1" value="22">
-    </div>
-    <div class="control-group">
-      <label>Levels <span class="param-value" id="value-levels">16</span></label>
-      <input type="range" id="param-levels" min="2" max="40" step="1" value="16">
-    </div>
-    <div class="control-group">
-      <label>Mouse Radius <span class="param-value" id="value-mouseRadius">8</span></label>
-      <input type="range" id="param-mouseRadius" min="1" max="30" step="1" value="8">
-    </div>
-    <div class="control-group">
-      <label>Mouse Strength <span class="param-value" id="value-mouseStrength">72</span></label>
-      <input type="range" id="param-mouseStrength" min="0" max="200" step="1" value="72">
-    </div>
-    <div class="control-group">
-      <label>Line Width <span class="param-value" id="value-lineWidth">7</span></label>
-      <input type="range" id="param-lineWidth" min="1" max="50" step="1" value="7">
-    </div>
-    <div class="control-group">
-      <label>Opacity <span class="param-value" id="value-opacityDeep">80</span></label>
-      <input type="range" id="param-opacityDeep" min="1" max="100" step="1" value="80">
-    </div>
-  </div>
-</div>
 
 <style lang="scss">
   .animation-canvas-container {
@@ -74,56 +42,6 @@
     }
   }
 
-  .controls-panel {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 1000;
-    pointer-events: auto;
-
-    .controls-content {
-      background: rgba(15, 15, 25, 0.85);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 1.25rem;
-      border-radius: 1rem;
-      width: 240px;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-
-      label {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.75rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .param-value {
-          font-variant-numeric: tabular-nums;
-          color: rgba(255, 255, 255, 0.5);
-          font-size: 0.7rem;
-          text-transform: none;
-        }
-      }
-
-      input[type="range"] {
-        width: 100%;
-        cursor: pointer;
-        accent-color: #585efb;
-      }
-    }
-  }
 </style>
 
 <script>
@@ -324,15 +242,20 @@
   });
   section?.addEventListener('mouseleave', () => { isInside = false; });
 
-  function advanceMouse() {
+  function advanceMouse(dt: number) {
+    const strengthFadeIn = 4.8;
+    const strengthFadeOut = 3.0;
+    const mouseLerp = 5.5;
+
     mouseStrength += isInside
-      ? Math.min(0.04, 1 - mouseStrength)
-      : -Math.min(0.025, mouseStrength);
+      ? Math.min(strengthFadeIn * dt, 1 - mouseStrength)
+      : -Math.min(strengthFadeOut * dt, mouseStrength);
     mouseStrength = Math.max(0, Math.min(1, mouseStrength));
 
     if (smoothX === -9999) { smoothX = mouseX; smoothY = mouseY; }
-    smoothX += (mouseX - smoothX) * 0.055;
-    smoothY += (mouseY - smoothY) * 0.055;
+    const smoothFactor = 1 - Math.exp(-mouseLerp * dt);
+    smoothX += (mouseX - smoothX) * smoothFactor;
+    smoothY += (mouseY - smoothY) * smoothFactor;
 
     uniforms.uMouse.value.set(smoothX, smoothY);
     uniforms.uMouseStrength.value = mouseStrength;
@@ -342,17 +265,21 @@
 
   const startTime = performance.now();
   let isVisible = false;
+  let lastFrameTime = performance.now();
 
   function frame() {
     if (!isVisible) return;
-    const t = (performance.now() - startTime) * params.timeSpeed;
+    const now = performance.now();
+    const dt = (now - lastFrameTime) / 1000;
+    lastFrameTime = now;
+    const t = (now - startTime) * params.timeSpeed;
     uniforms.uTime.value = t;
 
     // Update uLineWidth with current DPR (in case it changes or for consistency)
     const dpr = renderer.getPixelRatio();
     uniforms.uLineWidth.value = params.lineWidth * dpr;
 
-    advanceMouse();
+    advanceMouse(dt);
     renderer.render(scene, camera);
     requestAnimationFrame(frame);
   }
