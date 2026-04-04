@@ -10,7 +10,7 @@ const year = new Date().getFullYear()
 <footer>
   <span class="hidden"></span>
   <span class="copyright">©{year} Designed & Built by BAS Eliot</span>
-  <a href="/mentions-legales" class="legal">{t('footer.legal')}</a>
+  <a href={lang === 'fr' ? '/fr/mentions-legales' : '/mentions-legales'} class="legal">{t('footer.legal')}</a>
 </footer>
 
 <style lang="scss">

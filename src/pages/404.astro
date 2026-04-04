@@ -8,7 +8,7 @@ import ToggleThemeButton from '../components/ToggleThemeButton.astro'
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 
-const homeLink = lang === 'fr' ? '/' : `/${lang}`
+const homeLink = lang === 'en' ? '/' : `/${lang}`
 ---
 
 <Layout noIndex>

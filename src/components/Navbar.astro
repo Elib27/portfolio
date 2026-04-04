@@ -6,7 +6,7 @@ import Logo from '../components/Logo.astro'
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 
-const langLink = lang === 'fr' ? 'en' : 'fr'
+const langLink = lang === 'en' ? 'fr' : 'en'
 
 const navItems = [
   { href: '#about', label: t('nav.about'), section: 'about' },
@@ -31,14 +31,14 @@ const navItems = [
     </nav>
 
     <div class="navbar__actions animated">
-      <a class="navbar__lang" href={`/${langLink === 'fr' ? '' : langLink}`} aria-label={`Switch to ${langLink}`}>
+      <a class="navbar__lang" href={`/${langLink === 'en' ? '' : langLink}`} aria-label={`Switch to ${langLink}`}>
         {langLink}
       </a>
       <ToggleThemeButton id="desktop" />
     </div>
 
     <div class="navbar__mobile-actions animated">
-      <a class="navbar__lang" href={`/${langLink === 'fr' ? '' : langLink}`} aria-label={`Switch to ${langLink}`}>
+      <a class="navbar__lang" href={`/${langLink === 'en' ? '' : langLink}`} aria-label={`Switch to ${langLink}`}>
         {langLink}
       </a>
       <ToggleThemeButton id="mobile" />
@@ -60,7 +60,7 @@ const navItems = [
     ))}
   </ul>
   <div class="mobile-nav__footer" style="--delay: 0.2s">
-    <a class="navbar__lang" href={`/${langLink === 'fr' ? '' : langLink}`}>
+    <a class="navbar__lang" href={`/${langLink === 'en' ? '' : langLink}`}>
       {langLink}
     </a>
     <ToggleThemeButton id="mobile-nav" />
