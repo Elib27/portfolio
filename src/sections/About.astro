@@ -8,13 +8,95 @@ const t = useTranslations(lang)
 
 const entry = await getEntry('about', `${lang}/about`)
 const { Content: AboutContent } = await render(entry!)
+
+const activities = t('hobbies.activities') as unknown as string[]
 ---
 
 <SectionLayout title={t('about.title') as string} id="about">
   <div class="content">
     <AboutContent />
+    <p class="hobbies-intro">
+      {t('hobbies.intro')}
+    </p>
+    <ul class="hobbies-list" aria-label="activities">
+      <li class="hobby-item" data-hobby></li>
+      <li class="hobby-item" data-hobby></li>
+      <li class="hobby-item" data-hobby></li>
+    </ul>
+    <div hidden>
+      {activities.map((activity) => (
+        <span data-hobby-text>{activity}</span>
+      ))}
+    </div>
+    <p class="hobbies-outro">
+      {t("hobbies.outro")}
+    </p>
   </div>
 </SectionLayout>
+
+<script>
+  function initHobbies() {
+    const slots = [...document.querySelectorAll('.hobbies-list [data-hobby]')] as HTMLElement[]
+    const texts = [...document.querySelectorAll('[data-hobby-text]')].map((el) => el.textContent!)
+    const FADE_MS = 450
+    const MIN_CYCLE = 2500
+    const MAX_CYCLE = 4500
+
+    // Track which text indices are currently shown
+    const usedIndices = new Set<number>()
+
+    function pickNewIndex(): number {
+      const available = texts.map((_, i) => i).filter((i) => !usedIndices.has(i))
+      return available[Math.floor(Math.random() * available.length)]
+    }
+
+    // Assign initial random texts
+    const slotTextIndex: number[] = []
+    slots.forEach((slot, i) => {
+      const idx = pickNewIndex()
+      usedIndices.add(idx)
+      slotTextIndex[i] = idx
+      slot.textContent = texts[idx]
+      slot.style.opacity = '1'
+    })
+
+    let lastSlotIdx = -1
+
+    function scheduleCycle() {
+      const delay = MIN_CYCLE + Math.random() * (MAX_CYCLE - MIN_CYCLE)
+      setTimeout(() => {
+        // Pick a random slot to swap (never the same one twice in a row)
+        let slotIdx: number
+        do {
+          slotIdx = Math.floor(Math.random() * slots.length)
+        } while (slots.length > 1 && slotIdx === lastSlotIdx)
+        lastSlotIdx = slotIdx
+        const slot = slots[slotIdx]
+
+        // Fade out
+        slot.style.opacity = '0'
+
+        setTimeout(() => {
+          // Release old index, pick new one
+          usedIndices.delete(slotTextIndex[slotIdx])
+          const newIdx = pickNewIndex()
+          usedIndices.add(newIdx)
+          slotTextIndex[slotIdx] = newIdx
+          slot.textContent = texts[newIdx]
+
+          // Fade in
+          slot.style.opacity = '1'
+
+          scheduleCycle()
+        }, FADE_MS)
+      }, delay)
+    }
+
+    scheduleCycle()
+  }
+
+  initHobbies()
+</script>
 
 <style lang="scss">
   .content {
@@ -26,17 +108,51 @@ const { Content: AboutContent } = await render(entry!)
     }
     & :global(.highlight) {
       position: relative;
+      padding: 0 var(--highlight-padding);
     }
     & :global(.highlight::after) {
       content: '';
-      width: calc(100% + 2 * var(--highlight-padding));
-      height: 50%;
-      background: var(--highlight);
       position: absolute;
-      top: 52%;
-      left: calc(-1 * var(--highlight-padding));
+      inset: 52% 0 0 0;
       z-index: -1;
+      background: var(--highlight);
       transition: background-color var(--theme-transition);
+    }
+  }
+
+  .hobbies-intro {
+    font-weight: 600;
+    margin-top: 1.5rem !important;
+    margin-bottom: 0.6rem !important;
+  }
+
+  .hobbies-outro {
+    margin-top: 1.5rem !important;
+    margin-bottom: 0.6rem !important;
+  }
+
+  .hobbies-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .hobby-item {
+    padding: 0.3rem 0;
+    padding-left: 1.2rem;
+    position: relative;
+    font-size: 0.95rem;
+    color: var(--text);
+    transition:
+      opacity 0.45s ease-in-out,
+      color var(--theme-transition);
+
+    &::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      transition: color var(--theme-transition);
     }
   }
 
