@@ -1,7 +1,7 @@
-I'm a software engineering student at Grenoble INP - ESISAR, currently interning at <span class="highlight">Botpress</span> in Montréal as a Product Engineering Intern, where I'm building AI agent workflows. My relationship with code started in childhood with Arduino experiments, and since 2018 I've been deepening my passion for web development — always aiming to combine <span class="highlight">engineering rigor</span>, clean architecture and <span class="highlight">performance</span>.
+I'm Eliot — software engineer who spends too much time outdoors and not enough time away from a keyboard. Still figuring out the balance.
 
-I've had the chance to work as a fullstack engineer at companies like <span class="highlight">Upflow</span> (YC-backed startup, Paris) and <span class="highlight">Koesio</span> (Valence), building real-world features that handle millions in transactions and high-stakes business logic.
+I'm finishing my engineering degree in France while wrapping up an internship at Botpress in Montréal, where I get to both build with the product and build the product — developing internal AI agents while contributing to the core SDK and developer tooling. Before that, a fintech startup in Paris, a high-stakes benchmarking platform, and freelance work for an Australian company — enough variety to feel at home in the unfamiliar.
 
-My stack spans the full spectrum: React, Next.js, Node.js, Vue.js, Laravel, PostgreSQL, Docker — and I'm always curious to <span class="highlight">learn</span> new technologies and paradigms.
+I care about doing things right — not perfectly, just properly. I can't pretend something is fine when I know it isn't, which probably makes me a bad seller and a good teammate, depending on who you ask. Also relentlessly curious — I can't use something I don't understand, which in the AI era feels increasingly important.
 
-I'm actively looking for a full-time position starting September 2026. If you're hiring engineers who care about <span class="highlight">quality</span>, ownership and impact, let's talk!
+When I step away from the keyboard — it happens — you'll find me :

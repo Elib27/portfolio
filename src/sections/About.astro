@@ -15,9 +15,6 @@ const activities = t('hobbies.activities') as unknown as string[]
 <SectionLayout title={t('about.title') as string} id="about">
   <div class="content">
     <AboutContent />
-    <p class="hobbies-intro">
-      {t('hobbies.intro')}
-    </p>
     <ul class="hobbies-list" aria-label="activities">
       <li class="hobby-item" data-hobby></li>
       <li class="hobby-item" data-hobby></li>
@@ -120,11 +117,6 @@ const activities = t('hobbies.activities') as unknown as string[]
     }
   }
 
-  .hobbies-intro {
-    font-weight: 600;
-    margin-top: 1.5rem !important;
-    margin-bottom: 0.6rem !important;
-  }
 
   .hobbies-outro {
     margin-top: 1.5rem !important;
