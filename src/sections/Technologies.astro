@@ -2,7 +2,7 @@
 import { getLangFromUrl, useTranslations } from '../i18n/utils'
 import { getEntry } from 'astro:content'
 import SectionLayout from '../layouts/SectionLayout.astro'
-import TechnologiesTabs from '../components/TechnologiesTabs/TechnologiesTabs.jsx'
+import TechnologiesTabs from '../components/TechnologiesTabs/TechnologiesTabs.tsx'
 
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)

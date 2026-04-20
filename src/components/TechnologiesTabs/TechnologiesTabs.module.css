@@ -1,123 +1,156 @@
 .container {
-  --bezier-transition: cubic-bezier(0, 0.5, 0.5, 1);
-  aspect-ratio: 16/9;
-  width: min(90%, 750px);
+  width: min(100%, 700px);
   margin: 0 auto;
-  background-color: var(--gray);
-  border-radius: var(--radius);
-  overflow: hidden;
-  display: flex;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.25);
 }
-.tab_links_container {
-  height: 100%;
-  width: 25%;
-  background-color: var(--accent);
+
+/* ── Tab bar ── */
+.tabBar {
+  display: flex;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  background: var(--gray);
+  border-radius: var(--radius);
+  padding: 4px;
+  margin-bottom: 2rem;
+  transition: background-color var(--theme-transition);
 }
-.tab_link {
-  flex: 1 0 33%;
-  color: var(--white);
-  background: transparent;
-  border-top-left-radius: var(--radius);
-  border-bottom-left-radius: var(--radius);
+
+:global(.dark-theme) .tabBar {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tabButton {
+  flex: 1;
+  padding: 0.65rem 1rem;
   border: none;
-  padding: 0 1rem;
+  background: transparent;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  color: var(--text);
   cursor: pointer;
-  transition: color 0.3s var(--bezier-transition);
+  border-radius: calc(var(--radius) - 4px);
+  position: relative;
   z-index: 2;
+  transition: color 0.25s ease;
+  white-space: nowrap;
 }
-.tab_link_active {
-  color: var(--black);
+
+.tabButtonActive {
+  color: var(--accent);
 }
-.tab_selector {
+
+.tabIndicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  border-radius: calc(var(--radius) - 4px);
+  background: var(--background);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+:global(.dark-theme) .tabIndicator {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Panel ── */
+.panelWrapper {
+  position: relative;
+}
+
+.panel {
+  visibility: hidden;
   position: absolute;
   top: 0;
-  height: calc(100% / 3);
+  left: 0;
   width: 100%;
-  background-color: var(--gray);
-  color: var(--black);
-  border-top-left-radius: var(--radius);
-  border-bottom-left-radius: var(--radius);
-  box-shadow: 0px 0px 10px rgba(0,0,0,0.25);
-  transition: transform 0.3s var(--bezier-transition);
-  z-index: 1;
-  &.tab_1 {
-    transform: translateY(0);
-  }
-  &.tab_2 {
-    transform: translateY(100%);
-  }
-  &.tab_3 {
-    transform: translateY(200%);
-  }
-}
-.tab_container {
-  height: 100%;
-  position: relative;
-  flex-grow: 1;
-  box-shadow: 0px 0px 8px rgba(0,0,0,0.25);
-}
-.tab {
-  height: 100%;
-  width: 100%;
-  padding: 1.2rem;
-  position: absolute;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  place-items: center;
-  gap: 1.2rem;
-  opacity: 0;
-  transition: all 0.3s var(--bezier-transition);
   pointer-events: none;
 }
-.tab_up {
-  transform: translateY(-10%);
-}
-.tab_down {
-  transform: translateY(10%);
-}
-.tab_active {
-  transform: translateY(0);
-  opacity: 1;
-  z-index: 1;
-}
-.technoLogo {
-  height: auto;
-  width: 4.5rem;
-}
-.techno_title {
-  color: var(--black);
-  margin: 1rem 0 0 0;
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 500;
+
+.panelActive {
+  visibility: visible;
+  position: relative;
+  pointer-events: auto;
 }
 
-@media (max-width: 768px) {
-  .container {
-    width: min(80%, 500px);
-    height: 500px;
-  }
-  .tab_links_container {
-    width: max(100px, 33%);
-  }
-  .tab {
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+/* ── Card ── */
+.card {
+  display: block;
+  text-decoration: none;
+  border-radius: var(--radius);
+  background: var(--gray);
+  padding: 1.25rem 0.75rem;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) var(--card-delay, 0ms),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) var(--card-delay, 0ms),
+    background-color var(--theme-transition);
+}
+
+:global(.dark-theme) .card {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.cardVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.cardInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo {
+  width: 3.2rem;
+  height: 3.2rem;
+  object-fit: contain;
+  color: var(--text);
+  transition: color var(--theme-transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  transition: color var(--theme-transition);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .technoLogo {
-    width: 4rem;
-  }
-}
 
-@media (max-width: 480px) {
-  .container {
-    width: 100%;
+  .tabButton {
+    font-size: 0.8rem;
+    padding: 0.55rem 0.5rem;
   }
 }
