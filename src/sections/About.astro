@@ -97,12 +97,19 @@ const activities = t('hobbies.activities') as unknown as string[]
 
 <style lang="scss">
   .content {
-    --highlight-padding: 1px;
+    --highlight-padding: 4px;
     width: min(80%, 800px);
     margin: auto;
     & :global(p) {
       margin: 0 0 1rem 0;
       line-height: 1.5;
+    }
+    & :global(a) {
+      line-height: inherit;
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      text-decoration-thickness: 1px;
     }
     & :global(.highlight) {
       position: relative;
@@ -111,9 +118,10 @@ const activities = t('hobbies.activities') as unknown as string[]
     & :global(.highlight::after) {
       content: '';
       position: absolute;
-      inset: 52% 0 0 0;
+      inset: 52% 0 10% 0;
       z-index: -1;
       background: var(--highlight);
+      border-radius: 3px;
       transition: background-color var(--theme-transition);
     }
   }

@@ -61,7 +61,7 @@ export const ui = {
     'nav.projects': 'Projects',
     'nav.contact': 'Contact',
     'header.title-1': "Hi, I'm ",
-    'header.title-2': 'a software engineering student',
+    'header.title-2': 'software engineering student',
     'header.tagline': 'Building fast, beautiful software experiences.',
     'about.title': 'About',
     'hobbies.outro': 'Perpetually open to new things — for better or worse.',
