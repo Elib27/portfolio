@@ -1,0 +1,489 @@
+---
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+type Example = Record<string, string>
+
+// Single source of truth lives in public/ so the client can fetch it lazily; we
+// read it here (build time only) just to SSR the first example + model list.
+const data = JSON.parse(
+  readFileSync(join(process.cwd(), 'public/generated-commits.json'), 'utf-8')
+) as Example[]
+
+// Base models are derived from the per-example keys (everything except diff/reference,
+// with the _baseline/_finetuned suffix stripped).
+const sample = data[0] ?? {}
+const models = [
+  ...new Set(
+    Object.keys(sample)
+      .filter((k) => k !== 'diff' && k !== 'reference')
+      .map((k) => k.replace(/_(baseline|finetuned)$/, ''))
+  ),
+]
+const prettyModel = (m: string) => m.replace(/-Instruct$/, '')
+
+// SSR the first example with the first model, for no-JS users and initial paint.
+const first = data[0]
+const firstModel = models[0]
+---
+
+<section class="commit-comparison" data-total={data.length}>
+  <div class="controls">
+    <div class="model-select">
+      <span id="cc-model-label">base model</span>
+      <div class="dropdown">
+        <button
+          type="button"
+          class="dd-toggle"
+          aria-haspopup="listbox"
+          aria-controls="cc-listbox"
+          aria-expanded="false"
+          aria-labelledby="cc-model-label"
+        >
+          <span class="dd-current">{prettyModel(firstModel)}</span>
+          <span class="dd-caret" aria-hidden="true">▾</span>
+        </button>
+        <ul id="cc-listbox" class="dd-menu" role="listbox" hidden>
+          {
+            models.map((m, i) => (
+              <li
+                id={`cc-opt-${i}`}
+                role="option"
+                data-value={m}
+                class:list={[i === 0 && 'is-selected']}
+                aria-selected={i === 0 ? 'true' : 'false'}
+              >
+                {prettyModel(m)}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="nav">
+      <button type="button" data-dir="-1" aria-label="Previous example">‹ prev</button>
+      <span class="counter"><span class="current">1</span> / {data.length}</span>
+      <button type="button" data-dir="1" aria-label="Next example">next ›</button>
+    </div>
+  </div>
+
+  <p class="cc-error" role="alert" hidden>
+    Couldn't load the examples — check your connection and try again.
+  </p>
+
+  <div class="panel">
+    <pre class="diff"><code>{first.diff}</code></pre>
+    <dl class="messages">
+      <div class="msg msg-baseline">
+        <dt>baseline</dt>
+        <dd class="m-baseline">{first[`${firstModel}_baseline`]}</dd>
+      </div>
+      <div class="msg msg-finetuned">
+        <dt>fine-tuned</dt>
+        <dd class="m-finetuned">{first[`${firstModel}_finetuned`]}</dd>
+      </div>
+      <div class="msg msg-reference">
+        <dt>reference</dt>
+        <dd class="m-reference">{first.reference}</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<style lang="scss">
+  .commit-comparison {
+    margin: 2rem 0;
+    border: 1px solid color-mix(in srgb, var(--text) 14%, var(--background));
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .controls {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--text) 12%, var(--background));
+    background: color-mix(in srgb, var(--text) 4%, var(--background));
+  }
+  .commit-comparison.is-enhanced .controls {
+    display: flex;
+  }
+
+  .model-select {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--text) 65%, var(--background));
+  }
+
+  .dropdown {
+    position: relative;
+  }
+  .dd-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--background);
+    border: 1px solid color-mix(in srgb, var(--text) 18%, var(--background));
+    border-radius: 8px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    transition: border-color var(--theme-transition);
+    &:hover,
+    &[aria-expanded='true'] {
+      border-color: var(--accent);
+    }
+  }
+  .dd-caret {
+    font-size: 0.7em;
+    color: color-mix(in srgb, var(--text) 55%, var(--background));
+    transition: transform 0.15s ease;
+  }
+  .dd-toggle[aria-expanded='true'] .dd-caret {
+    transform: rotate(180deg);
+  }
+
+  .dd-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 20;
+    min-width: 100%;
+    margin: 0;
+    padding: 0.25rem;
+    list-style: none;
+    background: var(--background);
+    border: 1px solid color-mix(in srgb, var(--text) 16%, var(--background));
+    border-radius: 8px;
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--text) 18%, transparent);
+    max-height: 16rem;
+    overflow-y: auto;
+    &[hidden] {
+      display: none;
+    }
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      &::before {
+        content: '✓';
+        width: 0.9em;
+        color: var(--accent);
+        opacity: 0;
+      }
+      &:hover,
+      &.is-active {
+        background: color-mix(in srgb, var(--accent) 12%, var(--background));
+      }
+      &.is-selected {
+        color: var(--accent);
+        &::before {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    button {
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--background);
+      border: 1px solid color-mix(in srgb, var(--text) 18%, var(--background));
+      border-radius: 8px;
+      padding: 0.35rem 0.8rem;
+      cursor: pointer;
+      transition: border-color var(--theme-transition), color var(--theme-transition);
+      &:hover:not(:disabled) {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      &:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+    }
+  }
+  .counter {
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in srgb, var(--text) 65%, var(--background));
+    .current {
+      color: var(--accent);
+      font-weight: 700;
+    }
+  }
+
+  .cc-error {
+    margin: 0;
+    padding: 0.7rem 1.1rem;
+    font-size: 0.85rem;
+    color: #b3261e;
+    background: color-mix(in srgb, #b3261e 10%, var(--background));
+    border-bottom: 1px solid color-mix(in srgb, #b3261e 30%, var(--background));
+    &[hidden] {
+      display: none;
+    }
+  }
+  :global(.dark-theme) .cc-error {
+    color: #f2b8b5;
+  }
+
+  .panel {
+    padding: 1rem 1.1rem 1.2rem;
+  }
+
+  .diff {
+    margin: 0 0 1rem;
+    padding: 0.8rem 1rem;
+    background: #0c0d2a;
+    border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--background));
+    border-radius: 10px;
+    max-height: 15rem;
+    overflow: auto;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+      color: #c9d1d9;
+      white-space: pre;
+    }
+  }
+
+  .messages {
+    margin: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .msg {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    align-items: baseline;
+    gap: 0.85rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--text) 4%, var(--background));
+    dt {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 50px;
+      text-align: center;
+      align-self: start;
+    }
+    dd {
+      margin: 0;
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+  }
+  .msg-baseline dt {
+    color: color-mix(in srgb, var(--text) 65%, var(--background));
+    background: color-mix(in srgb, var(--text) 10%, var(--background));
+  }
+  .msg-baseline dd {
+    color: color-mix(in srgb, var(--text) 70%, var(--background));
+  }
+  .msg-finetuned dt {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, var(--background));
+  }
+  .msg-reference dt {
+    color: #1a7f37;
+    background: color-mix(in srgb, #2ea043 20%, var(--background));
+  }
+  :global(.dark-theme) .msg-reference dt {
+    color: #56d364;
+  }
+
+  @media (max-width: 540px) {
+    .msg {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+    .msg dt {
+      justify-self: start;
+    }
+  }
+</style>
+
+<script>
+  type Example = Record<string, string>
+
+  const root = document.querySelector<HTMLElement>('.commit-comparison')
+
+  if (root) {
+    const total = Number(root.dataset.total ?? '0')
+    const dropdown = root.querySelector<HTMLElement>('.dropdown')!
+    const toggle = root.querySelector<HTMLButtonElement>('.dd-toggle')!
+    const menu = root.querySelector<HTMLElement>('.dd-menu')!
+    const ddCurrent = root.querySelector<HTMLElement>('.dd-current')!
+    const options = Array.from(menu.querySelectorAll<HTMLLIElement>('[role="option"]'))
+    const code = root.querySelector<HTMLElement>('.diff code')!
+    const mBaseline = root.querySelector<HTMLElement>('.m-baseline')!
+    const mFinetuned = root.querySelector<HTMLElement>('.m-finetuned')!
+    const mReference = root.querySelector<HTMLElement>('.m-reference')!
+    const current = root.querySelector<HTMLElement>('.counter .current')!
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('.nav button[data-dir]'))
+
+    let index = 0
+    let model = options[0]?.dataset.value ?? ''
+    let activeIndex = 0
+    let data: Example[] | null = null
+    let loading: Promise<Example[]> | null = null
+    const errorEl = root.querySelector<HTMLElement>('.cc-error')!
+
+    // The dataset is fetched lazily on the first interaction, not bundled.
+    function loadData(): Promise<Example[]> {
+      if (data) return Promise.resolve(data)
+      if (!loading) {
+        loading = fetch('/generated-commits.json')
+          .then((r) => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`)
+            return r.json()
+          })
+          .then((d: Example[]) => (data = d))
+          .catch((e) => {
+            loading = null // allow a retry on the next interaction
+            throw e
+          })
+      }
+      return loading
+    }
+
+    async function ensureData(): Promise<boolean> {
+      try {
+        await loadData()
+        errorEl.hidden = true
+        return true
+      } catch {
+        errorEl.hidden = false
+        return false
+      }
+    }
+
+    function updateButtons() {
+      buttons.forEach((btn) => {
+        const dir = Number(btn.dataset.dir)
+        btn.disabled = index + dir < 0 || index + dir > total - 1
+      })
+    }
+
+    // Only the two model outputs depend on the selected model.
+    function renderModel() {
+      if (!data) return
+      const ex = data[index]
+      mBaseline.textContent = ex[`${model}_baseline`] ?? '—'
+      mFinetuned.textContent = ex[`${model}_finetuned`] ?? '—'
+    }
+
+    // The diff, reference and counter only change when the example changes.
+    function renderExample() {
+      if (!data) return
+      const ex = data[index]
+      code.textContent = ex.diff
+      mReference.textContent = ex.reference
+      current.textContent = String(index + 1)
+      renderModel()
+      updateButtons()
+    }
+
+    function setActive(i: number) {
+      activeIndex = Math.max(0, Math.min(options.length - 1, i))
+      options.forEach((o, j) => o.classList.toggle('is-active', j === activeIndex))
+      options[activeIndex]?.scrollIntoView({ block: 'nearest' })
+      toggle.setAttribute('aria-activedescendant', options[activeIndex]?.id ?? '')
+    }
+    function openMenu() {
+      menu.hidden = false
+      toggle.setAttribute('aria-expanded', 'true')
+      const sel = options.findIndex((o) => o.dataset.value === model)
+      setActive(sel < 0 ? 0 : sel)
+    }
+    function closeMenu() {
+      menu.hidden = true
+      toggle.setAttribute('aria-expanded', 'false')
+      toggle.removeAttribute('aria-activedescendant')
+    }
+    const isOpen = () => !menu.hidden
+
+    async function selectOption(opt: HTMLLIElement) {
+      model = opt.dataset.value ?? model
+      ddCurrent.textContent = opt.textContent ?? ''
+      options.forEach((o) => {
+        const on = o === opt
+        o.classList.toggle('is-selected', on)
+        o.setAttribute('aria-selected', on ? 'true' : 'false')
+      })
+      closeMenu()
+      toggle.focus()
+      if (await ensureData()) renderModel()
+    }
+
+    toggle.addEventListener('click', () => (isOpen() ? closeMenu() : openMenu()))
+    options.forEach((opt) => {
+      opt.addEventListener('click', () => selectOption(opt))
+      opt.addEventListener('mousemove', () => setActive(options.indexOf(opt)))
+    })
+    dropdown.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (isOpen()) {
+          closeMenu()
+          toggle.focus()
+        }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        if (isOpen()) setActive(activeIndex + 1)
+        else openMenu()
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        if (isOpen()) setActive(activeIndex - 1)
+        else openMenu()
+      } else if ((e.key === 'Enter' || e.key === ' ') && isOpen()) {
+        e.preventDefault()
+        selectOption(options[activeIndex])
+      }
+    })
+    document.addEventListener('click', (e) => {
+      if (isOpen() && !dropdown.contains(e.target as Node)) closeMenu()
+    })
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const next = index + Number(btn.dataset.dir)
+        if (next < 0 || next > total - 1) return
+        if (!(await ensureData())) return
+        index = next
+        renderExample()
+      })
+    })
+
+    root.classList.add('is-enhanced')
+    updateButtons()
+  }
+</script>

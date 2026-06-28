@@ -1,0 +1,77 @@
+---
+// total_score is a weighted sum of the five normalized metrics (weights sum to 1).
+const terms = [
+  { weight: 0.25, metric: 'accuracy_norm' },
+  { weight: 0.2, metric: 'ROUGE-L' },
+  { weight: 0.2, metric: 'conventional' },
+  { weight: 0.2, metric: 'concise_norm' },
+  { weight: 0.15, metric: 'valid_length' },
+]
+---
+
+<div class="formula">
+  <code class="lhs">total_score</code>
+  <span class="eq">=</span>
+  {
+    terms.map((t, i) => (
+      <span class="term">
+        {i > 0 && <span class="op">+</span>}
+        <span class="weight">{t.weight.toFixed(2)}</span>
+        <span class="times">×</span>
+        <code class="metric">{t.metric}</code>
+      </span>
+    ))
+  }
+</div>
+
+<style lang="scss">
+  .formula {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+    margin: 1.3rem 0;
+    padding: 0.7rem 1rem;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    background: color-mix(in srgb, var(--accent) 6%, var(--background));
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .lhs {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-weight: 600;
+    color: var(--text);
+    background: none;
+    padding: 0;
+  }
+  .eq {
+    color: color-mix(in srgb, var(--text) 55%, var(--background));
+  }
+
+  .term {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+  .op,
+  .times {
+    color: color-mix(in srgb, var(--text) 45%, var(--background));
+  }
+  .weight {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .metric {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.85em;
+    color: var(--text);
+    background: color-mix(in srgb, var(--text) 8%, var(--background));
+    padding: 0.08em 0.4em;
+    border-radius: 5px;
+  }
+</style>

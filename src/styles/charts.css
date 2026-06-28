@@ -1,0 +1,44 @@
+/* Shared styling for the build-time Plot charts (figure wrapper, legend, caption).
+   Imported by each chart component; bundled once. Chart-specific theming (bar/line
+   fills, swatch colors) stays in each component's scoped <style>. */
+
+.chart {
+  margin: 2rem 0;
+}
+.chart svg {
+  max-width: 100%;
+  height: auto;
+  font-family: inherit;
+}
+.chart.chart-centered svg {
+  display: block;
+  margin-inline: auto;
+}
+
+.chart figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--text) 60%, var(--background));
+  text-align: center;
+}
+
+.chart .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  justify-content: center;
+  margin-bottom: 0.7rem;
+  font-size: 0.85rem;
+}
+.chart .legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: color-mix(in srgb, var(--text) 75%, var(--background));
+}
+.chart .swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+}

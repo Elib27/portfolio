@@ -1,0 +1,99 @@
+---
+import * as Plot from '@observablehq/plot'
+import { renderPlotToSVG } from '../../lib/renderPlot'
+import leaderboard from '../../data/leaderboard.json'
+import '../../styles/charts.css'
+
+type Metrics = Record<string, number>
+const data = leaderboard as Record<string, Metrics>
+
+// Small, secondary chart: Qwen2.5-Coder-0.5B only — does the new, more diverse
+// dataset beat the old one? Baseline → old data → new data, on two metrics.
+const TARGET = 'Qwen2.5-Coder-0.5B-Instruct'
+const VARIANTS = [
+  ['baseline', 'baseline'],
+  ['finetuned_old-dataset', 'old data'],
+  ['finetuned', 'new data'],
+] as const
+const METRICS = [
+  ['ROUGE-L', 'ROUGE-L'],
+  ['total_score', 'total score'],
+] as const
+
+type Row = { metric: string; variant: string; value: number }
+const rows: Row[] = []
+for (const [rawVariant, variant] of VARIANTS) {
+  const metrics = data[`${TARGET}_${rawVariant}`]
+  if (!metrics) continue
+  for (const [key, metric] of METRICS) rows.push({ metric, variant, value: metrics[key] ?? 0 })
+}
+
+const byVariant = (v: string) => rows.filter((r) => r.variant === v)
+const variantOrder = VARIANTS.map(([, v]) => v)
+const metricOrder = METRICS.map(([, m]) => m)
+
+const chart = renderPlotToSVG({
+  width: 480,
+  height: 300,
+  marginTop: 24,
+  marginBottom: 36,
+  marginLeft: 40,
+  marginRight: 12,
+  fx: { label: null, domain: metricOrder, padding: 0.3 },
+  x: { axis: null, domain: variantOrder },
+  y: { domain: [0, Math.max(...rows.map((r) => r.value)) * 1.18], label: null, grid: true },
+  marks: [
+    Plot.barY(byVariant('baseline'), { fx: 'metric', x: 'variant', y: 'value', className: 'v-baseline' }),
+    Plot.barY(byVariant('old data'), { fx: 'metric', x: 'variant', y: 'value', className: 'v-old' }),
+    Plot.barY(byVariant('new data'), { fx: 'metric', x: 'variant', y: 'value', className: 'v-new' }),
+    Plot.text(rows, {
+      fx: 'metric',
+      x: 'variant',
+      y: 'value',
+      text: (d) => d.value.toFixed(3),
+      dy: -6,
+      fontSize: 10,
+      className: 'val-label',
+    }),
+    Plot.ruleY([0]),
+  ],
+})
+---
+
+<figure class="chart chart-centered">
+  <div class="legend">
+    <span class="legend-item legend-baseline"><span class="swatch" />baseline</span>
+    <span class="legend-item legend-old"><span class="swatch" />old dataset</span>
+    <span class="legend-item legend-new"><span class="swatch" />new dataset</span>
+  </div>
+  <Fragment set:html={chart} />
+  <figcaption>
+    Dataset quality on Qwen2.5-Coder-0.5B
+  </figcaption>
+</figure>
+
+<style lang="scss">
+  /* Plot rejects var() in fill, so theme the bars here (reacts to dark mode). */
+  .chart :global(.v-baseline rect) {
+    fill: color-mix(in srgb, var(--text) 32%, var(--background));
+  }
+  .chart :global(.v-old rect) {
+    fill: color-mix(in srgb, var(--accent) 50%, var(--background));
+  }
+  .chart :global(.v-new rect) {
+    fill: var(--accent);
+  }
+  .chart :global(.val-label text) {
+    fill: color-mix(in srgb, var(--text) 70%, var(--background));
+  }
+
+  .legend-baseline .swatch {
+    background: color-mix(in srgb, var(--text) 32%, var(--background));
+  }
+  .legend-old .swatch {
+    background: color-mix(in srgb, var(--accent) 50%, var(--background));
+  }
+  .legend-new .swatch {
+    background: var(--accent);
+  }
+</style>

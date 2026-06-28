@@ -1,0 +1,83 @@
+---
+import * as Plot from '@observablehq/plot'
+import { renderPlotToSVG } from '../../lib/renderPlot'
+import lossData from '../../data/Qwen2.5-Coder-1.5B-Instruct-training-loss.json'
+import '../../styles/charts.css'
+
+const trainingLossChart = renderPlotToSVG({
+  width: 700,
+  height: 360,
+  marginTop: 20,
+  marginBottom: 44,
+  marginLeft: 52,
+  marginRight: 16,
+  x: { label: 'training step →', labelAnchor: 'right' },
+  y: { label: '↑ loss', grid: true, nice: true },
+  marks: [
+    Plot.lineY(lossData.training_losses, {
+      x: 'step',
+      y: 'loss',
+      className: 'series-train',
+      strokeWidth: 1.5,
+    }),
+    Plot.lineY(lossData.eval_losses, {
+      x: 'step',
+      y: 'eval_loss',
+      className: 'series-eval',
+      strokeWidth: 2.5,
+    }),
+    Plot.dot(lossData.eval_losses, {
+      x: 'step',
+      y: 'eval_loss',
+      className: 'series-eval',
+      r: 3,
+    }),
+    Plot.text([0], {
+      frameAnchor: 'top-right',
+      dx: -6,
+      dy: 6,
+      text: () => 'training loss',
+      className: 'series-train',
+      textAnchor: 'end',
+      fontSize: 13,
+    }),
+    Plot.text([0], {
+      frameAnchor: 'top-right',
+      dx: -6,
+      dy: 24,
+      text: () => 'eval loss',
+      className: 'series-eval',
+      textAnchor: 'end',
+      fontSize: 13,
+    }),
+  ],
+})
+---
+
+<figure class="chart">
+  <Fragment set:html={trainingLossChart} />
+  <figcaption>
+    Training and eval loss during fine-tuning of Qwen2.5-Coder-1.5B-Instruct
+  </figcaption>
+</figure>
+
+<style>
+  /* Plot rejects var() in stroke/fill, so theme the series here (reacts to dark mode). */
+  .chart :global(.series-train) {
+    stroke: color-mix(in srgb, var(--text) 40%, var(--background));
+  }
+  .chart :global(.series-eval) {
+    stroke: var(--accent);
+  }
+  .chart :global(.series-eval[aria-label='dot']) {
+    fill: var(--accent);
+  }
+  .chart :global(.series-train[aria-label='text']) {
+    stroke: none;
+    fill: color-mix(in srgb, var(--text) 55%, var(--background));
+  }
+  .chart :global(.series-eval[aria-label='text']) {
+    stroke: none;
+    fill: var(--accent);
+  }
+</style>
