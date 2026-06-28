@@ -1,0 +1,98 @@
+---
+import * as Plot from '@observablehq/plot'
+import { renderPlotToSVG } from '../../lib/renderPlot'
+import leaderboard from '../../data/leaderboard.json'
+import '../../styles/charts.css'
+
+type Metrics = Record<string, number>
+const entries = Object.entries(leaderboard as Record<string, Metrics>)
+
+// vs_ref_better/equal/worse sum to 1, so we build 100%-stacked bars by
+// accumulating each segment's [x1, x2] range. Faceted by Coder model size.
+const CATEGORIES = [
+  ['vs_ref_better%', 'better'],
+  ['vs_ref_equal%', 'equal'],
+  ['vs_ref_worse%', 'worse'],
+] as const
+
+type Seg = { size: string; variant: string; category: string; x1: number; x2: number }
+const segments: Seg[] = []
+for (const [key, metrics] of entries) {
+  const sep = key.indexOf('_')
+  const model = sep === -1 ? key : key.slice(0, sep)
+  const variant = sep === -1 ? '' : key.slice(sep + 1)
+  if (!model.startsWith('Qwen2.5-Coder')) continue
+  if (variant !== 'baseline' && variant !== 'finetuned') continue
+  const sizeMatch = model.match(/\d+(?:\.\d+)?B/)
+  if (!sizeMatch) continue
+  const size = sizeMatch[0]
+  let acc = 0
+  for (const [metricKey, category] of CATEGORIES) {
+    const value = metrics[metricKey] ?? 0
+    segments.push({ size, variant, category, x1: acc, x2: acc + value })
+    acc += value
+  }
+}
+
+const sizes = [...new Set(segments.map((s) => s.size))].sort(
+  (a, b) => parseFloat(a) - parseFloat(b)
+)
+const seg = (cat: string) => segments.filter((s) => s.category === cat)
+
+const chart = renderPlotToSVG({
+  width: 700,
+  height: 340,
+  marginTop: 8,
+  marginBottom: 40,
+  marginLeft: 120,
+  marginRight: 16,
+  x: {
+    domain: [0, 1],
+    label: 'share of test set →',
+    labelAnchor: 'right',
+    tickFormat: (d) => `${Math.round(d * 100)}%`,
+  },
+  fy: { label: null, domain: sizes },
+  y: { label: null, domain: ['baseline', 'finetuned'] },
+  marks: [
+    Plot.barX(seg('better'), { fy: 'size', y: 'variant', x1: 'x1', x2: 'x2', className: 'seg-better' }),
+    Plot.barX(seg('equal'), { fy: 'size', y: 'variant', x1: 'x1', x2: 'x2', className: 'seg-equal' }),
+    Plot.barX(seg('worse'), { fy: 'size', y: 'variant', x1: 'x1', x2: 'x2', className: 'seg-worse' }),
+  ],
+})
+---
+
+<figure class="chart">
+  <div class="legend">
+    <span class="legend-item legend-better"><span class="swatch" />better than reference</span>
+    <span class="legend-item legend-equal"><span class="swatch" />equal</span>
+    <span class="legend-item legend-worse"><span class="swatch" />worse</span>
+  </div>
+  <Fragment set:html={chart} />
+  <figcaption>
+    LLM-judge verdict vs. the human reference, baseline vs. fine-tuned, per model size (Qwen2.5-Coder).
+  </figcaption>
+</figure>
+
+<style lang="scss">
+  /* Plot rejects var() in fill, so theme the stacked segments here (reacts to dark mode). */
+  .chart :global(.seg-better rect) {
+    fill: var(--accent);
+  }
+  .chart :global(.seg-equal rect) {
+    fill: color-mix(in srgb, var(--accent) 45%, var(--background));
+  }
+  .chart :global(.seg-worse rect) {
+    fill: color-mix(in srgb, var(--text) 15%, var(--background));
+  }
+
+  .legend-better .swatch {
+    background: var(--accent);
+  }
+  .legend-equal .swatch {
+    background: color-mix(in srgb, var(--accent) 45%, var(--background));
+  }
+  .legend-worse .swatch {
+    background: color-mix(in srgb, var(--text) 15%, var(--background));
+  }
+</style>

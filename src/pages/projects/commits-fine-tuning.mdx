@@ -1,0 +1,273 @@
+---
+layout: ../../layouts/ArticleLayout.astro
+title: "Teaching a small local LLM to write my git commits"
+description: "Fine-tuning tiny open-weight models to turn a git diff into a clean Conventional Commit message — privately, offline, and fast enough to live in a git hook."
+---
+
+import DatasetCharts from '../../components/CommitsFineTuning/DatasetCharts.astro'
+import TrainingAndEvalLossChart from '../../components/CommitsFineTuning/TrainingAndEvalLossChart.astro'
+import LeaderboardTable from '../../components/CommitsFineTuning/LeaderboardTable.astro'
+import TotalScoreChart from '../../components/CommitsFineTuning/TotalScoreChart.astro'
+import ImprovementBySizeChart from '../../components/CommitsFineTuning/ImprovementBySizeChart.astro'
+import VsReferenceChart from '../../components/CommitsFineTuning/VsReferenceChart.astro'
+import DatasetEffectChart from '../../components/CommitsFineTuning/DatasetEffectChart.astro'
+import TotalScoreFormula from '../../components/CommitsFineTuning/TotalScoreFormula.astro'
+import CommitComparison from '../../components/CommitsFineTuning/CommitComparison.astro'
+
+## 1. The problem
+
+Writing git commits has always been my favourite part of programming… no, of course I'm joking — that's exactly why I was about to spend a few dozen hours automating something that takes seconds.
+
+Every developer has written lazy commit messages. But commit history *is* documentation: it's the record of why a codebase looks the way it does. Automating a decent first draft is a reasonable thing to want.
+
+So let's scrape some commit data, fine-tune a few models on GPUs, evaluate them honestly, and find the best way to write our commit messages.
+
+(Everything here — code, dataset, and models — is open source; links at the end if you want to dig in.)
+
+## 2. The approach: why local, why fine-tuned
+
+So how do we do this? We have a few different options:
+
+- **Call an API to a frontier model.** It's simple and works well, but it has tradeoffs: you need to be online, you pay per call, you get some latency, and — most importantly — privacy. You'd be sending your code to an LLM provider, which isn't fun at all. I also prefer open source and privacy by principle.
+- **Run a local model.** It's virtually free and your code never leaves your machine. From there, two more options:
+  - **Prompt a relatively big local model** to generate the message. You keep your privacy, but it can use a lot of VRAM and is slower — and you probably don't want to spend all your VRAM just on commit messages.
+  - **Fine-tune a small model.** Because the task is narrow, a much smaller model can do the same job: privacy, speed, low latency, low VRAM. The cost is that you have to fine-tune it (or download an already fine-tuned one). And, most importantly, it's the most fun method — and the one that will teach me the most.
+
+So let's fine-tune our first model!
+
+## 3. The data
+
+Let's start with the most important thing: our training data. Its quality is probably the single biggest factor in output quality, we should be careful. Gathering and filtering good data can be hard — that's literally a job — but fortunately it's fairly simple in our case.
+
+We need git diffs and their corresponding commit messages, and there are plenty on GitHub. The plan: find open-source repos that follow [Conventional Commits](https://www.conventionalcommits.org/), clone them, then run a Python script to extract `(diff, message)` pairs into a JSONL file.
+
+One detail: I fine-tune specifically for **TypeScript**, because that's what I mostly use in my current internship at [Botpress](https://botpress.com/). Here are some of the repos I chose: Angular, Tanstack Query, Vite, Nuxt… and of course the Botpress OSS repo, to match my actual workflow.
+
+The script clones each repo, walks the commits, and for every commit grabs the diff and the message. But I don't keep every commit — many are badly formatted (developers are sometimes lazy) and others just aren't interesting. The main filters:
+
+- **Conventional Commits enforcement**: the message must follow the conventional structure (the whole point of this fine-tune).
+- **Stripping trailing refs** (`#1234`): these aren't inferable from the diff and would be learned as hallucination fodder, so I remove them.
+- **Generated-file exclusion**: each commit must touch at least one non-generated file. I skip lockfiles, minified JS, snapshots, `dist/`, etc.
+- **Per-repo cap**: prevents a massive repo (e.g. Angular) from dominating the distribution.
+
+**Lesson learned:** my first dataset iteration used only 9 repos and was less strict one the rules (e.g too many repetitions) — not enough diversity. The current dataset has 13.
+
+Running the script gives ~12k `(diff, message)` pairs — enough for fine-tuning, evaluation, and testing.
+
+### How many examples do we actually need?
+
+Honestly, nobody knows precisely, and the literature gives a wide range depending on assumptions. What the empirical evidence suggests, for LoRA on a narrow, well-defined task like this (consistent format, short output, constrained vocabulary):
+
+- **500–2k examples** is often enough to meaningfully shift behaviour, especially when the base model already has coding and instruction-following ability (Qwen2.5-Coder does).
+- **2k–10k** is a comfortable zone where most practitioners report stable convergence on focused tasks.
+- **Beyond 10–20k**, returns diminish fast for a task this narrow. Going from 12k to 50k is unlikely to help *for this specific task*.
+
+So our ~12k is more than enough. Why is this hard to pin down? It depends on:
+
+- **Task–data alignment with pretraining.** Qwen2.5-Coder was pretrained on code and likely saw git diffs, so we need fewer examples to *activate* existing knowledge than to teach something new.
+- **LoRA rank.** Higher rank (I use r=16) means more trainable parameters — can learn more from less data, but also more overfitting risk on small datasets.
+- **Output length and diversity.** Commit messages are short and have a consistent format, which lowers the data requirement.
+- **Quality vs. quantity.** 5k high-quality, diverse examples beat 20k noisy ones. This is probably the more important variable than raw count.
+
+Diversity also matters for generalization. I deliberately mixed:
+
+- Different project types: library, app, monorepo, CLI, backend.
+- Different team conventions within Conventional Commits.
+- Different subsystems being changed: build, core, docs, tests, ...
+
+Here's is the shape of my dataset:
+
+<DatasetCharts />
+
+In addition, I made different analysis to compare the repos:
+- Ran a dedup check — compared message subjects for exact duplicates, computed a duplicate rate, and charted how often subjects repeat.
+- Checked scope coverage — extracted file extensions from the diffs to see which languages/file types are represented, highlighting TypeScript specifically.
+- Spot-checked random samples — rendered a random sample of diff/message pairs in an HTML table for manual eyeballing.
+- Ran an LLM-as-judge evaluation — used GPT-4o-mini to score a sample (n=250) of examples on three dimensions: whether the message is inferable from the diff, how specific it is, and whether the commit type is correct.
+- Analyzed judge results — computed mean scores per dimension, plotted score distributions, and broke down "bad" example rates (any dimension ≤3) by repo to see which repos are dragging down quality.
+- Inspected bad/good/borderline examples — rendered tables of the worst-scoring, best-scoring, and borderline examples with the judge's reasoning, to understand failure patterns repo by repo.
+
+If you're curious, here is the notebook to check the dataset quality: [insert link]
+
+This analysis allowed me to tell the second version of the dataset was better than the first one.
+
+Even with all these precautions, there's a real **data limitation**: the training data came from curated open-source TypeScript repos, and may not generalize to codebases with different conventions or commit hygiene.
+
+After the extra filtering we have **12,433** higher-quality examples. In practice I trim further (to keep examples under 4096 tokens) and hold out 5% for evaluation and 5% for testing, leaving **11,178** examples for fine-tuning.
+
+## 4. Training
+
+Originally I wanted to fine-tune on my own machine. My first tests used Hugging Face Transformers and then MLX (I'm on a MacBook M4 Pro, 48 GB — my work laptop; otherwise I use Linux btw). It worked, but it was long and the laptop ran hot. I'll keep the Mac for inference only.
+
+So I looked for free GPU options. Kaggle has a generous offer (~30h GPU/week), but fine-tuning the smallest model with Transformers was still ~9h — doable, but painful when you want to run lots of experiments. I switched to **Google Colab Pro** ($10/month), which *in theory* gives you an H100 (80 GB VRAM, 3.35 TB/s)… except they're never available. The A100 (40 GB, 1.5 TB/s) is available and more than enough here. With **Unsloth** for performance, fine-tuning dropped to **~20 minutes**. Quite impressive. So let's invest $10 conscientiously and fine-tune our models.
+
+Here are the models I want to fine-tune and compare:
+
+- Qwen2.5-0.5B-Instruct
+- Qwen2.5-Coder-0.5B-Instruct
+- Qwen2.5-1.5B-Instruct
+- Qwen2.5-Coder-1.5B-Instruct
+- Qwen2.5-Coder-3B-Instruct
+- Llama-3.2-1B-Instruct
+- Qwen3.5-0.8B
+- Qwen3.5-2B
+- Ministral-3-3B-Instruct
+
+**Why these?** They're all open-weight, so I can run them locally for everyday use. I deliberately chose very small models: the task is narrow, I'll fine-tune them, and I want them fast and light on memory. I favoured the Qwen-Coder models because they were pretrained on lots of code, so they should be better at mapping a diff to a message than general-purpose models (I'll verify that later). I included a few general-purpose and newer models to compare.
+
+To fine-tune them I use **LoRA** (Low-Rank Adaptation): instead of updating all the parameters (there are a lot), which is compute-intensive and slow, we freeze the base model and train a small pair of "adapter" matrices added to a few weight layers. I use **r=16** with **alpha = 2·r = 32** , which is the default value for my model size.
+
+On Qwen2.5-Coder-3B that's only ~30M trainable params out of 3B — we train roughly **1%** of the parameters. Why does that work? The base model already knows code syntax, language, and summarization. It doesn't need to relearn any of that — it just needs a small, low-dimensional nudge to consistently map "diff → commit message." That nudge is exactly what LoRA's compact update can capture, giving most of the benefit of full fine-tuning at a fraction of the cost and memory.
+
+I set **max input length to 4096 tokens**, since git diffs can be long, then filter the dataset to that limit (which means tokenizing examples beforehand to filter).
+
+**Do we need a system prompt?** Not strictly — a task-specific fine-tune learns from data patterns alone. But a system prompt makes inference more robust and explicit, so I'll use`` one:
+
+```python
+SYSTEM_PROMPT = (
+    "You are an expert software engineer. "
+    "Given a git diff, write a single concise conventional"
+    "commit message in the imperative mood. "
+    "Output only the commit message, nothing else."
+)
+```
+
+At each step I pass only the diff, and the model returns the message — nothing else. The key rule: **be consistent between training and inference.** Use the exact same system prompt wording at inference as during training, or omit it in both.
+
+Some of the training arguments I used for fine-tuning `Qwen2.5-Coder-0.5B-Instruct`:
+
+```python
+training_args = SFTConfig(
+    per_device_train_batch_size=16,
+    gradient_accumulation_steps=1,
+    num_train_epochs=3,
+    learning_rate=1e-4,
+    warmup_steps=50,
+    bf16=True,
+    max_length=4096,
+    packing=True,
+)
+(go to the notebook to see every parameter I used)
+```
+
+
+A few choices worth explaining:
+
+- **Batch size.** On the A100 I use a `per_device_train_batch_size` of 16 — 16 examples processed in parallel before each gradient update — which speeds things up a lot. With `gradient_accumulation_steps=1`, the effective batch size stays 16 (effective = per-device × accumulation).
+- **Epochs and learning rate.** 3 epochs (each example seen 3 times), with a learning rate of `1e-4` for the smallest models (0.5B–1B) and `2e-5` for the bigger ones (1.5–3B). These are fairly high, but the training loss went down consistently. The 50 **warmup steps** ramp the learning rate up gradually, avoiding an early destabilizing step.
+- **Packing.** Most examples are well under 4096 tokens, so without packing I'd waste a large fraction of every batch on padding. With packing, several diffs are concatenated into one 4096-token sequence, so each forward pass does more useful work.
+
+I don't use LoRA dropout to enable Unsloth's optimizations. It's not a problem here because the dataset (11k examples) is large enough relative to the ~1.75% of parameters being trained that overfitting risk is low.
+
+Each model fine-tuning took between 20 and 30 minutes depending on the model size.
+
+<TrainingAndEvalLossChart />
+
+## 5. Evaluation: how do you know it works?
+
+This is probably the most important part of the whole project. It's easy to fine-tune a model and convince yourself it's better because the outputs *look* nicer — but proving it is harder, and it requires actually measuring, and being honest about what the measurements can and can't tell you.
+
+I evaluated on a test set of 621 examples the models had never seen during training (the 5% held out earlier). First step was generating the 621 predictions for each variant of each model. For this task, the T4 GPU was more than enough, I could even have generated then on my computer (remember, that's the goal of this project).
+
+The two variants for each model are:
+
+- **`baseline`** — the non-finetuned model, unmodified, given an explicit system prompt describing the task.
+- **`finetuned`** — the LoRA fine-tuned model, with the same system prompt used during training.
+
+Here is the system prompt given to each baseline model. This one is more detailed than the fine-tuned prompt to be a fair comparison.
+
+```python
+BASELINE_SYSTEM_PROMPT = (
+    "You are an expert software developer. "
+    "Given a git diff, generate a single conventional concise commit message.\n\n"
+    "Format: <type>(<optional-scope>): <description>\n"
+    "Allowed types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert.\n\n"
+    "Rules:\n"
+    "- The description must be in imperative mood (e.g. 'add', 'fix', 'remove') — never past tense (e.g. 'added') or gerund (e.g. 'adding').\n"
+    "- Total length must be between 10 and 72 characters.\n"
+    "- Do not end with a period, exclamation mark, or ellipsis.\n"
+    "Output only the commit message, nothing else."
+)
+```
+
+I used three layers of evaluation, each catching something the others miss.
+
+**ROUGE-L.** Measures the longest common subsequence between the generated message and the human reference. It's a metric with a real weakness: it rewards overlapping words and word order, not correctness. A model could score well while describing the wrong change, just by using similar phrasing. I keep it anyway because it's standard, cheap, and useful as a sanity check rather than a verdict.
+
+**Structural checks.** Simple, deterministic, and arguably more useful here than ROUGE-L: is the message between 10 and 72 characters? Does it follow the `type(scope): description` format? These don't measure quality, but they measure whether the model learned the *format* — which, for a tool that has to slot into a real workflow, matters as much as semantic accuracy.
+
+**LLM-as-judge.** For 200 test examples, I had GPT-4o-mini score each generated message against the diff and the human reference on accuracy, conciseness, and a relative judgment (better/equal/worse than the human reference), at temperature 0 for reproducibility. The limitation: using an LLM to judge an LLM has known biases — it can favour certain phrasing styles, and it's not ground truth, just another signal. I treat it as one data point among three, not the deciding one. I started with GPT-5.4-nano but switched to GPT-4o-mini because the smaller judge wasn't precise enough and often penalised a good commit message for the wrong reason. All the LLM calls for this analysis costed me less than a dollar.
+
+Before the aggregate numbers, here are a few examples to judge for yourself — the diff, both model outputs, and the human reference:
+
+Enough speaking, let's see the results!
+
+## 6. Results
+
+<LeaderboardTable />
+
+Here is the total score formula:
+
+<TotalScoreFormula />
+
+The headline number first: across every model I tested, fine-tuning improved every structural and ROUGE metric, with no exceptions. ROUGE-L went up between +26% and +164% relative depending on the model — the biggest jumps coming from the weakest baselines (Llama-3.2-1B, lowest at the start, gained the most); Conventional Commits compliance hit 100% for every fine-tuned model except the 3B (99.8%); valid-length compliance jumped by 3 to 35 percentage points. If I stopped here, the conclusion would be simple: fine-tuning seems to work. But the more interesting story is coming.
+
+Smaller fine-tuned beats bigger un-tuned. The fine-tuned 0.5B model scores higher in total score (0.773) than the un-tuned 3B baseline (0.758). A model six times smaller, specialized on this one task, outperforms a much larger general-purpose model that's never seen an example of how I want my commits written. This is the main argument for fine-tuning over "just prompt a bigger model" made concrete in the numbers — model size doesn't substitute for task-specific training, at least not for something this narrow.
+
+<TotalScoreChart />
+
+Diminishing returns as the base model grows. Looking at the relative improvement from fine-tuning at each size, the gain shrinks fast: +24% total score for 0.5B, +8% for 1.5B, +4% for 3B (on Qwen-2.5-coder models). The bigger the base model, the less there is for the adapter to teach it — Qwen2.5-Coder-3B already does a decent job at this task zero-shot, so fine-tuning is polishing rather than transforming. This is a useful number when deciding whether fine-tuning is worth the effort on a given model size: the smaller the model, the bigger the payoff.
+
+<ImprovementBySizeChart />
+
+Code-pretraining still matters, even with fine-tuning. Comparing Qwen2.5-Coder against the plain Qwen2.5 at matched sizes, the Coder variant wins both before fine-tuning (+2.3% at 1.5B) and after (+3.7% at 1.5B). The effect is modest, but consistent in direction. The model's coding-specific pretraining and the LoRA adapter aren't redundant, they compound.
+
+One of the finding I find most interesting: fine-tuning trades rare brilliance for reliable competence. This shows up clearly in the LLM-as-judge's relative verdicts. At every model size, the chance that fine-tuning makes the model actually beat the human-written reference goes down: 8.0%→1.5% at 0.5B, 11.0%→2.5% at 1.5B, 16.0%→4.5% at 3B. At the same time, the chance the model matches the human reference goes up substantially: 6.5%→23.5%, 15.5%→30.5%, 25.5%→31.0%. Said another way: the base model, prompted with explicit instructions, occasionally produces a surprisingly good commit message by getting creative — and just as often produces something off the rails. Fine-tuning sands off both ends of that distribution. The result is a model that almost never writes a great commit message, but reliably writes a good-enough one. For a tool meant to run unattended in a git hook, I'd take consistency over occasional brilliance but it's worth showing that this is a tradeoff, not a strict improvement.
+
+<VsReferenceChart />
+
+One result I can't fully explain: judge_accuracy drops for the 3B model after fine-tuning (4.110 → 3.895), the only metric, on the only model, where fine-tuning makes things worse by GPT-4o's judgment. Every other model improves on this metric after fine-tuning. I don't have a confirmed explanation — my best guesses are that the 3B model already had enough competence that the LoRA adapter nudged it toward shorter, more "trained" phrasing at a small cost to factual completeness, or that this is noise from judging a 200-example subsample rather than the full test set. I'd want a larger judge sample before treating this as a real effect rather than variance.
+
+Dataset quality: a real improvement, but smaller than I expected compared to the work of improving the dataset. Comparing the 0.5B model fine-tuned on the old, less diverse dataset against the new one, ROUGE-L moved from 0.371 to 0.391 — a real gain, but a modest one. More diverse data with stricter rules helped, but the single biggest lever in this project was still doing any task-specific fine-tuning at all. Maybe better quality commits, filtered with an LLM-as-judge would have given better results.
+
+<DatasetEffectChart />
+
+One result shaped how I read everything else: **all models lose to the human-written reference the vast majority of the time** — 92.7% for the baseline, 96.7% for the fine-tuned model. At first glance that makes the fine-tuned model sound *worse*. But the human authors had something neither model had: full context on the codebase, the ticket, and the conversation that led to the change. Beating that is a different, much harder problem than "write a plausible commit message from a diff alone."
+
+To conclude, the fine-tune reliably fixes *format* (Conventional Commits, length) — which is exactly what makes it usable as a drop-in tool — and modestly improves semantic quality. It does not, and is not expected to, beat a human author who knows the codebase.
+
+<CommitComparison />
+
+A practical note before moving to deployment: every number above comes from full-precision (BF16) models running on Colab. The version that will actually ships to my laptop is quantized to GGUF (Q4_K_M), and I haven't yet established whether that introduces a meaningful drop.
+
+## 7. Deployment: from notebook to git hook
+
+This is where the project becomes a real tool: **merge the LoRA adapter → export to GGUF → run with Ollama → wire it into a `prepare-commit-msg` hook.**
+
+There's a memory/latency tradeoff in how you run the model:
+
+- **Load then free** on each commit: best RAM usage, but slower.
+- **Keep it resident** in RAM: faster on the second use, but uses memory all the time.
+- **Something in between** (a short-lived keep-alive) is usually the sweet spot.
+
+## 8. Limitations and what's next
+
+All things considered, this works quite well: the fine-tuned model is genuinely better and consistent than the baseline on every metric I tracked. But "better than baseline" isn't the same as perfect. So here are the limitations I ran into, and what could be improved.
+
+- **Reasoning before answering.** Add a short hidden reasoning step to improve quality without bloating the final output.
+- **Higher-quality data over more data.** Move to a smaller, LLM-judge-filtered dataset.
+- **Generalization.** Training data came from high-discipline TypeScript repos; behaviour on messier codebases or other languages is untested.
+- **Quantization impact.** Confirm the real-world quality drop from Q4_K_M quantization versus the BF16 numbers above.
+- **Better judge.** The LLM-as-judge is one imperfect signal; a larger or human-in-the-loop evaluation would tighten the conclusions.
+
+## 9. Wrapping up
+
+That was another story about automating a few seconds of typing into a complete ML project: scraping and filtering ~12k diff/message pairs, LoRA fine-tuning a handful of small models on a Colab A100 with Unsloth, a three-layer evaluation (ROUGE-L, structural checks, LLM-as-judge), and shipping the result as a local `prepare-commit-msg` hook. The takeaway I keep coming back to: a tiny model you can run offline, for free and privately, writes clean Conventional Commits — and for a task this narrow, task-specific fine-tuning beats prompting a larger model.
+
+If you want to dig into the code, run the notebooks, or fine-tune your own:
+
+- **GitHub repository** — scraping scripts, training and evaluation code, and the git hook: [github.com/Elib27/commit-message-finetuning]()
+- **Fine-tuning notebook** — the Unsloth + LoRA training pipeline: [open in Colab]()
+- **Evaluation notebook** — ROUGE-L, structural checks, and the LLM-as-judge harness: [open in Colab]()
+
+Thanks for reading — and may your commit history finally read like documentation :)

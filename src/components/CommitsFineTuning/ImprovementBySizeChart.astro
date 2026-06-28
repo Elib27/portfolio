@@ -1,0 +1,134 @@
+---
+import * as Plot from '@observablehq/plot'
+import { renderPlotToSVG } from '../../lib/renderPlot'
+import leaderboard from '../../data/leaderboard.json'
+import '../../styles/charts.css'
+
+type Metrics = Record<string, number>
+const entries = Object.entries(leaderboard as Record<string, Metrics>)
+
+// Per model: parse the base-model size and gather baseline/finetuned total score.
+type Agg = { model: string; size: number; baseline?: number; finetuned?: number }
+const byModel = new Map<string, Agg>()
+for (const [key, metrics] of entries) {
+  const sep = key.indexOf('_')
+  const model = sep === -1 ? key : key.slice(0, sep)
+  const variant = sep === -1 ? '' : key.slice(sep + 1)
+  if (variant !== 'baseline' && variant !== 'finetuned') continue
+  const m = model.match(/(\d+(?:\.\d+)?)B/)
+  if (!m) continue
+  const agg = byModel.get(model) ?? { model, size: parseFloat(m[1]) }
+  agg[variant] = metrics['total_score']
+  byModel.set(model, agg)
+}
+
+type Point = { model: string; size: number; gain: number; label: string }
+const all: Point[] = [...byModel.values()]
+  .filter((a) => a.baseline != null && a.finetuned != null)
+  .map((a) => ({
+    model: a.model,
+    size: a.size,
+    gain: ((a.finetuned! - a.baseline!) / a.baseline!) * 100,
+    label: a.model.replace(/-Instruct$/, ''),
+  }))
+
+// The Qwen2.5-Coder family is the diminishing-returns line; everything else is
+// shown as standalone dots (not connected).
+const coder = all.filter((p) => p.model.startsWith('Qwen2.5-Coder')).sort((a, b) => a.size - b.size)
+const others = all.filter((p) => !p.model.startsWith('Qwen2.5-Coder'))
+
+const sizes = [...new Set(all.map((p) => p.size))].sort((a, b) => a - b)
+const maxGain = Math.max(...all.map((p) => p.gain))
+
+const chart = renderPlotToSVG({
+  width: 700,
+  height: 380,
+  marginTop: 28,
+  marginBottom: 44,
+  marginLeft: 48,
+  marginRight: 24,
+  x: {
+    domain: [0.2, 3.3],
+    ticks: sizes,
+    tickFormat: (d) => `${d}B`,
+    label: 'base model size →',
+    labelAnchor: 'right',
+  },
+  y: {
+    domain: [0, maxGain * 1.2],
+    label: '↑ total-score gain (%)',
+    grid: true,
+    tickFormat: (d) => `${d}%`,
+  },
+  marks: [
+    // other models — dots only, not linked
+    Plot.dot(others, { x: 'size', y: 'gain', className: 'other', r: 4 }),
+    Plot.text(others, {
+      x: 'size',
+      y: 'gain',
+      text: 'label',
+      dx: 8,
+      textAnchor: 'start',
+      fontSize: 11,
+      className: 'other-label',
+    }),
+    // Qwen2.5-Coder family — connected line
+    Plot.line(coder, { x: 'size', y: 'gain', className: 'series', strokeWidth: 2.5 }),
+    Plot.dot(coder, { x: 'size', y: 'gain', className: 'series', r: 4 }),
+    Plot.text(coder, {
+      x: 'size',
+      y: 'gain',
+      text: (d) => `+${Math.round(d.gain)}%`,
+      dy: -16,
+      fontSize: 13,
+      className: 'series-label',
+    }),
+  ],
+})
+---
+
+<figure class="chart">
+  <div class="legend">
+    <span class="legend-item legend-coder"><span class="swatch" />Qwen2.5-Coder</span>
+    <span class="legend-item legend-other"><span class="swatch" />other models</span>
+  </div>
+  <Fragment set:html={chart} />
+  <figcaption>
+    Relative total-score gain from fine-tuning, by base-model size
+  </figcaption>
+</figure>
+
+<style lang="scss">
+  /* Plot rejects var() in stroke/fill, so theme the series here (reacts to dark mode). */
+  .chart :global(.series[aria-label='line']) {
+    stroke: var(--accent);
+  }
+  .chart :global(.series[aria-label='dot']) {
+    fill: var(--accent);
+    stroke: var(--accent);
+  }
+  .chart :global(.series-label text) {
+    fill: var(--accent);
+    font-weight: 700;
+  }
+  .chart :global(.other[aria-label='dot']) {
+    fill: color-mix(in srgb, var(--text) 45%, var(--background));
+    stroke: color-mix(in srgb, var(--text) 45%, var(--background));
+  }
+  .chart :global(.other-label text) {
+    fill: color-mix(in srgb, var(--text) 60%, var(--background));
+  }
+
+  /* round swatches to match the dot markers (overrides the shared square swatch) */
+  .legend .swatch {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+  }
+  .legend-coder .swatch {
+    background: var(--accent);
+  }
+  .legend-other .swatch {
+    background: color-mix(in srgb, var(--text) 45%, var(--background));
+  }
+</style>

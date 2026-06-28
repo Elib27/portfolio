@@ -1,0 +1,134 @@
+---
+import * as Plot from '@observablehq/plot'
+import { loadCommitStats } from '../../lib/loadCommitStats'
+import { renderPlotToSVG } from '../../lib/renderPlot'
+import '../../styles/charts.css'
+
+const { types, repos, messageLengths, diffLengths } = loadCommitStats()
+const total = repos.reduce((sum, r) => sum + r.value, 0)
+
+function percentiles(values: number[]) {
+  const sorted = [...values].sort((a, b) => a - b)
+  const q = (p: number) => {
+    const i = (sorted.length - 1) * p
+    const lo = Math.floor(i)
+    const hi = Math.ceil(i)
+    return Math.round(lo === hi ? sorted[lo] : sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo))
+  }
+  return [0.5, 0.75, 0.95, 0.99].map((p) => ({ label: `p${p * 100}`, value: q(p) }))
+}
+
+const messagePercentiles = percentiles(messageLengths)
+const diffPercentiles = percentiles(diffLengths)
+
+const typeChart = renderPlotToSVG({
+  width: 700,
+  height: 320,
+  marginTop: 16,
+  marginBottom: 44,
+  marginLeft: 52,
+  x: { label: null },
+  y: { label: 'examples', grid: true, tickFormat: '~s' },
+  marks: [
+    Plot.barY(types, { x: 'label', y: 'value', rx: 3, sort: { x: '-y' } }),
+    Plot.ruleY([0]),
+  ],
+})
+
+const repoChart = renderPlotToSVG({
+  width: 700,
+  height: 420,
+  marginTop: 16,
+  marginBottom: 44,
+  marginLeft: 120,
+  x: { label: 'examples', grid: true, tickFormat: '~s' },
+  y: { label: null },
+  marks: [
+    Plot.barX(repos, { x: 'value', y: 'label', rx: 3, sort: { y: '-x' } }),
+    Plot.ruleX([0]),
+  ],
+})
+
+const messageLengthChart = renderPlotToSVG({
+  width: 700,
+  height: 320,
+  marginTop: 30,
+  marginBottom: 40,
+  marginLeft: 52,
+  x: { label: 'commit message length (chars) →', labelAnchor: 'right' },
+  y: { label: 'examples', grid: true, tickFormat: '~s' },
+  marks: [
+    Plot.rectY(messageLengths, Plot.binX({ y: 'count' }, { x: (d) => d, interval: 2 })),
+    Plot.ruleY([0]),
+    Plot.ruleX(messagePercentiles, { x: 'value', stroke: 'currentColor', strokeOpacity: 0.5, strokeDasharray: '4 3' }),
+    Plot.text(messagePercentiles, {
+      x: 'value',
+      text: (d) => `${d.label} = ${d.value.toLocaleString('en-US')}`,
+      frameAnchor: 'top',
+      dy: -12,
+      fontSize: 12,
+      fillOpacity: 0.75,
+    }),
+  ],
+})
+
+const diffLengthChart = renderPlotToSVG({
+  width: 700,
+  height: 320,
+  marginTop: 30,
+  marginBottom: 40,
+  marginLeft: 52,
+  x: { label: 'diff length (chars) →', labelAnchor: 'right', tickFormat: '~s' },
+  y: { label: 'examples', grid: true, tickFormat: '~s' },
+  marks: [
+    Plot.rectY(diffLengths, Plot.binX({ y: 'count' }, { x: (d) => d, interval: 200 })),
+    Plot.ruleY([0]),
+    Plot.ruleX(diffPercentiles, { x: 'value', stroke: 'currentColor', strokeOpacity: 0.5, strokeDasharray: '4 3' }),
+    Plot.text(diffPercentiles, {
+      x: 'value',
+      text: (d) => `${d.label} = ${d.value.toLocaleString('en-US')}`,
+      frameAnchor: 'top',
+      dy: -12,
+      fontSize: 12,
+      fillOpacity: 0.75,
+    }),
+  ],
+})
+---
+
+<figure class="chart">
+  <Fragment set:html={typeChart} />
+  <figcaption>
+    Commit-type distribution across the {total.toLocaleString('en-US')} examples
+    ({types.length} Conventional Commit types)
+  </figcaption>
+</figure>
+
+<figure class="chart">
+  <Fragment set:html={repoChart} />
+  <figcaption>
+    Examples per source repository ({repos.length} repos)
+  </figcaption>
+</figure>
+
+<figure class="chart">
+  <Fragment set:html={messageLengthChart} />
+  <figcaption>
+    Commit message length distribution
+  </figcaption>
+</figure>
+
+<figure class="chart">
+  <Fragment set:html={diffLengthChart} />
+  <figcaption>
+    Diff length distribution
+  </figcaption>
+</figure>
+
+<style>
+  /* Plot rejects var() in fill, so theme the bars here (reacts to dark mode). */
+  .chart :global(g[aria-label='bar'] rect),
+  .chart :global(g[aria-label='rect'] rect) {
+    fill: var(--accent);
+  }
+</style>

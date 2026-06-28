@@ -1,0 +1,127 @@
+---
+import * as Plot from '@observablehq/plot'
+import { renderPlotToSVG } from '../../lib/renderPlot'
+import leaderboard from '../../data/leaderboard.json'
+import '../../styles/charts.css'
+
+type Metrics = Record<string, number>
+type Point = { model: string; variant: 'baseline' | 'finetuned'; total: number }
+
+const entries = Object.entries(leaderboard as Record<string, Metrics>)
+
+const data: Point[] = []
+for (const [key, metrics] of entries) {
+  const sep = key.indexOf('_')
+  const variant = sep === -1 ? '' : key.slice(sep + 1)
+  if (variant !== 'baseline' && variant !== 'finetuned') continue // skip old-dataset
+  const model = (sep === -1 ? key : key.slice(0, sep)).replace(/-Instruct$/, '')
+  data.push({ model, variant, total: metrics['total_score'] ?? 0 })
+}
+
+const baseline = data.filter((d) => d.variant === 'baseline')
+const finetuned = data.filter((d) => d.variant === 'finetuned')
+
+// Order models (facets) by fine-tuned total score, best at top.
+const ftByModel = new Map(finetuned.map((d) => [d.model, d.total]))
+const blByModel = new Map(baseline.map((d) => [d.model, d.total]))
+const models = [...new Set(data.map((d) => d.model))].sort(
+  (a, b) => (ftByModel.get(b) ?? 0) - (ftByModel.get(a) ?? 0)
+)
+
+// Relative gain from fine-tuning, per model (one annotation per facet).
+type Gain = { model: string; gain: number }
+const gainData: Gain[] = models.map((model) => {
+  const bl = blByModel.get(model) ?? 0
+  const ft = ftByModel.get(model) ?? 0
+  return { model, gain: bl ? (ft - bl) / bl : 0 }
+})
+function formatGain(g: number): string {
+  const pct = Math.round(g * 100)
+  return `${pct >= 0 ? '+' : ''}${pct}%`
+}
+
+const chart = renderPlotToSVG({
+  width: 700,
+  height: models.length * 70 + 60,
+  marginTop: 8,
+  marginBottom: 36,
+  marginLeft: 150,
+  marginRight: 16,
+  // headroom on the right so bar value labels don't collide with the gain badge
+  x: { domain: [0, Math.max(...data.map((d) => d.total)) * 1.28], label: 'total score →', labelAnchor: 'right', grid: true },
+  fy: { label: null, domain: models },
+  y: { axis: null, domain: ['finetuned', 'baseline'] },
+  marks: [
+    Plot.barX(baseline, { fy: 'model', y: 'variant', x: 'total', className: 'bar-baseline' }),
+    Plot.barX(finetuned, { fy: 'model', y: 'variant', x: 'total', className: 'bar-finetuned' }),
+    Plot.text(baseline, {
+      fy: 'model',
+      y: 'variant',
+      x: 'total',
+      text: (d) => d.total.toFixed(3),
+      textAnchor: 'start',
+      dx: 5,
+      fontSize: 11,
+      className: 'label-baseline',
+    }),
+    Plot.text(finetuned, {
+      fy: 'model',
+      y: 'variant',
+      x: 'total',
+      text: (d) => d.total.toFixed(3),
+      textAnchor: 'start',
+      dx: 5,
+      fontSize: 11,
+      className: 'label-finetuned',
+    }),
+    Plot.text(gainData, {
+      fy: 'model',
+      frameAnchor: 'right',
+      dx: -2,
+      textAnchor: 'end',
+      text: (d) => formatGain(d.gain),
+      fontSize: 14,
+      className: 'gain-label',
+    }),
+    Plot.ruleX([0]),
+  ],
+})
+---
+
+<figure class="chart">
+  <div class="legend">
+    <span class="legend-item"><span class="swatch swatch-baseline" />baseline</span>
+    <span class="legend-item"><span class="swatch swatch-finetuned" />fine-tuned</span>
+  </div>
+  <Fragment set:html={chart} />
+  <figcaption>
+    Total score, baseline vs fine-tuned, per model (higher is better)
+  </figcaption>
+</figure>
+
+<style lang="scss">
+  /* Plot rejects var() in fill, so theme the series here (reacts to dark mode). */
+  .chart :global(.bar-baseline rect) {
+    fill: color-mix(in srgb, var(--text) 32%, var(--background));
+  }
+  .chart :global(.bar-finetuned rect) {
+    fill: var(--accent);
+  }
+  .chart :global(.label-baseline text) {
+    fill: color-mix(in srgb, var(--text) 60%, var(--background));
+  }
+  .chart :global(.label-finetuned text) {
+    fill: var(--accent);
+  }
+  .chart :global(.gain-label text) {
+    fill: var(--accent);
+    font-weight: 700;
+  }
+
+  .swatch-baseline {
+    background: color-mix(in srgb, var(--text) 32%, var(--background));
+  }
+  .swatch-finetuned {
+    background: var(--accent);
+  }
+</style>
