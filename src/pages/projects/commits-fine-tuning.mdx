@@ -50,7 +50,7 @@ The script clones each repo, walks the commits, and for every commit grabs the d
 - **Generated-file exclusion**: each commit must touch at least one non-generated file. I skip lockfiles, minified JS, snapshots, `dist/`, etc.
 - **Per-repo cap**: prevents a massive repo (e.g. Angular) from dominating the distribution.
 
-**Lesson learned:** my first dataset iteration used only 9 repos and was less strict one the rules (e.g too many repetitions) — not enough diversity. The current dataset has 13.
+**Lesson learned:** my first dataset iteration used only 9 repos and was less strict on one of the rules (e.g too many repetitions) — not enough diversity. The current dataset has 13.
 
 Running the script gives ~12k `(diff, message)` pairs — enough for fine-tuning, evaluation, and testing.
 
@@ -115,13 +115,13 @@ Here are the models I want to fine-tune and compare:
 
 **Why these?** They're all open-weight, so I can run them locally for everyday use. I deliberately chose very small models: the task is narrow, I'll fine-tune them, and I want them fast and light on memory. I favoured the Qwen-Coder models because they were pretrained on lots of code, so they should be better at mapping a diff to a message than general-purpose models (I'll verify that later). I included a few general-purpose and newer models to compare.
 
-To fine-tune them I use **LoRA** (Low-Rank Adaptation): instead of updating all the parameters (there are a lot), which is compute-intensive and slow, we freeze the base model and train a small pair of "adapter" matrices added to a few weight layers. I use **r=16** with **alpha = 2·r = 32** , which is the default value for my model size.
+To fine-tune them I use **LoRA** (Low-Rank Adaptation): instead of updating all the parameters (there are a lot), which is compute-intensive and slow, we freeze the base model and train a small pair of "adapter" matrices added to a few weight layers. I use **r=16** with **alpha = 2·r = 32** , a common default heuristic (alpha = 2×r).
 
 On Qwen2.5-Coder-3B that's only ~30M trainable params out of 3B — we train roughly **1%** of the parameters. Why does that work? The base model already knows code syntax, language, and summarization. It doesn't need to relearn any of that — it just needs a small, low-dimensional nudge to consistently map "diff → commit message." That nudge is exactly what LoRA's compact update can capture, giving most of the benefit of full fine-tuning at a fraction of the cost and memory.
 
 I set **max input length to 4096 tokens**, since git diffs can be long, then filter the dataset to that limit (which means tokenizing examples beforehand to filter).
 
-**Do we need a system prompt?** Not strictly — a task-specific fine-tune learns from data patterns alone. But a system prompt makes inference more robust and explicit, so I'll use`` one:
+**Do we need a system prompt?** Not strictly — a task-specific fine-tune learns from data patterns alone. But a system prompt makes inference more robust and explicit, so I'll use one:
 
 ```python
 SYSTEM_PROMPT = (
@@ -167,7 +167,7 @@ Each model fine-tuning took between 20 and 30 minutes depending on the model siz
 
 This is probably the most important part of the whole project. It's easy to fine-tune a model and convince yourself it's better because the outputs *look* nicer — but proving it is harder, and it requires actually measuring, and being honest about what the measurements can and can't tell you.
 
-I evaluated on a test set of 621 examples the models had never seen during training (the 5% held out earlier). First step was generating the 621 predictions for each variant of each model. For this task, the T4 GPU was more than enough, I could even have generated then on my computer (remember, that's the goal of this project).
+I evaluated on a test set of 621 examples the models had never seen during training (the 5% held out earlier). First step was generating the 621 predictions for each variant of each model. For this task, the T4 GPU was more than enough, I could even have generated them on my computer (remember, that's the goal of this project).
 
 The two variants for each model are:
 
@@ -196,7 +196,7 @@ I used three layers of evaluation, each catching something the others miss.
 
 **Structural checks.** Simple, deterministic, and arguably more useful here than ROUGE-L: is the message between 10 and 72 characters? Does it follow the `type(scope): description` format? These don't measure quality, but they measure whether the model learned the *format* — which, for a tool that has to slot into a real workflow, matters as much as semantic accuracy.
 
-**LLM-as-judge.** For 200 test examples, I had GPT-4o-mini score each generated message against the diff and the human reference on accuracy, conciseness, and a relative judgment (better/equal/worse than the human reference), at temperature 0 for reproducibility. The limitation: using an LLM to judge an LLM has known biases — it can favour certain phrasing styles, and it's not ground truth, just another signal. I treat it as one data point among three, not the deciding one. I started with GPT-5.4-nano but switched to GPT-4o-mini because the smaller judge wasn't precise enough and often penalised a good commit message for the wrong reason. All the LLM calls for this analysis costed me less than a dollar.
+**LLM-as-judge.** For 200 test examples, I had GPT-4o-mini score each generated message against the diff and the human reference on accuracy, conciseness, and a relative judgment (better/equal/worse than the human reference), at temperature 0 for reproducibility. The limitation: using an LLM to judge an LLM has known biases — it can favour certain phrasing styles, and it's not ground truth, just another signal. I treat it as one data point among three, not the deciding one. I started with GPT-5.4-nano but switched to GPT-4o-mini because the smaller judge wasn't precise enough and often penalised a good commit message for the wrong reason. All the LLM calls for this analysis cost me less than a dollar.
 
 Before the aggregate numbers, here are a few examples to judge for yourself — the diff, both model outputs, and the human reference:
 
@@ -228,7 +228,7 @@ One of the finding I find most interesting: fine-tuning trades rare brilliance f
 
 One result I can't fully explain: judge_accuracy drops for the 3B model after fine-tuning (4.110 → 3.895), the only metric, on the only model, where fine-tuning makes things worse by GPT-4o's judgment. Every other model improves on this metric after fine-tuning. I don't have a confirmed explanation — my best guesses are that the 3B model already had enough competence that the LoRA adapter nudged it toward shorter, more "trained" phrasing at a small cost to factual completeness, or that this is noise from judging a 200-example subsample rather than the full test set. I'd want a larger judge sample before treating this as a real effect rather than variance.
 
-Dataset quality: a real improvement, but smaller than I expected compared to the work of improving the dataset. Comparing the 0.5B model fine-tuned on the old, less diverse dataset against the new one, ROUGE-L moved from 0.371 to 0.391 — a real gain, but a modest one. More diverse data with stricter rules helped, but the single biggest lever in this project was still doing any task-specific fine-tuning at all. Maybe better quality commits, filtered with an LLM-as-judge would have given better results.
+Dataset quality: a real improvement, but smaller than I expected compared to the work of improving the dataset. Comparing the 0.5B model fine-tuned on the old, less diverse dataset against the new one, ROUGE-L moved from 0.370 to 0.390 — a real gain, but a modest one. More diverse data with stricter rules helped, but the single biggest lever in this project was still doing any task-specific fine-tuning at all. Maybe better quality commits, filtered with an LLM-as-judge would have given better results.
 
 <DatasetEffectChart />
 
