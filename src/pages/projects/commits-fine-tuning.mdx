@@ -50,7 +50,7 @@ The script clones each repo, walks the commits, and for every commit grabs the d
 - **Generated-file exclusion**: each commit must touch at least one non-generated file. I skip lockfiles, minified JS, snapshots, `dist/`, etc.
 - **Per-repo cap**: prevents a massive repo (e.g. Angular) from dominating the distribution.
 
-**Lesson learned:** my first dataset iteration used only 9 repos and was less strict on one of the rules (e.g too many repetitions) — not enough diversity. The current dataset has 13.
+**Lesson learned:** my first dataset iteration used only 9 repos and was less strict on the rules (e.g too many repetitions) — not enough diversity. The current dataset has 13.
 
 Running the script gives ~12k `(diff, message)` pairs — enough for fine-tuning, evaluation, and testing.
 
@@ -87,7 +87,7 @@ In addition, I made different analysis to compare the repos:
 - Analyzed judge results — computed mean scores per dimension, plotted score distributions, and broke down "bad" example rates (any dimension ≤3) by repo to see which repos are dragging down quality.
 - Inspected bad/good/borderline examples — rendered tables of the worst-scoring, best-scoring, and borderline examples with the judge's reasoning, to understand failure patterns repo by repo.
 
-If you're curious, here is the notebook to check the dataset quality: [insert link]
+If you're curious, here is the notebook to check the dataset quality: [open in Colab](https://colab.research.google.com/drive/1W8il-7FyAurJDkTJPEOMri-Mei9bnXNR?usp=sharing)
 
 This analysis allowed me to tell the second version of the dataset was better than the first one.
 
@@ -109,9 +109,7 @@ Here are the models I want to fine-tune and compare:
 - Qwen2.5-Coder-1.5B-Instruct
 - Qwen2.5-Coder-3B-Instruct
 - Llama-3.2-1B-Instruct
-- Qwen3.5-0.8B
-- Qwen3.5-2B
-- Ministral-3-3B-Instruct
+- <span style="opacity: 0.45">Ministral-3-3B-Instruct <em>(soon)</em></span>
 
 **Why these?** They're all open-weight, so I can run them locally for everyday use. I deliberately chose very small models: the task is narrow, I'll fine-tune them, and I want them fast and light on memory. I favoured the Qwen-Coder models because they were pretrained on lots of code, so they should be better at mapping a diff to a message than general-purpose models (I'll verify that later). I included a few general-purpose and newer models to compare.
 
@@ -266,8 +264,9 @@ That was another story about automating a few seconds of typing into a complete 
 
 If you want to dig into the code, run the notebooks, or fine-tune your own:
 
-- **GitHub repository** — scraping scripts, training and evaluation code, and the git hook: [github.com/Elib27/commit-message-finetuning]()
-- **Fine-tuning notebook** — the Unsloth + LoRA training pipeline: [open in Colab]()
-- **Evaluation notebook** — ROUGE-L, structural checks, and the LLM-as-judge harness: [open in Colab]()
+- **Hugging Face collection** — the LoRA adapters and the dataset in one place: [open on Hugging Face](https://huggingface.co/collections/Elib27/teaching-small-llms-to-write-git-commits)
+- **Dataset quality notebook** — dedup, scope coverage, and the LLM-as-judge dataset analysis: [open in Colab](https://colab.research.google.com/drive/1W8il-7FyAurJDkTJPEOMri-Mei9bnXNR?usp=sharing)
+- **Fine-tuning notebook** — the Unsloth + LoRA training pipeline: [open in Colab](https://colab.research.google.com/drive/1cdkALv0Vwakzfl5RRE33S3OMupUlhPzD?usp=sharing)
+- **Evaluation notebook** — ROUGE-L, structural checks, and the LLM-as-judge harness: [open in Colab](https://colab.research.google.com/drive/1mW24x6YnVe0xjEMSaqvaNAs_aUXaEQGq?usp=sharing)
 
 Thanks for reading — and may your commit history finally read like documentation :)
