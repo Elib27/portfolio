@@ -17,6 +17,9 @@ const t = useTranslations(lang)
     <div class="line-wrapper animated">
       <p class="tagline line">{t('header.tagline')}</p>
     </div>
+    <div class="line-wrapper animated">
+      <p class="availability"><span class="dot"></span>{t('header.availability')}</p>
+    </div>
   </div>
 
   <a class="scroll-arrow" href="#about" aria-label="Scroll down">
@@ -65,6 +68,7 @@ const t = useTranslations(lang)
     &:nth-child(1) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.2s, opacity 1s ease 0.2s; }
     &:nth-child(2) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s, opacity 1s ease 0.4s; }
     &:nth-child(3) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.5s, opacity 1s ease 0.5s; }
+    &:nth-child(4) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.6s, opacity 1s ease 0.6s; }
   }
 
   .greeting {
@@ -92,6 +96,27 @@ const t = useTranslations(lang)
     opacity: 0.75;
     font-weight: 400;
     margin: 0.5rem 0 0;
+  }
+
+  .availability {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0;
+    padding: 0.4rem 0.95rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 50px;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+
+    .dot {
+      height: 7px;
+      width: 7px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      flex-shrink: 0;
+    }
   }
 
   .line {

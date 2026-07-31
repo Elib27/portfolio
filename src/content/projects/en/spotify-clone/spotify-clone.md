@@ -7,4 +7,4 @@ demoLink: "https://spotify-clone-nextjs-elib27.vercel.app"
 repoLink: "https://github.com/Elib27/spotify-clone-nextjs"
 ---
 
-This project is a reproduction of the Spotify website. The features and design being already defined for this site, I was able to focus on their implementation. I used the Next.js framework for development. The major challenges were the management of the interaction with the Spotify API via a server state manager: React Query, the client-side state management with Redux Toolkit, the creation of the music player as well as the authentication, carried out with NextAuth.
+A pixel-level rebuild of the Spotify web player. With the design and the feature set fixed by the original, the whole exercise was engineering: a real audio player with seek and queue state, OAuth against the Spotify API, server cache in React Query, client state in Redux Toolkit. Copying something well turns out to be a good way to find where the hard parts actually are.

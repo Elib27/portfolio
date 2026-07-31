@@ -7,4 +7,4 @@ demoLink: "https://eliotbas.com"
 repoLink: "https://github.com/Elib27/portfolio"
 ---
 
-This project is my current portfolio, where you are right now! I built it by focusing on SEO, performance and design. The user experience, characterized by the fluidity, design and accessibility, was essential. I used Astro for this website, implemented a light and dark theme, used the SolidJS library for the dynamic elements and Three.js for the header animation. Of course, an easter egg is hidden somewhere!
+The site you're on. Astro renders everything to static HTML; SolidJS is loaded only for the two pieces that need real client-side state — the Othello board and these technology tabs. The contour-line background is a hand-written GLSL shader, not a video. Light and dark themes, two languages, and an easter egg hidden somewhere.
