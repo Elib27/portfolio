@@ -8,6 +8,8 @@ import GithubLogo from '../assets/technologies/github.svg?raw'
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 const copiedText = t('contact.copied') as string
+
+const email = 'contact@eliotbas.com'
 ---
 
 <SectionLayout title={t('contact.title') as string} id="contact">
@@ -17,8 +19,8 @@ const copiedText = t('contact.copied') as string
       <span>{t('contact.cta-2')}</span>
     </p>
     <div class="email-card">
-      <a class="email-link" href="mailto:eliot.bas.dev@gmail.com">
-        <span class="email">contact@eliotbas.com</span>
+      <a class="email-link" href={`mailto:${email}`}>
+        <span class="email">{email}</span>
       </a>
       <button class="copy-btn" data-copied-text={copiedText} aria-label="Copy email">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -271,7 +273,9 @@ const copiedText = t('contact.copied') as string
   const copyBtn = document.querySelector<HTMLButtonElement>('.copy-btn')
 
   copyBtn?.addEventListener('click', async () => {
-    await navigator.clipboard.writeText('contact@eliotbas.com')
+    const email = document.querySelector('.email')?.textContent
+    if (!email) return
+    await navigator.clipboard.writeText(email)
     copyBtn.classList.add('copied')
     setTimeout(() => copyBtn.classList.remove('copied'), 1000)
   })

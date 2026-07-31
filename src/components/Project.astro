@@ -30,6 +30,11 @@ const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 
 const coverPosition = inverted ? 'left' : 'right'
+
+// Internal articles open in the same tab and get a "read" label, not "live"
+const isInternal = demoLink.startsWith('/')
+const demoTarget = isInternal ? undefined : '_blank'
+const demoLabel = t(isInternal ? 'projects.read' : 'projects.live')
 ---
 
 <div class="project-container">
@@ -43,15 +48,15 @@ const coverPosition = inverted ? 'left' : 'right'
   <a
     href={demoLink}
     class={'project-image-link ' + coverPosition}
-    target="_blank"
+    target={demoTarget}
   >
     <Image class="project-image" src={cover} alt={coverAlt} />
   </a>
   <div
     class=`project-links ${inverted ? "right" : "left"} ${inverted && "inverted"}`
   >
-    <a class="link website" href={demoLink} target="_blank">
-      <span>{t('projects.live')}</span>
+    <a class="link website" href={demoLink} target={demoTarget}>
+      <span>{demoLabel}</span>
       <Fragment set:html={LinkIcon} />
     </a>
     <a class="link github" href={repoLink} target="_blank">

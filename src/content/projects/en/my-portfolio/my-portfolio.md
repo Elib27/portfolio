@@ -1,5 +1,5 @@
 ---
-title: "Mon Portfolio"
+title: "My Portfolio"
 technologies: "Astro, SolidJS, Three.js"
 cover: "./my-portfolio.jpg"
 coverAlt: "mon portfolio"
