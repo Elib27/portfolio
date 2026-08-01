@@ -1,0 +1,225 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils'
+import SectionLayout from '../layouts/SectionLayout.astro'
+import botpressMark from '../assets/companies/botpress-mark.svg'
+import koesioMark from '../assets/companies/koesio-mark.svg'
+import upflowMark from '../assets/companies/upflow-mark.svg'
+import freelanceMark from '../assets/companies/freelance-mark.svg'
+
+const lang = getLangFromUrl(Astro.url)
+const t = useTranslations(lang)
+
+interface Role {
+  company: string
+  logo: string
+  url?: string
+  location: string
+  title: string
+  dates: string
+  bullets: string[]
+}
+
+// Each mark is sized so the three match in visual mass rather than bounding box:
+// the solid Botpress tile has to sit smaller than the open Koesio and Upflow letterforms.
+const logos: Record<string, { src: ImageMetadata; w: number; h: number }> = {
+  botpress: { src: botpressMark, w: 56.7, h: 56.7 },
+  koesio: { src: koesioMark, w: 52.3, h: 74.4 },
+  upflow: { src: upflowMark, w: 75, h: 57.5 },
+  freelance: { src: freelanceMark, w: 61.8, h: 61.8 },
+}
+
+const roles = t('experience.roles') as unknown as Role[]
+---
+
+<SectionLayout title={t('experience.title') as string} id="experience">
+  <ol class="timeline">
+    {
+      roles.map((role) => (
+        <li class="role">
+          <span class="logo">
+            <img
+              src={logos[role.logo].src.src}
+              alt=""
+              style={`width:${logos[role.logo].w}%;height:${logos[role.logo].h}%`}
+            />
+          </span>
+          <div class="head">
+            <h3>
+              {role.url ? (
+                <a href={role.url} target="_blank" rel="noopener noreferrer">
+                  {role.company}
+                </a>
+              ) : (
+                role.company
+              )}
+            </h3>
+            <span class="location">{role.location}</span>
+          </div>
+          <div class="meta">
+            <span class="job-title">{role.title}</span>
+            <span class="dates">{role.dates}</span>
+          </div>
+          <ul class="points">
+            {role.bullets.map((bullet) => (
+              <li set:html={bullet} />
+            ))}
+          </ul>
+        </li>
+      ))
+    }
+  </ol>
+</SectionLayout>
+
+<style lang="scss">
+  .timeline {
+    width: min(80%, 800px);
+    margin: auto;
+    list-style: none;
+    padding: 0;
+  }
+
+  .role {
+    --logo-size: 40px;
+    // nudges the chip onto the optical centre of the two-line company/role header
+    --logo-top: 0.3rem;
+    position: relative;
+    padding: 0 0 2.75rem calc(var(--logo-size) + 1.1rem);
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    // Rail, running from just under the logo to the next one
+    &::before {
+      content: '';
+      position: absolute;
+      left: calc(var(--logo-size) / 2);
+      top: calc(var(--logo-top) + var(--logo-size) + 0.5rem);
+      bottom: 0;
+      width: 1px;
+      background-color: color-mix(in srgb, var(--text) 15%, transparent);
+      transition: background-color var(--theme-transition);
+    }
+
+    &:last-child::before {
+      display: none;
+    }
+  }
+
+  .logo {
+    position: absolute;
+    left: 0;
+    top: var(--logo-top);
+    height: var(--logo-size);
+    width: var(--logo-size);
+    border-radius: 11px;
+    background-color: var(--white);
+    border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      display: block;
+    }
+  }
+
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+
+    h3 {
+      font-size: 1.15rem;
+      margin: 0;
+
+      a {
+        line-height: inherit;
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+        text-decoration-color: color-mix(in srgb, var(--text) 30%, transparent);
+        transition: text-decoration-color 0.2s ease;
+
+        &:hover {
+          text-decoration-color: var(--accent);
+        }
+      }
+    }
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-top: 0.2rem;
+
+    .job-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--accent);
+    }
+  }
+
+  .location,
+  .dates {
+    font-size: 0.85rem;
+    opacity: 0.6;
+    white-space: nowrap;
+  }
+
+  .points {
+    list-style: none;
+    padding: 0;
+    margin: 0.85rem 0 0;
+
+    li {
+      position: relative;
+      padding-left: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--text);
+      transition: color var(--theme-transition);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+        transition: color var(--theme-transition);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .timeline {
+      width: 90%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .timeline {
+      width: 100%;
+    }
+
+    .head,
+    .meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.15rem;
+    }
+
+    .location,
+    .dates {
+      white-space: normal;
+    }
+  }
+</style>

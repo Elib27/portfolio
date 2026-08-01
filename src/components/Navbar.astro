@@ -10,6 +10,7 @@ const langLink = lang === 'en' ? 'fr' : 'en'
 
 const navItems = [
   { href: '#about', label: t('nav.about'), section: 'about' },
+  { href: '#experience', label: t('nav.experience'), section: 'experience' },
   { href: '#projects', label: t('nav.projects'), section: 'projects' },
   { href: '#contact', label: t('nav.contact'), section: 'contact' },
 ]
@@ -432,7 +433,7 @@ const navItems = [
   }
 
   // IntersectionObserver for sections
-  const sectionIds = ['about', 'projects', 'contact']
+  const sectionIds = ['about', 'experience', 'projects', 'contact']
   const sectionElements = sectionIds
     .map((id) => document.getElementById(id))
     .filter(Boolean) as HTMLElement[]

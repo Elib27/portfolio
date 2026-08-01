@@ -4,4 +4,4 @@ I'm finishing my engineering degree in France while wrapping up an internship at
 
 I care about <span class="highlight">doing things right</span> — not perfectly, just properly. I can't pretend something is fine when I know it isn't, which probably makes me a bad seller and a good teammate, depending on who you ask. Also <span class="highlight">relentlessly curious</span> — I can't use something I don't understand, which in the AI era feels increasingly important.
 
-When I step away from the keyboard — it happens — you'll find me :
+When I step away from the keyboard — it happens — you'll find me:

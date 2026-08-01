@@ -1,11 +1,11 @@
 ---
 // total_score is a weighted sum of the five normalized metrics (weights sum to 1).
 const terms = [
-  { weight: 0.25, metric: 'accuracy_norm' },
   { weight: 0.2, metric: 'ROUGE-L' },
   { weight: 0.2, metric: 'conventional' },
-  { weight: 0.2, metric: 'concise_norm' },
   { weight: 0.15, metric: 'valid_length' },
+  { weight: 0.2, metric: 'concise_norm' },
+  { weight: 0.25, metric: 'accuracy_norm' },
 ]
 ---
 
