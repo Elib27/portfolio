@@ -1,15 +1,15 @@
 ---
-import Layout from '../../layouts/Layout.astro'
-import Logo from '../../components/Logo.astro'
-import ToggleThemeButton from '../../components/ToggleThemeButton.astro'
-import TopographicBackground from '../../components/TopographicBackground.astro'
-import { Content } from '../../content/mention-legales/fr/mentions-legales.md'
+import Layout from '../layouts/Layout.astro'
+import Logo from '../components/Logo.astro'
+import ToggleThemeButton from '../components/ToggleThemeButton.astro'
+import TopographicBackground from '../components/TopographicBackground.astro'
+import { Content } from '../content/legal-notice/en/legal-notice.md'
 ---
 
 <Layout noIndex>
   <div class="nav-wrapper">
     <Logo link="/" />
-    <ToggleThemeButton id="legal-fr" />
+    <ToggleThemeButton id="legal-en" />
   </div>
   <div class="container">
     <Content />
