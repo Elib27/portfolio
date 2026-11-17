@@ -110,7 +110,7 @@ export const ui = {
   en: {
     'site.title': 'Eliot Bas - Software Engineer',
     'site.metaDescription':
-      'Software engineer in Montréal — AI agents, SDK and developer tooling at Botpress. Engineering degree at Grenoble INP - ESISAR. Available September 2026.',
+      'Software engineer in Montréal: AI agents, SDK and developer tooling at Botpress. Engineering degree at Grenoble INP - ESISAR. Available from January 2027.',
     'nav.about': 'About',
     'nav.experience': 'Experience',
     'nav.projects': 'Projects',
@@ -122,7 +122,7 @@ export const ui = {
     'header.availability': 'Available from January 2027',
     'about.title': 'About',
     'hobbies.outro':
-      "Always up for talking code, travel tips, Montréal gems, or whatever rabbit hole I'm in this week — feel free to reach out.",
+      "Always up for talking code, travel tips, Montréal gems, or whatever rabbit hole I'm in this week. Feel free to reach out.",
     'hobbies.activities': [
       'shooting film',
       'trying to learn guitar',
@@ -131,7 +131,7 @@ export const ui = {
       'out on a bike ride',
       'planning a bike route that is slightly too long',
       'hiking whenever mountains are within reach',
-      'chasing a sub-39 10k, a 1h36 half — and maybe finally signing up for a marathon',
+      'chasing a sub-39 10k, a 1h36 half, and maybe finally signing up for a marathon',
       'skiing or snowboarding whenever conditions allow',
       'at Piknic Électronik on a Sunday',
       'cooking something new (or trying to)',
@@ -202,7 +202,7 @@ export const ui = {
     'projects.read': 'Article',
     'projects.last-project': 'One last project?',
     'contact.title': 'Contact',
-    'contact.cta': 'Hiring, collaborating, or just curious — my inbox is open.',
+    'contact.cta': 'Hiring, collaborating, or just curious? My inbox is open.',
     'contact.findMeOn': 'Find me also on',
     'contact.copied': 'Copied!',
     'footer.legal': 'Legal notice',
