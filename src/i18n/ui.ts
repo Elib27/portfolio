@@ -129,6 +129,7 @@ export const ui = {
       'finally getting better at climbing',
       'planning my next trip',
       'out on a bike ride',
+      'planning a bike route that is slightly too long',
       'hiking whenever mountains are within reach',
       'chasing a sub-39 10k, a 1h36 half — and maybe finally signing up for a marathon',
       'skiing or snowboarding whenever conditions allow',
