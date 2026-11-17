@@ -18,7 +18,7 @@ export const ui = {
     'header.title-1': 'Hello, je suis ',
     'header.title-2': 'ingénieur logiciel',
     'header.tagline': 'Agents IA, outils pour développeurs, et les systèmes qui les font tourner.',
-    'header.availability': 'Disponible à partir de septembre 2026',
+    'header.availability': 'Disponible à partir de janvier 2027',
     'about.title': 'À propos',
     'hobbies.outro':
       "Toujours partant pour parler code, bons plans voyage, pépites montréalaises ou n'importe quel rabbit hole du moment — n'hésitez pas à me contacter.",
@@ -119,7 +119,7 @@ export const ui = {
     'header.title-1': "Hi, I'm ",
     'header.title-2': 'software engineer',
     'header.tagline': 'AI agents, developer tooling, and the systems underneath them.',
-    'header.availability': 'Available from September 2026',
+    'header.availability': 'Available from January 2027',
     'about.title': 'About',
     'hobbies.outro':
       "Always up for talking code, travel tips, Montréal gems, or whatever rabbit hole I'm in this week — feel free to reach out.",
