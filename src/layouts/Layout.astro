@@ -57,6 +57,24 @@ const ogImage = new URL('/og/home.png', siteUrl)
   <body>
     <Loader />
     <slot />
+    <link rel="stylesheet" href="https://vdk-viber-runtime-prod.bot.botpress.host/edge/webchat.css" />
+    <script is:inline src="https://vdk-viber-runtime-prod.bot.botpress.host/edge/webchat.js"></script>
+    <script is:inline>
+      fetch("https://vdk-viber-runtime-prod.bot.botpress.host/edge/bots/042840fa-e266-461f-be2a-4900e16c1ef7/config")
+        .then((res) => res.json())
+        .then(({ webchat }) => {
+          // follow the site's theme toggle (.dark-theme on <html>) instead of the OS preference
+          const siteTheme = () => (document.documentElement.classList.contains("dark-theme") ? "dark" : "light")
+          VdkEdgeWebchat.mount({ ...webchat, theme: siteTheme(), fontFamily: "'Plus Jakarta Sans', sans-serif", mode: "bubble", baseUrl: "https://vdk-viber-runtime-prod.bot.botpress.host", botId: "042840fa-e266-461f-be2a-4900e16c1ef7" })
+          new MutationObserver(() => {
+            const dark = siteTheme() === "dark"
+            document.querySelectorAll(".vdk-edge").forEach((el) => {
+              el.classList.toggle("vdk-edge-dark", dark)
+              el.classList.toggle("vdk-edge-light", !dark)
+            })
+          }).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+        })
+    </script>
   </body>
 </html>
 
@@ -99,28 +117,22 @@ const ogImage = new URL('/og/home.png', siteUrl)
       overflow: hidden;
     }
   }
-  h1,
-  h2,
-  h3,
-  p,
-  a,
-  span {
+  // :not(:where(...)) keeps the original specificity while leaving the Botpress webchat alone
+  :is(h1, h2, h3, p, a, span):not(:where(.vdk-edge *)) {
     color: var(--text);
     transition: color var(--theme-transition);
   }
-  h1,
-  h2,
-  h3 {
+  :is(h1, h2, h3):not(:where(.vdk-edge *)) {
     font-family: 'Space Grotesk', sans-serif;
   }
-  a {
+  a:not(:where(.vdk-edge *)) {
     text-decoration: none;
     line-height: 0;
     outline-color: var(--accent);
   }
   button {
   }
-  p {
+  p:not(:where(.vdk-edge *)) {
     font-size: 1rem;
     margin: 0;
     transition: color var(--theme-transition);
