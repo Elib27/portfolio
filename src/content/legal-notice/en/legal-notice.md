@@ -7,6 +7,6 @@
 
 ## Hosting provider
 
-**Company:** OVH  
-**Address:** 2 rue Kellermann 59100 Roubaix  
-**Phone:** 1007  
+**Company:** Netlify, Inc.  
+**Address:** 101 2nd Street, Suite 575, San Francisco, CA 94105, United States  
+**Website:** [netlify.com](https://www.netlify.com)  

@@ -12,8 +12,8 @@
   width: 100%;
   text-align: center;
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   position: absolute;
   top: 0;
   left: 0;

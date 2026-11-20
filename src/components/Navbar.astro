@@ -95,8 +95,8 @@ const navItems = [
     align-items: center;
     padding: 0.35rem 0.4rem;
     background: color-mix(in srgb, var(--nav-background) 70%, transparent);
-    backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
     border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
     border-radius: 50px;
     box-shadow:
@@ -169,8 +169,8 @@ const navItems = [
     gap: 1rem;
     padding: 0.5rem 0.8rem;
     background: color-mix(in srgb, var(--nav-background) 70%, transparent);
-    backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
     border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
     border-radius: 50px;
     box-shadow:
@@ -259,8 +259,8 @@ const navItems = [
     justify-content: center;
     align-items: center;
     background: color-mix(in srgb, var(--nav-background) 95%, transparent);
-    backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
     opacity: 0;
     visibility: hidden;
     transition:
@@ -336,6 +336,9 @@ const navItems = [
     }
     .navbar__mobile-actions {
       display: flex;
+      // The desktop nav is hidden, so pin this group to the right column
+      // instead of letting it flow into the centre (auto) column.
+      grid-column: 3;
     }
     .mobile-nav {
       display: flex;

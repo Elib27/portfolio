@@ -7,15 +7,28 @@ const t = useTranslations(lang)
 
 export interface Props {
   noIndex?: boolean
+  /** Page-specific title; defaults to the site title. */
+  title?: string
+  /** Page-specific meta/social description; defaults to the site description. */
+  description?: string
+  /** Path of a 1200x630 social preview image, relative to the site root. */
+  ogImage?: string
+  ogType?: 'website' | 'article'
 }
 
-const { noIndex } = Astro.props
+const {
+  noIndex,
+  title = t('site.title') as string,
+  description = t('site.metaDescription') as string,
+  ogImage: ogImagePath = '/og/home.png',
+  ogType = 'website',
+} = Astro.props
 
 // Social preview metadata. Absolute URLs are required by the scrapers, so
 // everything is resolved against `site` in astro.config.mjs.
 const siteUrl = Astro.site ?? new URL('https://eliotbas.com')
 const pageUrl = new URL(Astro.url.pathname, siteUrl)
-const ogImage = new URL('/og/home.png', siteUrl)
+const ogImage = new URL(ogImagePath, siteUrl)
 ---
 
 <!doctype html>
@@ -23,14 +36,11 @@ const ogImage = new URL('/og/home.png', siteUrl)
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={t('site.metaDescription') as string} />
-    <meta property="og:type" content="website" />
+    <meta name="description" content={description} />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="Eliot Bas" />
-    <meta property="og:title" content={t('site.title') as string} />
-    <meta
-      property="og:description"
-      content={t('site.metaDescription') as string}
-    />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
     <meta property="og:url" content={pageUrl.href} />
     <meta property="og:image" content={ogImage.href} />
     <meta property="og:image:width" content="1200" />
@@ -40,11 +50,8 @@ const ogImage = new URL('/og/home.png', siteUrl)
       content="Eliot Bas — software engineer, based in Montréal"
     />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={t('site.title') as string} />
-    <meta
-      name="twitter:description"
-      content={t('site.metaDescription') as string}
-    />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage.href} />
     {noIndex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -52,7 +59,7 @@ const ogImage = new URL('/og/home.png', siteUrl)
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
     <meta name="generator" content={Astro.generator} />
-    <title>{t('site.title')}</title>
+    <title>{title}</title>
   </head>
   <body>
     <Loader />
