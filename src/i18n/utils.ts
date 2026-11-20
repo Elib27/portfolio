@@ -8,6 +8,7 @@ export function getLangFromUrl(url: URL) {
 
 export function useTranslations(lang: keyof typeof ui) {
   return function t(key: keyof typeof ui[typeof defaultLang]) {
-    return ui[lang][key] || ui[defaultLang][key];
+    // Keys missing from a language (e.g. the frozen French copy) fall back to the default one
+    return (ui[lang] as Partial<(typeof ui)[typeof defaultLang]>)[key] || ui[defaultLang][key];
   }
 }

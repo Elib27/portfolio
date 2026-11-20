@@ -10,7 +10,8 @@ const projectsCollection = defineCollection({
     cover: image(),
     coverAlt: z.string(),
     demoLink: z.string(),
-    repoLink: z.string()
+    repoLink: z.string(),
+    hidden: z.boolean().default(false),
   }),
 });
 

@@ -8,8 +8,9 @@ import OthelloProject from '../components/Othello/OthelloProject'
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 
-const projects = await getCollection('projects', ({ id }) =>
-  id.startsWith(`${lang}/`)
+const projects = await getCollection(
+  'projects',
+  ({ id, data }) => id.startsWith(`${lang}/`) && !data.hidden
 )
 const othelloDescription = await getEntry('othello', `${lang}/othello`)
 ---
