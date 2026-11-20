@@ -9,6 +9,7 @@ const { link } = Astro.props
 <a class="link" href={link} aria-label="Homepage">
   <svg
     class="logo"
+    data-site-logo
     width="81"
     height="81"
     viewBox="0 0 81 81"
@@ -30,9 +31,11 @@ const { link } = Astro.props
 
 <style lang="scss">
   .link {
-    transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
-    :global(html.is-loading) & {
-      transform: translateY(20px);
+    // The Loader's logo flies in and lands here, then this one takes over (see Loader.astro)
+    @media (prefers-reduced-motion: no-preference) {
+      :global(html.show-loader) & {
+        opacity: 0;
+      }
     }
     .logo {
       width: 50px;

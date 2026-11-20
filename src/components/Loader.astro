@@ -6,11 +6,15 @@
 //   is-loading      intro start state. Components style their pre-intro look
 //                   with `:global(html.is-loading)`. Removed once the page is
 //                   ready, at which point a `site:ready` event fires on document.
-//   show-loader     the overlay is displayed.
-//   loader-leaving  the overlay is sliding out.
+//   show-loader     the overlay is displayed. The site logo (Logo.astro) hides
+//                   meanwhile, so the loader's logo can land in its place.
+//   loader-leaving  the overlay is wiping out.
 //
 // "Ready" means the DOM is parsed and the fonts are loaded, capped at
 // MAX_WAIT_MS so a slow resource can never keep the site hidden.
+//
+// The exit: two skewed panels (accent, then a lighter trailing one) slide up
+// while steepening their slant, and the logo flies onto the site logo.
 ---
 
 <script is:inline>
@@ -22,6 +26,22 @@
     if (!reducedMotion) root.classList.add('is-loading')
     root.classList.add('show-loader')
 
+    // Same SVG as the site logo: move and scale it onto that logo, which stays
+    // hidden until the loader is removed, so the two swap without a seam.
+    const flyLogo = (loader) => {
+      const logo = loader.querySelector('.loader__logo')
+      const target = document.querySelector('[data-site-logo]')?.getBoundingClientRect()
+      if (!logo) return
+      if (!target?.width) {
+        logo.style.transform = 'translateY(-100vh)' // no site logo on this page: leave with the wipe
+        return
+      }
+      const from = logo.getBoundingClientRect()
+      const dx = target.left + target.width / 2 - (from.left + from.width / 2)
+      const dy = target.top + target.height / 2 - (from.top + from.height / 2)
+      logo.style.transform = `translate(${dx}px, ${dy}px) scale(${target.width / from.width})`
+    }
+
     let revealed = false
     const reveal = () => {
       if (revealed) return
@@ -32,12 +52,16 @@
       const loader = document.querySelector('.loader')
       if (!loader) return
       root.classList.add('loader-leaving')
+      if (!reducedMotion) flyLogo(loader)
+
       const finish = () => {
         root.classList.remove('show-loader', 'loader-leaving')
         loader.remove()
       }
-      loader.addEventListener('transitionend', (e) => e.target === loader && finish())
-      setTimeout(finish, 1000) // in case transitionend never fires
+      // The trailing panel is the last thing to move (with reduced motion, the whole loader fades).
+      const last = reducedMotion ? loader : loader.querySelector('.loader__panel--back')
+      last?.addEventListener('transitionend', (e) => e.target === last && finish())
+      setTimeout(finish, 1200) // in case transitionend never fires
     }
 
     setTimeout(reveal, MAX_WAIT_MS)
@@ -53,46 +77,69 @@
 </script>
 
 <div class="loader" aria-hidden="true">
-  <span class="loader-container">
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-  </span>
+  <div class="loader__panel loader__panel--back"></div>
+  <div class="loader__panel loader__panel--front"></div>
+  <div class="loader__logo">
+    <svg viewBox="0 0 81 81" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0.785522" y="0.959625" width="80" height="80" rx="10"></rect>
+      <path
+        d="M31.1548 55.9596V26.8687H50.0753V31.2863H36.4247V39.1841H49.0952V43.6017H36.4247V51.542H50.1889V55.9596H31.1548Z"
+      ></path>
+    </svg>
+  </div>
 </div>
 
 <style lang="scss">
   .loader {
-    --diagonal-angle: -3deg;
-    --loader-height-offset: -50vw * tan(var(--diagonal-angle));
-    background-color: var(--accent);
     position: fixed;
-    top: calc(-1 * var(--loader-height-offset));
-    left: 0;
-    height: calc(100vh + 2 * var(--loader-height-offset));
-    width: 100%;
+    inset: 0;
+    z-index: 9999;
     display: none;
     align-items: center;
     justify-content: center;
-    transform: skewY(var(--diagonal-angle)) translateY(0);
+  }
+
+  .loader__panel {
+    // Extra height above and below, enough to keep the viewport covered at
+    // the steepest slant used during the exit (6deg).
+    --overhang: calc(50vw * tan(6deg));
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: calc(-1 * var(--overhang));
+    height: calc(100% + 2 * var(--overhang));
+    transform: skewY(-3deg);
     transition: transform 0.65s cubic-bezier(0.63, 0.12, 0.87, 0.3) 0.05s;
-    z-index: 9999;
-    .loader-container {
-      transform: skewY(calc(-1 * var(--diagonal-angle)));
-      display: flex;
-      .dot {
-        height: 2rem;
-        width: 2rem;
-        border-radius: 50%;
-        background-color: var(--white);
-        transform-origin: center -200%;
-        &:first-child {
-          animation: dotSwing1 2s infinite -0.5s;
-        }
-        &:last-child {
-          animation: dotSwing2 2s infinite -0.5s;
-        }
-      }
+  }
+  .loader__panel--front {
+    background-color: var(--accent);
+  }
+  .loader__panel--back {
+    background-color: var(--secondary);
+    transition-delay: 0.13s;
+  }
+  :global(html.dark-theme) .loader__panel--back {
+    background-color: var(--nav-background);
+  }
+
+  .loader__logo {
+    position: relative;
+    width: clamp(64px, 10vw, 96px);
+    aspect-ratio: 1;
+    transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    // Late and quick, so the colors don't sit halfway (grey) for long
+    rect {
+      fill: var(--white);
+      transition: fill 0.3s ease 0.3s;
+    }
+    path {
+      fill: var(--accent);
+      transition: fill 0.3s ease 0.3s;
     }
   }
 
@@ -100,7 +147,7 @@
     display: flex;
   }
   :global(html.loader-leaving) .loader {
-    transform: skewY(var(--diagonal-angle)) translateY(-100%);
+    pointer-events: none;
   }
 
   // No scrolling under the overlay. The reserved gutter keeps the page from
@@ -111,50 +158,48 @@
   :global(html.show-loader:not(.loader-leaving) body) {
     overflow: hidden;
   }
+  // The Botpress chat bubble stacks above everything; keep it out of the loader
+  :global(html.show-loader body > .vdk-edge) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    // Only noticeable when loading takes a while
+    .loader__logo svg {
+      animation: logoPulse 1.2s ease-in-out 0.6s infinite alternate;
+    }
+    :global(html.loader-leaving) {
+      .loader__panel {
+        transform: skewY(-6deg) translateY(-100%);
+      }
+      // Takes on the site logo's colors while it flies over to it
+      .loader__logo {
+        svg {
+          animation: none;
+        }
+        rect {
+          fill: var(--text);
+        }
+        path {
+          fill: var(--background);
+        }
+      }
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .loader {
       transition: opacity 0.3s ease;
-      .loader-container .dot:is(:first-child, :last-child) {
-        animation: none;
-      }
     }
     :global(html.loader-leaving) .loader {
-      transform: skewY(var(--diagonal-angle));
       opacity: 0;
     }
   }
 
-  @keyframes dotSwing1 {
-    0% {
-      transform: rotate(0deg);
-      animation-timing-function: ease-out;
-    }
-    25% {
-      transform: rotate(70deg);
-      animation-timing-function: ease-in;
-    }
-    50% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(0deg);
-    }
-  }
-  @keyframes dotSwing2 {
-    0% {
-      transform: rotate(0deg);
-    }
-    50% {
-      transform: rotate(0deg);
-      animation-timing-function: ease-out;
-    }
-    75% {
-      transform: rotate(-70deg);
-      animation-timing-function: ease-in;
-    }
-    100% {
-      transform: rotate(0deg);
+  @keyframes logoPulse {
+    to {
+      transform: scale(0.92);
     }
   }
 </style>
