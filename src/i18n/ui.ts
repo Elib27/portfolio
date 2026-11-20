@@ -201,7 +201,7 @@ export const ui = {
     'projects.last-project': 'One last project?',
     'contact.title': 'Contact',
     'contact.cta': 'Hiring, collaborating, or just curious? My inbox is open.',
-    'contact.findMeOn': 'Find me also on',
+    'contact.findMeOn': 'You can also find me on',
     'contact.copied': 'Copied!',
     'footer.legal': 'Legal notice',
     'pageNotFound.title': 'Page not found',

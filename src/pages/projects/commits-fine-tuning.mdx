@@ -37,7 +37,7 @@ So let's fine-tune our first model!
 
 ## 3. The data
 
-Let's start with the most important thing: our training data. Its quality is probably the single biggest factor in output quality, we should be careful. Gathering and filtering good data can be hard — that's literally a job — but fortunately it's fairly simple in our case.
+Let's start with the most important thing: our training data. Its quality is probably the single biggest factor in output quality, so we should be careful. Gathering and filtering good data can be hard — that's literally a job — but fortunately it's fairly simple in our case.
 
 We need git diffs and their corresponding commit messages, and there are plenty on GitHub. The plan: find open-source repos that follow [Conventional Commits](https://www.conventionalcommits.org/), clone them, then run a Python script to extract `(diff, message)` pairs into a JSONL file.
 
@@ -50,7 +50,7 @@ The script clones each repo, walks the commits, and for every commit grabs the d
 - **Generated-file exclusion**: each commit must touch at least one non-generated file. I skip lockfiles, minified JS, snapshots, `dist/`, etc.
 - **Per-repo cap**: prevents a massive repo (e.g. Angular) from dominating the distribution.
 
-**Lesson learned:** my first dataset iteration used only 9 repos and was less strict on the rules (e.g too many repetitions) — not enough diversity. The current dataset has 13.
+**Lesson learned:** my first dataset iteration used only 9 repos and was less strict on the rules (e.g. too many repetitions) — not enough diversity. The current dataset has 13.
 
 Running the script gives ~12k `(diff, message)` pairs — enough for fine-tuning, evaluation, and testing.
 
@@ -67,7 +67,7 @@ So our ~12k is more than enough. Why is this hard to pin down? It depends on:
 - **Task–data alignment with pretraining.** Qwen2.5-Coder was pretrained on code and likely saw git diffs, so we need fewer examples to *activate* existing knowledge than to teach something new.
 - **LoRA rank.** Higher rank (I use r=16) means more trainable parameters — can learn more from less data, but also more overfitting risk on small datasets.
 - **Output length and diversity.** Commit messages are short and have a consistent format, which lowers the data requirement.
-- **Quality vs. quantity.** 5k high-quality, diverse examples beat 20k noisy ones. This is probably the more important variable than raw count.
+- **Quality vs. quantity.** 5k high-quality, diverse examples beat 20k noisy ones. This is probably a more important variable than raw count.
 
 Diversity also matters for generalization. I deliberately mixed:
 
@@ -75,11 +75,11 @@ Diversity also matters for generalization. I deliberately mixed:
 - Different team conventions within Conventional Commits.
 - Different subsystems being changed: build, core, docs, tests, ...
 
-Here's is the shape of my dataset:
+Here's the shape of my dataset:
 
 <DatasetCharts />
 
-In addition, I made different analysis to compare the repos:
+In addition, I ran several analyses to compare the repos:
 - Ran a dedup check — compared message subjects for exact duplicates, computed a duplicate rate, and charted how often subjects repeat.
 - Checked scope coverage — extracted file extensions from the diffs to see which languages/file types are represented, highlighting TypeScript specifically.
 - Spot-checked random samples — rendered a random sample of diff/message pairs in an HTML table for manual eyeballing.
@@ -113,7 +113,7 @@ Here are the models I want to fine-tune and compare:
 
 **Why these?** They're all open-weight, so I can run them locally for everyday use. I deliberately chose very small models: the task is narrow, I'll fine-tune them, and I want them fast and light on memory. I favoured the Qwen-Coder models because they were pretrained on lots of code, so they should be better at mapping a diff to a message than general-purpose models (I'll verify that later). I included a few general-purpose and newer models to compare.
 
-To fine-tune them I use **LoRA** (Low-Rank Adaptation): instead of updating all the parameters (there are a lot), which is compute-intensive and slow, we freeze the base model and train a small pair of "adapter" matrices added to a few weight layers. I use **r=16** with **alpha = 2·r = 32** , a common default heuristic (alpha = 2×r).
+To fine-tune them I use **LoRA** (Low-Rank Adaptation): instead of updating all the parameters (there are a lot), which is compute-intensive and slow, we freeze the base model and train a small pair of "adapter" matrices added to a few weight layers. I use **r=16** with **alpha = 2·r = 32**, a common default heuristic (alpha = 2×r).
 
 On Qwen2.5-Coder-3B that's only ~30M trainable params out of 3B — we train roughly **1%** of the parameters. Why does that work? The base model already knows code syntax, language, and summarization. It doesn't need to relearn any of that — it just needs a small, low-dimensional nudge to consistently map "diff → commit message." That nudge is exactly what LoRA's compact update can capture, giving most of the benefit of full fine-tuning at a fraction of the cost and memory.
 
@@ -165,14 +165,14 @@ Each model fine-tuning took between 20 and 30 minutes depending on the model siz
 
 This is probably the most important part of the whole project. It's easy to fine-tune a model and convince yourself it's better because the outputs *look* nicer — but proving it is harder, and it requires actually measuring, and being honest about what the measurements can and can't tell you.
 
-I evaluated on a test set of 621 examples the models had never seen during training (the 5% held out earlier). First step was generating the 621 predictions for each variant of each model. For this task, the T4 GPU was more than enough, I could even have generated them on my computer (remember, that's the goal of this project).
+I evaluated on a test set of 621 examples the models had never seen during training (the 5% held out earlier). First step was generating the 621 predictions for each variant of each model. For this task, the T4 GPU was more than enough; I could even have generated them on my computer (remember, that's the goal of this project).
 
 The two variants for each model are:
 
 - **`baseline`** — the non-finetuned model, unmodified, given an explicit system prompt describing the task.
 - **`finetuned`** — the LoRA fine-tuned model, with the same system prompt used during training.
 
-Here is the system prompt given to each baseline model. This one is more detailed than the fine-tuned prompt to be a fair comparison.
+Here is the system prompt given to each baseline model. This one is more detailed than the fine-tuned prompt, to make the comparison fair.
 
 ```python
 BASELINE_SYSTEM_PROMPT = (
@@ -214,19 +214,19 @@ Smaller fine-tuned beats bigger un-tuned. The fine-tuned 0.5B model scores highe
 
 <TotalScoreChart />
 
-Diminishing returns as the base model grows. Looking at the relative improvement from fine-tuning at each size, the gain shrinks fast: +24% total score for 0.5B, +8% for 1.5B, +4% for 3B (on Qwen-2.5-coder models). The bigger the base model, the less there is for the adapter to teach it — Qwen2.5-Coder-3B already does a decent job at this task zero-shot, so fine-tuning is polishing rather than transforming. This is a useful number when deciding whether fine-tuning is worth the effort on a given model size: the smaller the model, the bigger the payoff.
+Diminishing returns as the base model grows. Looking at the relative improvement from fine-tuning at each size, the gain shrinks fast: +24% total score for 0.5B, +8% for 1.5B, +4% for 3B (on Qwen2.5-Coder models). The bigger the base model, the less there is for the adapter to teach it — Qwen2.5-Coder-3B already does a decent job at this task zero-shot, so fine-tuning is polishing rather than transforming. This is a useful number when deciding whether fine-tuning is worth the effort on a given model size: the smaller the model, the bigger the payoff.
 
 <ImprovementBySizeChart />
 
-Code-pretraining still matters, even with fine-tuning. Comparing Qwen2.5-Coder against the plain Qwen2.5 at matched sizes, the Coder variant wins both before fine-tuning (+2.3% at 1.5B) and after (+3.7% at 1.5B). The effect is modest, but consistent in direction. The model's coding-specific pretraining and the LoRA adapter aren't redundant, they compound.
+Code-pretraining still matters, even with fine-tuning. Comparing Qwen2.5-Coder against the plain Qwen2.5 at matched sizes, the Coder variant wins both before fine-tuning (+2.3% at 1.5B) and after (+3.7% at 1.5B). The effect is modest, but consistent in direction. The model's coding-specific pretraining and the LoRA adapter aren't redundant; they compound.
 
-One of the finding I find most interesting: fine-tuning trades rare brilliance for reliable competence. This shows up clearly in the LLM-as-judge's relative verdicts. At every model size, the chance that fine-tuning makes the model actually beat the human-written reference goes down: 8.0%→1.5% at 0.5B, 11.0%→2.5% at 1.5B, 16.0%→4.5% at 3B. At the same time, the chance the model matches the human reference goes up substantially: 6.5%→23.5%, 15.5%→30.5%, 25.5%→31.0%. Said another way: the base model, prompted with explicit instructions, occasionally produces a surprisingly good commit message by getting creative — and just as often produces something off the rails. Fine-tuning sands off both ends of that distribution. The result is a model that almost never writes a great commit message, but reliably writes a good-enough one. For a tool meant to run unattended in a git hook, I'd take consistency over occasional brilliance but it's worth showing that this is a tradeoff, not a strict improvement.
+One of the findings I find most interesting: fine-tuning trades rare brilliance for reliable competence. This shows up clearly in the LLM-as-judge's relative verdicts. At every model size, the chance that fine-tuning makes the model actually beat the human-written reference goes down: 8.0%→1.5% at 0.5B, 11.0%→2.5% at 1.5B, 16.0%→4.5% at 3B. At the same time, the chance the model matches the human reference goes up substantially: 6.5%→23.5%, 15.5%→30.5%, 25.5%→31.0%. Said another way: the base model, prompted with explicit instructions, occasionally produces a surprisingly good commit message by getting creative — and just as often produces something off the rails. Fine-tuning sands off both ends of that distribution. The result is a model that almost never writes a great commit message, but reliably writes a good-enough one. For a tool meant to run unattended in a git hook, I'd take consistency over occasional brilliance, but it's worth showing that this is a tradeoff, not a strict improvement.
 
 <VsReferenceChart />
 
-One result I can't fully explain: judge_accuracy drops for the 3B model after fine-tuning (4.110 → 3.895), the only metric, on the only model, where fine-tuning makes things worse by GPT-4o's judgment. Every other model improves on this metric after fine-tuning. I don't have a confirmed explanation — my best guesses are that the 3B model already had enough competence that the LoRA adapter nudged it toward shorter, more "trained" phrasing at a small cost to factual completeness, or that this is noise from judging a 200-example subsample rather than the full test set. I'd want a larger judge sample before treating this as a real effect rather than variance.
+One result I can't fully explain: judge_accuracy drops for the 3B model after fine-tuning (4.110 → 3.895), the only metric, on the only model, where fine-tuning makes things worse by GPT-4o-mini's judgment. Every other model improves on this metric after fine-tuning. I don't have a confirmed explanation — my best guesses are that the 3B model already had enough competence that the LoRA adapter nudged it toward shorter, more "trained" phrasing at a small cost to factual completeness, or that this is noise from judging a 200-example subsample rather than the full test set. I'd want a larger judge sample before treating this as a real effect rather than variance.
 
-Dataset quality: a real improvement, but smaller than I expected compared to the work of improving the dataset. Comparing the 0.5B model fine-tuned on the old, less diverse dataset against the new one, ROUGE-L moved from 0.370 to 0.390 — a real gain, but a modest one. More diverse data with stricter rules helped, but the single biggest lever in this project was still doing any task-specific fine-tuning at all. Maybe better quality commits, filtered with an LLM-as-judge would have given better results.
+Dataset quality: a real improvement, but smaller than I expected compared to the work of improving the dataset. Comparing the 0.5B model fine-tuned on the old, less diverse dataset against the new one, ROUGE-L moved from 0.370 to 0.390 — a real gain, but a modest one. More diverse data with stricter rules helped, but the single biggest lever in this project was still doing any task-specific fine-tuning at all. Maybe better quality commits, filtered with an LLM-as-judge, would have given better results.
 
 <DatasetEffectChart />
 
@@ -236,7 +236,7 @@ To conclude, the fine-tune reliably fixes *format* (Conventional Commits, length
 
 <CommitComparison />
 
-A practical note before moving to deployment: every number above comes from full-precision (BF16) models running on Colab. The version that will actually ships to my laptop is quantized to GGUF (Q4_K_M), and I haven't yet established whether that introduces a meaningful drop.
+A practical note before moving to deployment: every number above comes from full-precision (BF16) models running on Colab. The version that will actually ship to my laptop is quantized to GGUF (Q4_K_M), and I haven't yet established whether that introduces a meaningful drop.
 
 ## 7. Deployment: from notebook to git hook
 
@@ -250,7 +250,7 @@ There's a memory/latency tradeoff in how you run the model:
 
 ## 8. Limitations and what's next
 
-All things considered, this works quite well: the fine-tuned model is genuinely better and consistent than the baseline on every metric I tracked. But "better than baseline" isn't the same as perfect. So here are the limitations I ran into, and what could be improved.
+All things considered, this works quite well: the fine-tuned model is genuinely better and more consistent than the baseline on every metric I tracked. But "better than baseline" isn't the same as perfect. So here are the limitations I ran into, and what could be improved.
 
 - **Reasoning before answering.** Add a short hidden reasoning step to improve quality without bloating the final output.
 - **Higher-quality data over more data.** Move to a smaller, LLM-judge-filtered dataset.
