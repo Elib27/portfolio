@@ -11,5 +11,6 @@ export default defineConfig({
   // French build can be restored later by moving the folder back to src/pages/fr.
   redirects: {
     '/fr': '/',
+    '/en': '/',
   },
 });
