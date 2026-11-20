@@ -52,9 +52,6 @@ const navItems = [
       </li>
     ))}
   </ul>
-  <div class="mobile-nav__footer" style="--delay: 0.2s">
-    <ToggleThemeButton id="mobile-nav" />
-  </div>
 </nav>
 
 <style lang="scss">
@@ -276,11 +273,6 @@ const navItems = [
         opacity: 1;
         transform: translateY(0);
       }
-
-      .mobile-nav__footer {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     ul {
@@ -313,18 +305,6 @@ const navItems = [
           background: color-mix(in srgb, var(--text) 6%, transparent);
         }
       }
-    }
-
-    &__footer {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-top: 3rem;
-      opacity: 0;
-      transform: translateY(20px);
-      transition:
-        opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--delay),
-        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--delay);
     }
   }
 
