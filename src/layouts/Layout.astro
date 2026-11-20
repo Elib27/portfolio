@@ -66,13 +66,21 @@ const ogImage = new URL('/og/home.png', siteUrl)
           // follow the site's theme toggle (.dark-theme on <html>) instead of the OS preference
           const siteTheme = () => (document.documentElement.classList.contains("dark-theme") ? "dark" : "light")
           VdkEdgeWebchat.mount({ ...webchat, theme: siteTheme(), fontFamily: "'Plus Jakarta Sans', sans-serif", mode: "bubble", baseUrl: "https://vdk-viber-runtime-prod.bot.botpress.host", botId: "042840fa-e266-461f-be2a-4900e16c1ef7" })
-          new MutationObserver(() => {
+          // the accent is set inline at mount, so swap it here: the site's black on light, white on dark
+          const applyTheme = () => {
             const dark = siteTheme() === "dark"
+            const [accent, contrast] = dark ? ["var(--white)", "var(--black)"] : ["var(--black)", "var(--white)"]
             document.querySelectorAll(".vdk-edge").forEach((el) => {
               el.classList.toggle("vdk-edge-dark", dark)
               el.classList.toggle("vdk-edge-light", !dark)
+              el.classList.toggle("vdk-edge-bright-accent", dark)
+              el.style.setProperty("--vdk-accent", accent)
+              el.style.setProperty("--vdk-accent-contrast", contrast)
+              el.style.setProperty("--vdk-accent-icon", contrast)
             })
-          }).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+          }
+          applyTheme()
+          new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
         })
     </script>
   </body>
