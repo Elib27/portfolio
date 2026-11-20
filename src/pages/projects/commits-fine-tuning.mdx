@@ -41,7 +41,7 @@ Let's start with the most important thing: our training data. Its quality is pro
 
 We need git diffs and their corresponding commit messages, and there are plenty on GitHub. The plan: find open-source repos that follow [Conventional Commits](https://www.conventionalcommits.org/), clone them, then run a Python script to extract `(diff, message)` pairs into a JSONL file.
 
-One detail: I fine-tune specifically for **TypeScript**, because that's what I mostly use in my current internship at [Botpress](https://botpress.com/). Here are some of the repos I chose: Angular, Tanstack Query, Vite, Nuxt… and of course the Botpress OSS repo, to match my actual workflow.
+One detail: I fine-tune specifically for **TypeScript**, because that's what I mostly used during my internship at [Botpress](https://botpress.com/). Here are some of the repos I chose: Angular, Tanstack Query, Vite, Nuxt… and of course the Botpress OSS repo, to match my actual workflow.
 
 The script clones each repo, walks the commits, and for every commit grabs the diff and the message. But I don't keep every commit — many are badly formatted (developers are sometimes lazy) and others just aren't interesting. The main filters:
 
@@ -97,9 +97,9 @@ After the extra filtering we have **12,433** higher-quality examples. In practic
 
 ## 4. Training
 
-Originally I wanted to fine-tune on my own machine. My first tests used Hugging Face Transformers and then MLX (I'm on a MacBook M4 Pro, 48 GB — my work laptop; otherwise I use Linux btw). It worked, but it was long and the laptop ran hot. I'll keep the Mac for inference only.
+Originally I wanted to fine-tune on my own machine. My first tests used Hugging Face Transformers and then MLX (I'm on a MacBook M4 Pro, 48 GB — my work laptop; otherwise I use Linux btw). It worked, but it was slow and the laptop ran hot. I'll keep the Mac for inference only.
 
-So I looked for free GPU options. Kaggle has a generous offer (~30h GPU/week), but fine-tuning the smallest model with Transformers was still ~9h — doable, but painful when you want to run lots of experiments. I switched to **Google Colab Pro** ($10/month), which *in theory* gives you an H100 (80 GB VRAM, 3.35 TB/s)… except they're never available. The A100 (40 GB, 1.5 TB/s) is available and more than enough here. With **Unsloth** for performance, fine-tuning dropped to **~20 minutes**. Quite impressive. So let's invest $10 conscientiously and fine-tune our models.
+So I looked for free GPU options. Kaggle has a generous offer (~30h GPU/week), but fine-tuning the smallest model with Transformers was still ~9h — doable, but painful when you want to run lots of experiments. I switched to **Google Colab Pro** ($10/month), which *in theory* gives you an H100 (80 GB VRAM, 3.35 TB/s)… except they're never available. The A100 (40 GB, 1.5 TB/s) is available and more than enough here. With **Unsloth** for performance, fine-tuning dropped to **~20 minutes**. Quite impressive. So let's spend $10 wisely and fine-tune our models.
 
 Here are the models I want to fine-tune and compare:
 
@@ -124,7 +124,7 @@ I set **max input length to 4096 tokens**, since git diffs can be long, then fil
 ```python
 SYSTEM_PROMPT = (
     "You are an expert software engineer. "
-    "Given a git diff, write a single concise conventional"
+    "Given a git diff, write a single concise conventional "
     "commit message in the imperative mood. "
     "Output only the commit message, nothing else."
 )
@@ -194,11 +194,11 @@ I used three layers of evaluation, each catching something the others miss.
 
 **Structural checks.** Simple, deterministic, and arguably more useful here than ROUGE-L: is the message between 10 and 72 characters? Does it follow the `type(scope): description` format? These don't measure quality, but they measure whether the model learned the *format* — which, for a tool that has to slot into a real workflow, matters as much as semantic accuracy.
 
-**LLM-as-judge.** For 200 test examples, I had GPT-4o-mini score each generated message against the diff and the human reference on accuracy, conciseness, and a relative judgment (better/equal/worse than the human reference), at temperature 0 for reproducibility. The limitation: using an LLM to judge an LLM has known biases — it can favour certain phrasing styles, and it's not ground truth, just another signal. I treat it as one data point among three, not the deciding one. I started with GPT-5.4-nano but switched to GPT-4o-mini because the smaller judge wasn't precise enough and often penalised a good commit message for the wrong reason. All the LLM calls for this analysis cost me less than a dollar.
+**LLM-as-judge.** For 200 test examples, I had GPT-4o-mini score each generated message against the diff and the human reference on accuracy, conciseness, and a relative judgment (better/equal/worse than the human reference), at temperature 0 for reproducibility. The limitation: using an LLM to judge an LLM has known biases — it can favour certain phrasing styles, and it's not ground truth, just another signal. I treat it as one data point among three, not the deciding one. I started with GPT-5.4-nano but switched to GPT-4o-mini because the smaller judge wasn't precise enough and often penalized a good commit message for the wrong reason. All the LLM calls for this analysis cost me less than a dollar.
 
 Before the aggregate numbers, here are a few examples to judge for yourself — the diff, both model outputs, and the human reference:
 
-Enough speaking, let's see the results!
+Enough talk, let's see the results!
 
 ## 6. Results
 
