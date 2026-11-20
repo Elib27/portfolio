@@ -1,7 +1,58 @@
 ---
+// Full-screen intro wipe, shown on every page load.
+//
+// The inline script below drives classes on <html>. They only ever exist when
+// JavaScript runs, so without JS the page simply renders in its final state:
+//   is-loading      intro start state. Components style their pre-intro look
+//                   with `:global(html.is-loading)`. Removed once the page is
+//                   ready, at which point a `site:ready` event fires on document.
+//   show-loader     the overlay is displayed.
+//   loader-leaving  the overlay is sliding out.
+//
+// "Ready" means the DOM is parsed and the fonts are loaded, capped at
+// MAX_WAIT_MS so a slow resource can never keep the site hidden.
 ---
 
-<div class="loader">
+<script is:inline>
+  ;(() => {
+    const MAX_WAIT_MS = 3000
+    const root = document.documentElement
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (!reducedMotion) root.classList.add('is-loading')
+    root.classList.add('show-loader')
+
+    let revealed = false
+    const reveal = () => {
+      if (revealed) return
+      revealed = true
+      root.classList.remove('is-loading')
+      document.dispatchEvent(new Event('site:ready'))
+
+      const loader = document.querySelector('.loader')
+      if (!loader) return
+      root.classList.add('loader-leaving')
+      const finish = () => {
+        root.classList.remove('show-loader', 'loader-leaving')
+        loader.remove()
+      }
+      loader.addEventListener('transitionend', (e) => e.target === loader && finish())
+      setTimeout(finish, 1000) // in case transitionend never fires
+    }
+
+    setTimeout(reveal, MAX_WAIT_MS)
+
+    const domReady =
+      document.readyState === 'loading'
+        ? new Promise((resolve) => document.addEventListener('DOMContentLoaded', resolve, { once: true }))
+        : Promise.resolve()
+    // Wait two frames so the start state is painted and the transitions actually play.
+    const afterPaint = () => requestAnimationFrame(() => requestAnimationFrame(reveal))
+    domReady.then(() => document.fonts && document.fonts.ready).then(afterPaint, afterPaint)
+  })()
+</script>
+
+<div class="loader" aria-hidden="true">
   <span class="loader-container">
     <div class="dot"></div>
     <div class="dot"></div>
@@ -9,6 +60,7 @@
     <div class="dot"></div>
   </span>
 </div>
+
 <style lang="scss">
   .loader {
     --diagonal-angle: -3deg;
@@ -19,15 +71,12 @@
     left: 0;
     height: calc(100vh + 2 * var(--loader-height-offset));
     width: 100%;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     transform: skewY(var(--diagonal-angle)) translateY(0);
     transition: transform 0.65s cubic-bezier(0.63, 0.12, 0.87, 0.3) 0.05s;
     z-index: 9999;
-    &.hidden {
-      transform: skewY(var(--diagonal-angle)) translateY(-100%);
-    }
     .loader-container {
       transform: skewY(calc(-1 * var(--diagonal-angle)));
       display: flex;
@@ -44,6 +93,35 @@
           animation: dotSwing2 2s infinite -0.5s;
         }
       }
+    }
+  }
+
+  :global(html.show-loader) .loader {
+    display: flex;
+  }
+  :global(html.loader-leaving) .loader {
+    transform: skewY(var(--diagonal-angle)) translateY(-100%);
+  }
+
+  // No scrolling under the overlay. The reserved gutter keeps the page from
+  // shifting sideways when the scrollbar comes back.
+  :global(html.show-loader:not(.loader-leaving)) {
+    scrollbar-gutter: stable;
+  }
+  :global(html.show-loader:not(.loader-leaving) body) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loader {
+      transition: opacity 0.3s ease;
+      .loader-container .dot:is(:first-child, :last-child) {
+        animation: none;
+      }
+    }
+    :global(html.loader-leaving) .loader {
+      transform: skewY(var(--diagonal-angle));
+      opacity: 0;
     }
   }
 
@@ -80,22 +158,3 @@
     }
   }
 </style>
-
-<script>
-  const loader = document.querySelector<HTMLDivElement>('.loader')
-  function animateLoader() {
-    loader?.classList.add('hidden')
-    setTimeout(() => (loader!.style.display = 'none'), 700)
-  }
-
-  const animatedElements = document.querySelectorAll<Element>('.animated')
-
-  function animateElements() {
-    animatedElements?.forEach((element) => {
-      element.classList.remove('animated')
-    })
-  }
-
-  window.addEventListener('load', animateLoader)
-  window.addEventListener('load', animateElements)
-</script>

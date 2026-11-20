@@ -6,7 +6,7 @@ export interface Props {
 const { link } = Astro.props
 ---
 
-<a class="link animated" href={link} aria-label="Homepage">
+<a class="link" href={link} aria-label="Homepage">
   <svg
     class="logo"
     width="81"
@@ -31,7 +31,7 @@ const { link } = Astro.props
 <style lang="scss">
   .link {
     transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
-    &.animated {
+    :global(html.is-loading) & {
       transform: translateY(20px);
     }
     .logo {

@@ -8,16 +8,16 @@ const t = useTranslations(lang)
 
 <section id="home">
   <div class="hero-content">
-    <div class="line-wrapper animated">
+    <div class="line-wrapper">
       <p class="greeting line">{t('header.title-1')}<span class="name">Eliot</span></p>
     </div>
-    <div class="line-wrapper animated">
+    <div class="line-wrapper">
       <h1 class="role line">{t('header.title-2')}</h1>
     </div>
-    <div class="line-wrapper animated">
+    <div class="line-wrapper">
       <p class="tagline line">{t('header.tagline')}</p>
     </div>
-    <div class="line-wrapper animated">
+    <div class="line-wrapper">
       <p class="availability"><span class="dot"></span>{t('header.availability')}</p>
     </div>
   </div>
@@ -61,7 +61,7 @@ const t = useTranslations(lang)
   }
 
   .line-wrapper {
-    &.animated {
+    :global(html.is-loading) & {
       transform: translateY(30px);
       opacity: 0.3;
     }

@@ -18,7 +18,7 @@ const navItems = [
   <div class="navbar__inner">
     <Logo link="#" />
 
-    <nav class="navbar__desktop animated" aria-label="Main navigation">
+    <nav class="navbar__desktop" aria-label="Main navigation">
       <div class="navbar__indicator"></div>
       <ul>
         {navItems.map(({ href, label, section }) => (
@@ -29,11 +29,11 @@ const navItems = [
       </ul>
     </nav>
 
-    <div class="navbar__actions animated">
+    <div class="navbar__actions">
       <ToggleThemeButton id="desktop" />
     </div>
 
-    <div class="navbar__mobile-actions animated">
+    <div class="navbar__mobile-actions">
       <ToggleThemeButton id="mobile" />
       <button class="navbar__hamburger" aria-expanded="false" aria-label="Toggle menu">
         <span class="line"></span>
@@ -82,9 +82,9 @@ const navItems = [
     }
   }
 
-  .animated {
+  // Intro start state, released by the Loader (see Loader.astro)
+  :global(html.is-loading) :is(.navbar__desktop, .navbar__actions, .navbar__mobile-actions) {
     transform: translateY(20px);
-    transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
   }
 
   // Desktop nav pill
