@@ -1,7 +1,7 @@
 ---
 ---
 
-<div class="animation-canvas-container animated">
+<div class="animation-canvas-container">
   <canvas class="animation-canvas"></canvas>
 </div>
 
@@ -25,7 +25,7 @@
     -webkit-mask-position: left;
     transition: -webkit-mask-position 1s linear 0.4s;
     pointer-events: none;
-    &.animated {
+    :global(html.is-loading) & {
       -webkit-mask-position: right;
     }
 
@@ -340,15 +340,10 @@
     });
   }
 
-  if (!container.classList.contains('animated')) {
-    startAnimation();
+  // The Loader removes `is-loading` and fires `site:ready` once the page is ready.
+  if (document.documentElement.classList.contains('is-loading')) {
+    document.addEventListener('site:ready', startAnimation, { once: true });
   } else {
-    const observer = new MutationObserver(() => {
-      if (!container.classList.contains('animated')) {
-        observer.disconnect();
-        startAnimation();
-      }
-    });
-    observer.observe(container, { attributes: true, attributeFilter: ['class'] });
+    startAnimation();
   }
 </script>

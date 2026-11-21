@@ -2,8 +2,6 @@
 
 ## Propriétaire du site web
 
-**Entreprise :** Eliot Bas EI  
-**SIRET :** 88397035200026  
 **Propriétaire du site :** BAS Eliot  
 **Créateur du site web :** BAS Eliot  
 

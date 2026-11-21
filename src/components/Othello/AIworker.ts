@@ -1,47 +1,49 @@
-import type { Gameboard, Move } from './othello';
+import { GAMEBOARD_SIZE } from './othello';
+import type { Gameboard, Move, Player } from './othello';
+import type { MoveRequest, WorkerMessage } from './messages';
 
-const GAMEBOARD_SIZE = 8;
+const BOARD_BYTES = GAMEBOARD_SIZE * GAMEBOARD_SIZE;
 
-function copyArray(src: Int8Array, dest: Int8Array): void {
-  for (let i = 0; i < src.length; i++) {
-    dest[i] = src[i];
-  }
-}
+// Exports of othelloAI.wasm (C compiled with Emscripten)
+type AIExports = {
+  memory: WebAssembly.Memory;
+  // Takes a pointer to 64 bytes (one char per square, row by row),
+  // returns the chosen square as row * 8 + column
+  getAImove: (boardPointer: number, player: number, difficulty: number) => number;
+  stackSave: () => number;
+  stackAlloc: (size: number) => number;
+  stackRestore: (pointer: number) => void;
+};
 
-function convertAImoveToMove(AImove: number): Move{
-  const row = Math.floor(AImove / GAMEBOARD_SIZE);
-  const column = AImove % GAMEBOARD_SIZE;
-  const move = { row, column };
-  return move;
-}
+const send = (message: WorkerMessage) => self.postMessage(message);
 
-function convertGameboardToArray(gameboard: Gameboard) {
-  const gameboardArray = new Int8Array(GAMEBOARD_SIZE * GAMEBOARD_SIZE);
-  for (let i = 0; i < GAMEBOARD_SIZE; i++) {
-    for (let j = 0; j < GAMEBOARD_SIZE; j++) {
-      gameboardArray[i * GAMEBOARD_SIZE + j] = gameboard[i][j].charCodeAt(0);
+function createAI(ai: AIExports) {
+  return function getAIMove(gameboard: Gameboard, player: Player, difficulty: number): Move {
+    // Borrow 64 bytes on the WASM stack for the board, then give them back
+    const stack = ai.stackSave();
+    try {
+      const pointer = ai.stackAlloc(BOARD_BYTES);
+      const board = new Int8Array(ai.memory.buffer, pointer, BOARD_BYTES);
+      gameboard.flat().forEach((cell, i) => (board[i] = cell.charCodeAt(0)));
+      const square = ai.getAImove(pointer, player.charCodeAt(0), difficulty);
+      return { row: Math.floor(square / GAMEBOARD_SIZE), column: square % GAMEBOARD_SIZE };
+    } finally {
+      ai.stackRestore(stack);
     }
-  }
-  return gameboardArray;
+  };
 }
 
-WebAssembly.instantiateStreaming(fetch(new URL('./othelloAI.wasm', import.meta.url).href), {}).then(obj => {
+WebAssembly.instantiateStreaming(fetch(new URL('./othelloAI.wasm', import.meta.url).href), {})
+  .then(({ instance }) => {
+    const getAIMove = createAI(instance.exports as unknown as AIExports);
 
-  const getAImove = obj.instance.exports.getAImove as CallableFunction;
+    self.onmessage = (event: MessageEvent<MoveRequest>) => {
+      const { gameboard, player, difficulty, gameId } = event.data;
+      send({ type: 'move', move: getAIMove(gameboard, player, difficulty), gameId });
+    };
 
-  async function generateAImove (gameboard: Gameboard, player: string, difficulty: number): Promise<Move> {
-    const arrayGameboard = convertGameboardToArray(gameboard);
-    const WASMmemory = obj.instance.exports.memory as WebAssembly.Memory;
-    const arrayGameboardMemory = new Int8Array(WASMmemory.buffer);
-    copyArray(arrayGameboard, arrayGameboardMemory);
-    const result = getAImove(arrayGameboardMemory, player.charCodeAt(0), difficulty);
-    const move = convertAImoveToMove(result);
-    return move;
-  }
-
-  self.onmessage = async (event: MessageEvent<{gameboard: Gameboard, player: string, difficulty: number}>) => {
-    const { gameboard, player, difficulty } = event.data;
-    const AImove = await generateAImove(gameboard, player, difficulty)
-    self.postMessage({ move: AImove });
-  };
-});
+    // The UI keeps the board locked until this arrives, so no request is
+    // ever sent before onmessage exists (it would be silently dropped)
+    send({ type: 'ready' });
+  })
+  .catch(() => send({ type: 'error' }));

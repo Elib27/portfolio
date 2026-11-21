@@ -1,0 +1,86 @@
+---
+layout: ../../layouts/ArticleLayout.astro
+title: "Drag: a RAG assistant that learns from what it can't answer"
+description: "An information-security assistant I designed and shipped on my own at Botpress, and the self-healing loop that turns every “I don't know” into work for a human expert, then into the next person's answer."
+date: "Software engineering internship at Botpress, Montréal · March – August 2026"
+---
+
+import SelfHealingLoop from '../../components/Drag/SelfHealingLoop.astro'
+
+> **TL;DR:** Drag answers Botpress employees' security and compliance questions in Slack, and fills in the security questionnaires that big customers send before signing. I owned it alone, from design to production: v1 shipped in under three weeks. Over 16 weeks in production, **74 % of questions were fully answered**. The part I'm proudest of is what happens with the other 26 %.
+
+## 1. The problem
+
+**The internal one.** The answers exist, but they're buried in policy documents nobody reads. So someone asks an expert on Slack, waits, and three weeks later someone else asks the same question. That costs twice: the search, and pulling an expert onto a question that was already settled.
+
+**The commercial one**, and the real trigger for the project. Before a large customer signs, they send a **security questionnaire**: a spreadsheet of dozens to hundreds of questions ("Do you encrypt data at rest?", "What's your incident response SLA?"), worded differently every time, and filled in **by hand**.
+
+Two constraints shaped everything after: **freshness** (policies are revised regularly and synced every night) and **traceability** (an auditor must be able to reach the clause behind every answer). That second one settled the approach: a fine-tuned model can't cite its source, and on a compliance corpus a correct but untraceable answer is useless. So: **retrieval-augmented generation (RAG)**, with every answer citing the policy it came from.
+
+When the policies don't cover something, Drag says so plainly instead of improvising from general knowledge: *"I don't see that covered in our indexed policies."* That reply is where the interesting part starts.
+
+## 2. The self-healing loop
+
+After I demoed v1, our CTO said something that changed the project:
+
+> An "I don't know" shouldn't be a dead end. It should be a work item for a human.
+
+It wasn't in the original spec. It became the most distinctive feature of the bot: every question Drag can't fully answer goes to the experts, and their answer goes back into Drag's knowledge, so **the next person who asks gets an answer**. The knowledge base fills its own gaps, and nobody has to maintain a FAQ.
+
+<SelfHealingLoop />
+
+The risk was simple: **a channel full of redundant, vague bot messages gets muted, and then the loop is dead.** Four mechanisms keep it precise and reliable.
+
+### Mechanism 1: isolate the gap
+
+If someone asks *"What's our SOC 2 status, pen-test cadence, and incident response plan?"* and the policies cover the first two, forwarding the whole message would waste the expert's time. So when an answer is partial or missing, the model must also write out **only the uncovered part**, as one short self-contained sentence.
+
+> *"What's our SOC 2 status, pen-test cadence, and IR plan?"* → *"What is the company's incident response plan?"*
+
+Why so strict? Because that sentence has two readers, and neither has the conversation: the expert reading it in Slack, and the deduplication search in mechanism 2. Both break on *"and what about that?"*.
+
+### Mechanism 2: deduplicate, and prefer missing a duplicate over merging wrongly
+
+Before posting, Drag checks whether the question is already waiting for an answer, and asks the model to pick a match among the unresolved ones. Two choices make that safe:
+
+- **The model returns a candidate's number, not text.** There's nothing for it to hallucinate.
+- **The bias is deliberate, toward false negatives.** Different specifics (access logs vs audit logs, encryption at rest vs in transit) mean different questions, and when in doubt, there's no match. A duplicate thread costs a bit of noise; a wrong merge loses a question.
+
+### Mechanism 3: a protocol experts can't trigger by accident
+
+The first version saved *any* thread reply as the answer. In practice, experts discuss before they agree, and that discussion was being stored as the canonical answer. So saving became **opt-in**: **SAVE:** followed by the answer stores it (latest save wins), **DELETE** removes it, and **anything else is just discussion**. That last rule, printed on every post, is what keeps the channel usable as a normal channel.
+
+Expert answers then become a third source next to the policies, but a less trusted one: good enough to answer a colleague on Slack, never cited in a questionnaire an auditor will read.
+
+### Mechanism 4: never lose an answer silently
+
+A loop that spans an LLM, a database and Slack can break quietly in a lot of places. If an expert's answer lands on a thread Drag lost track of, it recovers the question from its own original post. If even that fails, it tells the expert nothing was saved: they asked for a save, so they can't be left thinking it happened. The general rule I followed: anything a person can observe gets an explicit message, and anything that degrades the data gets a log with enough context to repair it by hand.
+
+## 3. Does it work?
+
+Over 16 weeks in production:
+
+| Classification | Share |
+|---|---|
+| Fully answered | 74.1 % |
+| Partially answered (gap sent to experts) | 18.4 % |
+| Legitimate but not covered | 7.5 % |
+
+- **Both use cases carried equal weight:** questions split almost evenly between Slack DMs and CSV questionnaires, which justified building both.
+- **About 19 hours of work saved per month.**
+
+The 7.5 % "not covered" isn't a failure rate. It measures how well the corpus fits the real need, and those questions are exactly what feeds the loop.
+
+The time saved relies on a baseline (~15 min per question by hand) that is the requester's **estimate**, not a measurement, and some of the volume is probably **induced demand**: questions nobody would have asked without the bot.
+
+Quality is checked by a regression suite built for a system that never answers the same way twice. Assertions are graded from the **OpenTelemetry traces** the runtime already emits, so the tests check *what the bot did* (whether it searched, whether it forwarded the gap) and not just its text, with a judge model scoring the rest. The key design choice: **negative cases count as much as positive ones.** An assistant tuned only against hallucination ends up refusing to answer, which is just a different failure, so the strictest test spends half its turns making sure Drag *does* answer what the policies cover. The same suite picked the model, by measurement rather than by feel.
+
+## 4. Takeaway
+
+Most of the loop's refinements came from real usage rather than the spec. That's a point for shipping early, but also a reminder that users paid for the cases I hadn't planned for.
+
+What I take away for any LLM product: **let the model judge, let the code decide, and make every failure loud for the person who can act on it.**
+
+*Drag is an internal Botpress tool, so there's no public repo or demo.*
+
+**Stack:** TypeScript · Botpress ADK · Claude Sonnet 4.6 · Slack · RAG · LLM-as-judge evals over OpenTelemetry traces.

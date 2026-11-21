@@ -1,132 +1,204 @@
-.gameboard {
-  height: clamp(200px, 60vmin, 1000px);
-  width: clamp(200px, 60vmin, 1000px);
-  table-layout: fixed;
-  text-align: center;
-  border-collapse: separate;
-  border-spacing: 0;
-  position: relative;
-  font-size: 2rem;
-  background-color: var(--othello-gameboard-bg);
+.frame {
+  --square: var(--othello-gameboard-bg);
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 18px;
+  background-color: color-mix(in srgb, var(--text) 14%, var(--square));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
   transition: background-color var(--theme-transition);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
 }
 
-.cell {
-  border-bottom: 1px solid rgba(128, 128, 128, 0.25);
-  border-right: 1px solid rgba(128, 128, 128, 0.25);
-  perspective: 400px;
+.grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 3px;
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
 }
 
-.cell:first-child {
-  border-left: 1px solid rgba(128, 128, 128, 0.25);
+/* AI loading or thinking: the board can't be played, show it */
+.locked .grid {
+  opacity: 0.85;
+  filter: saturate(0.8);
 }
 
-.row:first-child .cell {
-  border-top: 1px solid rgba(128, 128, 128, 0.25);
+.square {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--square);
+  color: inherit;
+  cursor: default;
+  transition: background-color var(--theme-transition);
 }
 
-.cell:hover {
-  background-color: rgba(128, 128, 128, 0.08);
+.square:disabled {
+  opacity: 1;
 }
 
-.row {
-  height: 12.5%;
+.legal {
+  cursor: pointer;
 }
 
-@keyframes piecePlace {
-  from {
-    transform: scale(0);
-  }
-  to {
-    transform: scale(1);
-  }
+.legal:hover,
+.legal:focus-visible {
+  background-color: color-mix(in srgb, var(--accent) 10%, var(--square));
+}
+
+.square:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  z-index: 1;
+}
+
+/* Hint and piece sit on top of each other in the square's single cell */
+.hint,
+.piece {
+  grid-area: 1 / 1;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.hint {
+  width: 24%;
+  background-color: var(--accent);
+  opacity: 0.3;
+  transition:
+    width 0.15s ease-out,
+    opacity 0.15s ease-out;
+}
+
+/* Hovering a legal square shows a ghost of the piece */
+.legal:hover .hint,
+.legal:focus-visible .hint {
+  width: 80%;
+  opacity: 0.35;
 }
 
 .piece {
-  height: 85%;
-  width: 85%;
-  border-radius: 50%;
-  margin: 0 auto;
+  position: relative;
+  width: 80%;
   transition: background-color var(--theme-transition);
 }
 
-.placing {
-  animation: piecePlace 150ms ease-out;
-}
-
-.black {
-  background-color: var(--text);
-  box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.15),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
-    0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-.accent {
+.you {
   background-color: var(--accent);
   box-shadow:
     inset 0 2px 4px rgba(255, 255, 255, 0.2),
     inset 0 -2px 4px rgba(0, 0, 0, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.25);
+    0 2px 5px rgba(0, 0, 0, 0.25);
 }
 
-.possibleMove {
-  background-color: var(--accent);
-  opacity: 0.15;
-  cursor: pointer;
-  width: 40%;
-  height: 40%;
-  border: none;
-  animation: none;
-  transition:
-    width 120ms ease-out,
-    height 120ms ease-out,
-    opacity 120ms ease-out;
-}
-
-.hasMove {
-  cursor: pointer;
-}
-
-.hasMove:hover .possibleMove {
-  width: 85%;
-  height: 85%;
-  opacity: 0.35;
-}
-
-.lastAIMove {
+.ai {
+  background-color: var(--text);
   box-shadow:
-    0 0 7px 1px var(--text),
-    0 2px 6px rgba(0, 0, 0, 0.25);
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 2px 5px rgba(0, 0, 0, 0.25);
 }
 
-@keyframes flipPiece {
+/* Small dot marking the AI's last move */
+.lastAIMove::after {
+  content: "";
+  position: absolute;
+  inset: 38%;
+  border-radius: 50%;
+  background-color: var(--background);
+  opacity: 0.85;
+}
+
+/* Pieces the hovered move would turn over */
+.willFlip {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.star {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--text) 40%, transparent);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.placing {
+  animation: place 180ms ease-out;
+}
+
+@keyframes place {
+  from {
+    transform: scale(0.3);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Two-sided flip: the colour switches when the piece is edge-on (50%).
+   `backwards` keeps the old colour during the staggered delay; afterwards
+   the piece's own colour applies (the class stays until the next move). */
+.flipToYou {
+  animation: flipToYou 400ms ease-in-out backwards;
+}
+
+.flipToAi {
+  animation: flipToAi 400ms ease-in-out backwards;
+}
+
+@keyframes flipToYou {
   0% {
-    transform: rotateY(0deg);
+    transform: perspective(300px) rotateY(0deg);
+    background-color: var(--text);
+  }
+  49.99% {
+    background-color: var(--text);
   }
   50% {
-    transform: rotateY(90deg);
+    transform: perspective(300px) rotateY(90deg);
+    background-color: var(--accent);
   }
   100% {
-    transform: rotateY(0deg);
+    transform: perspective(300px) rotateY(0deg);
+    background-color: var(--accent);
   }
 }
 
-.flipping {
-  animation: flipPiece 300ms ease-in-out;
-}
-
-@media screen and (max-width: 960px) {
-  .gameboard {
-    height: max(80vmin, 430px);
-    width: max(80vmin, 430px);
+@keyframes flipToAi {
+  0% {
+    transform: perspective(300px) rotateY(0deg);
+    background-color: var(--accent);
+  }
+  49.99% {
+    background-color: var(--accent);
+  }
+  50% {
+    transform: perspective(300px) rotateY(90deg);
+    background-color: var(--text);
+  }
+  100% {
+    transform: perspective(300px) rotateY(0deg);
+    background-color: var(--text);
   }
 }
 
-@media screen and (max-width: 480px) {
-  .gameboard {
-    height: 90vmin;
-    width: 90vmin;
+@media (prefers-reduced-motion: reduce) {
+  .placing,
+  .flipToYou,
+  .flipToAi {
+    animation: none;
   }
 }
