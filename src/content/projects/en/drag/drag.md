@@ -2,7 +2,7 @@
 title: 'Drag: a Self-Healing RAG Assistant'
 technologies: 'TypeScript, RAG, Botpress ADK'
 cover: './drag.svg'
-coverAlt: 'Diagram of the Drag self-healing loop: question, answer, gap forwarded to experts, SAVE, next answer'
+coverAlt: 'The Drag self-healing loop: an "I don''t know" goes to an expert, the expert answers, and the next asker gets the answer'
 demoLink: '/projects/drag'
 repoLink: ''
 order: 2
