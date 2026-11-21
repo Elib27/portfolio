@@ -108,7 +108,7 @@
 }
 
 /* Small dot marking the AI's last move */
-.lastMove::after {
+.lastAIMove::after {
   content: "";
   position: absolute;
   inset: 38%;
@@ -149,13 +149,14 @@
 }
 
 /* Two-sided flip: the colour switches when the piece is edge-on (50%).
-   `both` keeps the old colour during the staggered delay. */
+   `backwards` keeps the old colour during the staggered delay; afterwards
+   the piece's own colour applies (the class stays until the next move). */
 .flipToYou {
-  animation: flipToYou 400ms ease-in-out both;
+  animation: flipToYou 400ms ease-in-out backwards;
 }
 
 .flipToAi {
-  animation: flipToAi 400ms ease-in-out both;
+  animation: flipToAi 400ms ease-in-out backwards;
 }
 
 @keyframes flipToYou {

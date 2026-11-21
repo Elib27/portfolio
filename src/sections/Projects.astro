@@ -1,10 +1,9 @@
 ---
-import { getLangFromUrl, useTranslations } from '../i18n/utils'
+import { getLangFromUrl, pickTranslations, useTranslations } from '../i18n/utils'
 import { getCollection } from 'astro:content'
 import SectionLayout from '../layouts/SectionLayout.astro'
 import Project from '../components/Project.astro'
 import OthelloPlay from '../components/Othello/OthelloPlay'
-import type { OthelloLabels } from '../components/Othello/labels'
 
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
@@ -13,33 +12,7 @@ const projects = (
   await getCollection('projects', ({ id }) => id.startsWith(`${lang}/`))
 ).sort((a, b) => a.data.order - b.data.order)
 
-const othelloLabels: OthelloLabels = {
-  play: t('othello.play') as string,
-  close: t('othello.close') as string,
-  yourTurn: t('othello.your-turn') as string,
-  aiThinking: t('othello.ai-thinking') as string,
-  loadingAI: t('othello.loading-ai') as string,
-  aiError: t('othello.ai-error') as string,
-  youPass: t('othello.you-pass') as string,
-  aiPasses: t('othello.ai-passes') as string,
-  newGame: t('othello.new-game') as string,
-  difficulty: t('othello.difficulty') as string,
-  easy: t('othello.easy') as string,
-  medium: t('othello.medium') as string,
-  hard: t('othello.hard') as string,
-  you: t('othello.you') as string,
-  ai: t('othello.ai') as string,
-  won: t('othello.won') as string,
-  lost: t('othello.lost') as string,
-  draw: t('othello.draw') as string,
-  playAgain: t('othello.play-again') as string,
-  tryEasier: t('othello.try-easier') as string,
-  board: t('othello.board') as string,
-  legalMove: t('othello.legal-move') as string,
-  yourPiece: t('othello.your-piece') as string,
-  aiPiece: t('othello.ai-piece') as string,
-  emptySquare: t('othello.empty-square') as string,
-}
+const othelloLabels = pickTranslations(lang, 'othello.')
 ---
 
 <SectionLayout title={t('projects.title') as string} id="projects">

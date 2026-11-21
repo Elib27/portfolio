@@ -3,7 +3,7 @@ import { Show } from "solid-js";
 import type { Gameboard } from "../othello";
 import type { OthelloLabels } from "../labels";
 import styles from "./GameResult.module.css";
-import { getWinner, getScore } from "../othello";
+import { getWinner, getScore, HUMAN_PLAYER } from "../othello";
 
 interface GameResultProps {
   gameboard: Gameboard;
@@ -19,7 +19,7 @@ const GameResult: Component<GameResultProps> = (props) => {
 
   const title = () => {
     if (winner() === "draw") return props.labels.draw;
-    return winner() === "x" ? props.labels.won : props.labels.lost;
+    return winner() === HUMAN_PLAYER ? props.labels.won : props.labels.lost;
   };
 
   return (
@@ -42,7 +42,7 @@ const GameResult: Component<GameResultProps> = (props) => {
           <span class={`${styles.dot} ${styles.ai}`} aria-hidden="true" />
         </p>
         <button type="button" class={styles.primary} onClick={props.onPlayAgain}>
-          {props.labels.playAgain}
+          {props.labels["play-again"]}
         </button>
         <Show when={props.onTryEasier}>
           <button
@@ -50,7 +50,7 @@ const GameResult: Component<GameResultProps> = (props) => {
             class={styles.secondary}
             onClick={() => props.onTryEasier?.()}
           >
-            {props.labels.tryEasier}
+            {props.labels["try-easier"]}
           </button>
         </Show>
       </div>

@@ -1,62 +1,49 @@
-import type { Gameboard, Move } from './othello';
+import { GAMEBOARD_SIZE } from './othello';
+import type { Gameboard, Move, Player } from './othello';
+import type { MoveRequest, WorkerMessage } from './messages';
 
-const GAMEBOARD_SIZE = 8;
+const BOARD_BYTES = GAMEBOARD_SIZE * GAMEBOARD_SIZE;
 
-function copyArray(src: Int8Array, dest: Int8Array): void {
-  for (let i = 0; i < src.length; i++) {
-    dest[i] = src[i];
-  }
-}
-
-function convertAImoveToMove(AImove: number): Move{
-  const row = Math.floor(AImove / GAMEBOARD_SIZE);
-  const column = AImove % GAMEBOARD_SIZE;
-  const move = { row, column };
-  return move;
-}
-
-function convertGameboardToArray(gameboard: Gameboard) {
-  const gameboardArray = new Int8Array(GAMEBOARD_SIZE * GAMEBOARD_SIZE);
-  for (let i = 0; i < GAMEBOARD_SIZE; i++) {
-    for (let j = 0; j < GAMEBOARD_SIZE; j++) {
-      gameboardArray[i * GAMEBOARD_SIZE + j] = gameboard[i][j].charCodeAt(0);
-    }
-  }
-  return gameboardArray;
-}
-
-type MoveRequest = {
-  gameboard: Gameboard;
-  player: string;
-  difficulty: number;
-  gameId: number;
+// Exports of othelloAI.wasm (C compiled with Emscripten)
+type AIExports = {
+  memory: WebAssembly.Memory;
+  // Takes a pointer to 64 bytes (one char per square, row by row),
+  // returns the chosen square as row * 8 + column
+  getAImove: (boardPointer: number, player: number, difficulty: number) => number;
+  stackSave: () => number;
+  stackAlloc: (size: number) => number;
+  stackRestore: (pointer: number) => void;
 };
 
-// Messages sent back to the UI:
-//   { type: 'ready' }                 once the WASM module is instantiated
-//   { type: 'error' }                 if it can't be loaded
-//   { type: 'move', move, gameId }    answer to a request (gameId lets the UI
-//                                      ignore answers for a game it has reset)
-WebAssembly.instantiateStreaming(fetch(new URL('./othelloAI.wasm', import.meta.url).href), {})
-  .then((obj) => {
-    const getAImove = obj.instance.exports.getAImove as CallableFunction;
-    const WASMmemory = obj.instance.exports.memory as WebAssembly.Memory;
+const send = (message: WorkerMessage) => self.postMessage(message);
 
-    function generateAImove(gameboard: Gameboard, player: string, difficulty: number): Move {
-      const arrayGameboardMemory = new Int8Array(WASMmemory.buffer);
-      copyArray(convertGameboardToArray(gameboard), arrayGameboardMemory);
-      const result = getAImove(arrayGameboardMemory, player.charCodeAt(0), difficulty);
-      return convertAImoveToMove(result);
+function createAI(ai: AIExports) {
+  return function getAIMove(gameboard: Gameboard, player: Player, difficulty: number): Move {
+    // Borrow 64 bytes on the WASM stack for the board, then give them back
+    const stack = ai.stackSave();
+    try {
+      const pointer = ai.stackAlloc(BOARD_BYTES);
+      const board = new Int8Array(ai.memory.buffer, pointer, BOARD_BYTES);
+      gameboard.flat().forEach((cell, i) => (board[i] = cell.charCodeAt(0)));
+      const square = ai.getAImove(pointer, player.charCodeAt(0), difficulty);
+      return { row: Math.floor(square / GAMEBOARD_SIZE), column: square % GAMEBOARD_SIZE };
+    } finally {
+      ai.stackRestore(stack);
     }
+  };
+}
+
+WebAssembly.instantiateStreaming(fetch(new URL('./othelloAI.wasm', import.meta.url).href), {})
+  .then(({ instance }) => {
+    const getAIMove = createAI(instance.exports as unknown as AIExports);
 
     self.onmessage = (event: MessageEvent<MoveRequest>) => {
       const { gameboard, player, difficulty, gameId } = event.data;
-      const move = generateAImove(gameboard, player, difficulty);
-      self.postMessage({ type: 'move', move, gameId });
+      send({ type: 'move', move: getAIMove(gameboard, player, difficulty), gameId });
     };
 
     // The UI keeps the board locked until this arrives, so no request is
     // ever sent before onmessage exists (it would be silently dropped)
-    self.postMessage({ type: 'ready' });
+    send({ type: 'ready' });
   })
-  .catch(() => self.postMessage({ type: 'error' }));
+  .catch(() => send({ type: 'error' }));
