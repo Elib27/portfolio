@@ -2,7 +2,7 @@
 title: "Spotify Clone"
 technologies: "Next.js, Redux, Spotify API"
 cover: "./spotify-clone.jpg"
-coverAlt: "spotify clone"
+coverAlt: "Clone du lecteur web Spotify affichant une playlist"
 demoLink: "https://spotify-clone-nextjs-elib27.vercel.app"
 repoLink: "https://github.com/Elib27/spotify-clone-nextjs"
 ---

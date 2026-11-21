@@ -2,7 +2,7 @@
 title: "Hestia Généalogie"
 technologies: "Astro, SEO, SASS"
 cover: "./hestia-genealogie.jpg"
-coverAlt: "hestia généalogie"
+coverAlt: "Page d'accueil du site Hestia Généalogie"
 demoLink: "https://estienne-genealogie.fr"
 repoLink: "https://github.com/Elib27/site-genealogie"
 ---

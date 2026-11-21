@@ -2,7 +2,7 @@
 title: "My Portfolio"
 technologies: "Astro, SolidJS, Three.js"
 cover: "./my-portfolio.jpg"
-coverAlt: "mon portfolio"
+coverAlt: "Hero section of this portfolio, with its contour-line background"
 demoLink: "https://eliotbas.com"
 repoLink: "https://github.com/Elib27/portfolio"
 ---
