@@ -9,8 +9,11 @@ const projectsCollection = defineCollection({
     technologies: z.string(),
     cover: image(),
     coverAlt: z.string(),
-    demoLink: z.string(),
-    repoLink: z.string()
+    // Omitted for playable projects, which open inline instead of linking out
+    demoLink: z.string().optional(),
+    repoLink: z.string(),
+    playable: z.boolean().default(false),
+    order: z.number(),
   }),
 });
 
@@ -18,12 +21,7 @@ const aboutCollection = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/about' }),
 });
 
-const othelloCollection = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/othello' }),
-});
-
 export const collections = {
   'projects': projectsCollection,
   'about': aboutCollection,
-  'othello': othelloCollection,
 };

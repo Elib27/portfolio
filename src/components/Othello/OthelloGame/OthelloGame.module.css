@@ -12,8 +12,8 @@
 
 .playerRound {
   color: var(--text);
-  margin: 3rem 0 0 0;
-  font-size: 1.5em;
+  margin: 0;
+  font-size: 1.25rem;
   font-weight: 700;
   text-align: center;
   transition: color var(--theme-transition);
@@ -65,10 +65,11 @@
   color: var(--background);
   background-color: var(--text);
   font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 1.25em;
-  font-weight: 600;
-  padding: 0.5em 1em;
-  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  padding: 0.55rem 1.1rem;
+  border-radius: 10px;
   cursor: pointer;
   border: none;
   transition:
@@ -89,4 +90,10 @@
 
 .resetButtonAccent {
   background-color: var(--accent);
+}
+
+.ghostButton {
+  color: var(--text);
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 25%, transparent);
 }

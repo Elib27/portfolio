@@ -1,5 +1,6 @@
 import type { Component } from "solid-js";
 import type { Move, Gameboard } from "../othello";
+import type { OthelloLabels } from "../labels";
 import { createSignal, onMount, Show } from "solid-js";
 import styles from "./OthelloGame.module.css";
 import GameResult from "../GameResult/GameResult";
@@ -15,7 +16,13 @@ import {
   getLegalMoves,
 } from "../othello";
 
-const OthelloGame: Component = () => {
+type Props = {
+  labels: OthelloLabels;
+  onReady?: () => void;
+  onClose?: () => void;
+};
+
+const OthelloGame: Component<Props> = (props) => {
   const [gameboard, setGameboard] = createSignal<Gameboard>(
     initializeGameBoard(),
   );
@@ -34,13 +41,11 @@ const OthelloGame: Component = () => {
   const difficultyText = () => {
     switch (difficulty()) {
       case 0:
-        return "Easy";
-      case 1:
-        return "Medium";
+        return props.labels.easy;
       case 2:
-        return "Hard";
+        return props.labels.hard;
       default:
-        return "Medium";
+        return props.labels.medium;
     }
   };
 
@@ -74,7 +79,7 @@ const OthelloGame: Component = () => {
     difficulty: number,
   ) => void;
 
-  let timeOutAImoveID: number | undefined;
+  let timeOutAImoveID: ReturnType<typeof setTimeout> | undefined;
 
   onMount(() => {
     const othelloAIworker = new AIworker();
@@ -89,6 +94,8 @@ const OthelloGame: Component = () => {
         timeToWait,
       );
     };
+
+    props.onReady?.();
   });
 
   function updateGameboardWithMove(move: Move, player: string) {
@@ -116,7 +123,7 @@ const OthelloGame: Component = () => {
   }
 
   function reset() {
-    if (player() === AI_PLAYER) clearInterval(timeOutAImoveID);
+    if (player() === AI_PLAYER) clearTimeout(timeOutAImoveID);
     setGameboard(initializeGameBoard());
     setPlayer("x");
     setLastAIMove(null);
@@ -162,11 +169,15 @@ const OthelloGame: Component = () => {
             [styles.statusDotAI]: player() === AI_PLAYER,
           }}
         ></span>
-        {player() === AI_PLAYER ? "AI is thinking..." : "Your turn"}
+        {player() === AI_PLAYER ? props.labels.aiThinking : props.labels.yourTurn}
       </div>
       <div class={styles.centerWrapper}>
         <Show when={isGameEnd()}>
-          <GameResult gameboard={gameboard()} onReset={reset} />
+          <GameResult
+            gameboard={gameboard()}
+            onReset={reset}
+            labels={props.labels}
+          />
         </Show>
         <GameboardUI
           gameboard={gameboard}
@@ -185,11 +196,19 @@ const OthelloGame: Component = () => {
           }}
           onClick={reset}
         >
-          Reset
+          {props.labels.reset}
         </button>
         <button class={styles.resetButton} onClick={changeDifficulty}>
-          Difficulty: {difficultyText()}
+          {props.labels.difficulty} {difficultyText()}
         </button>
+        <Show when={props.onClose}>
+          <button
+            classList={{ [styles.resetButton]: true, [styles.ghostButton]: true }}
+            onClick={() => props.onClose?.()}
+          >
+            {props.labels.close}
+          </button>
+        </Show>
       </div>
     </div>
   );
