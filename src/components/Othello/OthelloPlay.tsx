@@ -75,7 +75,15 @@ const OthelloPlay: Component<Props> = (props) => {
       <Show when={loaded() && panel}>
         <Portal mount={panel!}>
           <div class={styles.panel}>
-            <Suspense fallback={<p class={styles.loading}>…</p>}>
+            <Suspense
+              fallback={
+                // Same footprint as the game, so nothing jumps when it loads
+                <div class={styles.skeleton} aria-hidden="true">
+                  <div class={styles.skeletonBoard} />
+                  <div class={styles.skeletonSide} />
+                </div>
+              }
+            >
               <OthelloGame
                 labels={props.labels}
                 onReady={scrollToPanel}

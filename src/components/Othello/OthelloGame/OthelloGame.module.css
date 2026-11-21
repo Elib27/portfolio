@@ -1,99 +1,289 @@
+/* Desktop: board on the left, score + controls on the right.
+   Mobile: score above the board, controls below. */
 .layout {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: min(480px, 100%) 240px;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "board top"
+    "board controls";
+  column-gap: 3rem;
+  row-gap: 1.75rem;
+  justify-content: center;
+  align-items: start;
+  color: var(--text);
+  transition: color var(--theme-transition);
 }
 
-.centerWrapper {
+.top {
+  grid-area: top;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.boardArea {
+  grid-area: board;
   position: relative;
 }
 
-.playerRound {
-  color: var(--text);
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  text-align: center;
-  transition: color var(--theme-transition);
+.controls {
+  grid-area: controls;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Score */
+.scoreboard {
+  display: grid;
   gap: 0.5rem;
 }
 
-.statusDot {
-  width: 0.6em;
-  height: 0.6em;
+.side {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.side[data-active] {
+  background-color: color-mix(in srgb, var(--text) 5%, transparent);
+  border-color: color-mix(in srgb, var(--text) 35%, transparent);
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  display: inline-block;
   flex-shrink: 0;
 }
 
-.statusDotPlayer {
+.dotYou {
   background-color: var(--accent);
 }
 
-.statusDotAI {
+.dotAI {
   background-color: var(--text);
   transition: background-color var(--theme-transition);
 }
 
-@keyframes pulse {
+.name {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 500;
+}
+
+.count {
+  margin-left: auto;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  grid-column: 1 / -1;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: var(--text);
+  transition: background-color var(--theme-transition);
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  background-color: var(--accent);
+  border-right: 2px solid var(--background);
+  transition: width 0.4s ease;
+}
+
+.thinking {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.thinking i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: blink 1s infinite ease-in-out;
+}
+
+.thinking i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.thinking i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes blink {
   0%,
+  80%,
   100% {
+    opacity: 0.2;
+  }
+  40% {
     opacity: 1;
   }
-  50% {
-    opacity: 0.4;
-  }
 }
 
-.aiThinking {
-  animation: pulse 1.2s ease-in-out infinite;
+.status {
+  margin: 0;
+  min-height: 3em;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.8;
 }
 
-.controlRow {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
+/* Controls */
+.label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
 }
 
-.resetButton {
-  color: var(--background);
-  background-color: var(--text);
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  padding: 0.55rem 1.1rem;
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 3px;
   border-radius: 10px;
-  cursor: pointer;
+  background-color: color-mix(in srgb, var(--text) 7%, transparent);
+}
+
+.segment {
+  padding: 0.45rem 0.5rem;
   border: none;
-  transition:
-    background-color var(--theme-transition),
-    color var(--theme-transition),
-    opacity 150ms ease,
-    transform 150ms ease;
-}
-
-.resetButton:hover {
-  opacity: 0.85;
-  transform: translateY(-1px);
-}
-
-.resetButton:active {
-  transform: scale(0.98);
-}
-
-.resetButtonAccent {
-  background-color: var(--accent);
-}
-
-.ghostButton {
+  border-radius: 8px;
+  background: transparent;
   color: var(--text);
-  background-color: transparent;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 25%, transparent);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color var(--theme-transition);
+}
+
+.segment:hover {
+  background-color: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.segment[aria-pressed="true"] {
+  background-color: var(--background);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.newGame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--text) 25%, transparent);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color var(--theme-transition);
+}
+
+.newGame:hover {
+  background-color: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.newGame svg {
+  width: 18px;
+  height: 18px;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.close:hover {
+  background-color: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.segment:focus-visible,
+.newGame:focus-visible,
+.close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: min(480px, 100%);
+    grid-template-rows: auto;
+    grid-template-areas:
+      "top"
+      "board"
+      "controls";
+    row-gap: 1.25rem;
+  }
+
+  .scoreboard {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .status {
+    min-height: 1.5em;
+    text-align: center;
+  }
+
+  .controls {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .difficulty {
+    flex: 1 1 220px;
+  }
+
+  .newGame {
+    flex: 1 1 140px;
+  }
+
+  /* The row's own Close button sits right above the game on small screens */
+  .close {
+    display: none;
+  }
 }

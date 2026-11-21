@@ -25,23 +25,38 @@ function convertGameboardToArray(gameboard: Gameboard) {
   return gameboardArray;
 }
 
-WebAssembly.instantiateStreaming(fetch(new URL('./othelloAI.wasm', import.meta.url).href), {}).then(obj => {
+type MoveRequest = {
+  gameboard: Gameboard;
+  player: string;
+  difficulty: number;
+  gameId: number;
+};
 
-  const getAImove = obj.instance.exports.getAImove as CallableFunction;
-
-  async function generateAImove (gameboard: Gameboard, player: string, difficulty: number): Promise<Move> {
-    const arrayGameboard = convertGameboardToArray(gameboard);
+// Messages sent back to the UI:
+//   { type: 'ready' }                 once the WASM module is instantiated
+//   { type: 'error' }                 if it can't be loaded
+//   { type: 'move', move, gameId }    answer to a request (gameId lets the UI
+//                                      ignore answers for a game it has reset)
+WebAssembly.instantiateStreaming(fetch(new URL('./othelloAI.wasm', import.meta.url).href), {})
+  .then((obj) => {
+    const getAImove = obj.instance.exports.getAImove as CallableFunction;
     const WASMmemory = obj.instance.exports.memory as WebAssembly.Memory;
-    const arrayGameboardMemory = new Int8Array(WASMmemory.buffer);
-    copyArray(arrayGameboard, arrayGameboardMemory);
-    const result = getAImove(arrayGameboardMemory, player.charCodeAt(0), difficulty);
-    const move = convertAImoveToMove(result);
-    return move;
-  }
 
-  self.onmessage = async (event: MessageEvent<{gameboard: Gameboard, player: string, difficulty: number}>) => {
-    const { gameboard, player, difficulty } = event.data;
-    const AImove = await generateAImove(gameboard, player, difficulty)
-    self.postMessage({ move: AImove });
-  };
-});
+    function generateAImove(gameboard: Gameboard, player: string, difficulty: number): Move {
+      const arrayGameboardMemory = new Int8Array(WASMmemory.buffer);
+      copyArray(convertGameboardToArray(gameboard), arrayGameboardMemory);
+      const result = getAImove(arrayGameboardMemory, player.charCodeAt(0), difficulty);
+      return convertAImoveToMove(result);
+    }
+
+    self.onmessage = (event: MessageEvent<MoveRequest>) => {
+      const { gameboard, player, difficulty, gameId } = event.data;
+      const move = generateAImove(gameboard, player, difficulty);
+      self.postMessage({ type: 'move', move, gameId });
+    };
+
+    // The UI keeps the board locked until this arrives, so no request is
+    // ever sent before onmessage exists (it would be silently dropped)
+    self.postMessage({ type: 'ready' });
+  })
+  .catch(() => self.postMessage({ type: 'error' }));

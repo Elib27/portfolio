@@ -123,6 +123,21 @@ export function playMove(move: Move, player: string, gameboard: Gameboard): void
   convertAdversaryPieces(move, player, gameboard);
 }
 
+// Pieces that playing `move` would turn over, without touching the board
+export function getFlippedPieces(move: Move, player: string, gameboard: Gameboard): Move[] {
+  const after = cloneGameboard(gameboard);
+  playMove(move, player, after);
+  const flipped: Move[] = [];
+  for (let row = 0; row < GAMEBOARD_SIZE; row++) {
+    for (let column = 0; column < GAMEBOARD_SIZE; column++) {
+      const isPlacedPiece = row === move.row && column === move.column;
+      if (!isPlacedPiece && gameboard[row][column] !== after[row][column])
+        flipped.push({ row, column });
+    }
+  }
+  return flipped;
+}
+
 export function placeLegalMovesOnGameboard(gameboard: Gameboard, player: string): Gameboard {
   const legalMoves = getLegalMoves(player, gameboard);
   const gameboardWithLegalMoves = cloneGameboard(gameboard);
