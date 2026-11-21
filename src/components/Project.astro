@@ -59,10 +59,14 @@ const demoLabel = t(isInternal ? 'projects.read' : 'projects.live')
       <span>{demoLabel}</span>
       <Fragment set:html={LinkIcon} />
     </a>
-    <a class="link github" href={repoLink} target="_blank">
-      <Fragment set:html={GithubLogo} />
-      <span>Github Repo</span>
-    </a>
+    {
+      repoLink && (
+        <a class="link github" href={repoLink} target="_blank">
+          <Fragment set:html={GithubLogo} />
+          <span>GitHub Repo</span>
+        </a>
+      )
+    }
   </div>
 </div>
 

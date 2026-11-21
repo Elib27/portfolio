@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" font-family="ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7c82ff"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="675" fill="#02031d"/>
+
+  <text x="60" y="78" fill="#fafafa" font-size="46" font-weight="700">Drag</text>
+  <text x="60" y="116" fill="#9a9cc0" font-size="22">A RAG assistant that turns “I don't know” into its next answer</text>
+
+  <!-- Loop ring -->
+  <g transform="translate(600,395)">
+    <circle r="190" fill="none" stroke="#2a2d5c" stroke-width="2" stroke-dasharray="6 8"/>
+    <path d="M -60 -181 A 190 190 0 0 1 150 -116" fill="none" stroke="#7c82ff" stroke-width="4" marker-end="url(#arrow)"/>
+    <path d="M 185 45 A 190 190 0 0 1 60 180" fill="none" stroke="#7c82ff" stroke-width="4" marker-end="url(#arrow)"/>
+    <path d="M -60 180 A 190 190 0 0 1 -185 45" fill="none" stroke="#7c82ff" stroke-width="4" marker-end="url(#arrow)"/>
+    <path d="M -185 -45 A 190 190 0 0 1 -120 -147" fill="none" stroke="#7c82ff" stroke-width="4" marker-end="url(#arrow)"/>
+
+    <text y="-12" text-anchor="middle" fill="#fafafa" font-size="30" font-weight="700">self-healing</text>
+    <text y="26" text-anchor="middle" fill="#fafafa" font-size="30" font-weight="700">loop</text>
+  </g>
+
+  <!-- Nodes -->
+  <g font-size="21" text-anchor="middle">
+    <g transform="translate(600,205)">
+      <rect x="-150" y="-30" width="300" height="60" rx="14" fill="#0f1240" stroke="#585efb" stroke-width="2"/>
+      <text y="8" fill="#e6e6f0">Question in Slack / CSV</text>
+    </g>
+    <g transform="translate(850,395)">
+      <rect x="-150" y="-30" width="300" height="60" rx="14" fill="#0f1240" stroke="#585efb" stroke-width="2"/>
+      <text y="8" fill="#e6e6f0">Answer or isolate the gap</text>
+    </g>
+    <g transform="translate(600,585)">
+      <rect x="-150" y="-30" width="300" height="60" rx="14" fill="#1b1f6b" stroke="#7c82ff" stroke-width="2"/>
+      <text y="8" fill="#fafafa">Expert replies SAVE: …</text>
+    </g>
+    <g transform="translate(350,395)">
+      <rect x="-150" y="-30" width="300" height="60" rx="14" fill="#0f1240" stroke="#585efb" stroke-width="2"/>
+      <text y="8" fill="#e6e6f0">Next asker gets it</text>
+    </g>
+  </g>
+
+  <!-- Stats -->
+  <g font-size="20" fill="#9a9cc0" text-anchor="end">
+    <text x="1140" y="200"><tspan fill="#cdd0ff" font-weight="700" font-size="34">74 %</tspan></text>
+    <text x="1140" y="226">fully answered</text>
+    <text x="1140" y="290"><tspan fill="#cdd0ff" font-weight="700" font-size="34">18 %</tspan></text>
+    <text x="1140" y="316">gaps sent to experts</text>
+    <text x="1140" y="560"><tspan fill="#cdd0ff" font-weight="700" font-size="34">16 weeks</tspan></text>
+    <text x="1140" y="586">in production</text>
+  </g>
+</svg>
