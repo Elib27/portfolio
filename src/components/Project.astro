@@ -10,9 +10,11 @@ export interface Props {
   technologies: string[]
   cover: ImageMetadata
   coverAlt: string
-  demoLink: string
+  demoLink?: string
   repoLink: string
-  inverted?: boolean
+  // Playable projects pass their own primary button in the "action" slot and
+  // get an empty panel below the row for it to open into
+  panelId?: string
 }
 
 const {
@@ -21,235 +23,259 @@ const {
   technologies,
   cover,
   coverAlt,
-  demoLink,
+  demoLink = '',
   repoLink,
-  inverted,
+  panelId,
 } = Astro.props
 
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 
-const coverPosition = inverted ? 'left' : 'right'
-
 // Internal articles open in the same tab and get a "read" label, not "live"
 const isInternal = demoLink.startsWith('/')
 const demoTarget = isInternal ? undefined : '_blank'
+const demoRel = isInternal ? undefined : 'noopener noreferrer'
 const demoLabel = t(isInternal ? 'projects.read' : 'projects.live')
 ---
 
-<div class="project-container">
-  <div class=`presentation ${inverted ? "right" : "left"}`>
+<article class="project">
+  {
+    panelId ? (
+      <div class="cover">
+        <Image
+          class="cover-image"
+          src={cover}
+          alt={coverAlt}
+          widths={[480, 800, 1200]}
+          sizes="(max-width: 768px) 100vw, 460px"
+        />
+      </div>
+    ) : (
+      <a
+        href={demoLink}
+        class="cover"
+        target={demoTarget}
+        rel={demoRel}
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <Image
+          class="cover-image"
+          src={cover}
+          alt={coverAlt}
+          widths={[480, 800, 1200]}
+          sizes="(max-width: 768px) 100vw, 460px"
+        />
+      </a>
+    )
+  }
+  <div class="content">
     <h3>{title}</h3>
     <p class="description">{description}</p>
     <ul class="technologies">
       {technologies.map((technology) => <li>{technology}</li>)}
     </ul>
+    <div class="links">
+      {
+        panelId ? (
+          <slot name="action" />
+        ) : (
+          <a class="link primary" href={demoLink} target={demoTarget} rel={demoRel}>
+            <span>{demoLabel}</span>
+            {isInternal ? (
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M5 12h14M13 6l6 6-6 6"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            ) : (
+              <Fragment set:html={LinkIcon} />
+            )}
+          </a>
+        )
+      }
+      {
+        repoLink && (
+          <a class="link github" href={repoLink} target="_blank" rel="noopener noreferrer">
+            <Fragment set:html={GithubLogo} />
+            <span>GitHub</span>
+          </a>
+        )
+      }
+    </div>
   </div>
-  <a
-    href={demoLink}
-    class={'project-image-link ' + coverPosition}
-    target={demoTarget}
-  >
-    <Image class="project-image" src={cover} alt={coverAlt} />
-  </a>
-  <div
-    class=`project-links ${inverted ? "right" : "left"} ${inverted && "inverted"}`
-  >
-    <a class="link website" href={demoLink} target={demoTarget}>
-      <span>{demoLabel}</span>
-      <Fragment set:html={LinkIcon} />
-    </a>
-    {
-      repoLink && (
-        <a class="link github" href={repoLink} target="_blank">
-          <Fragment set:html={GithubLogo} />
-          <span>GitHub Repo</span>
-        </a>
-      )
-    }
-  </div>
-</div>
+  {panelId && <div class="play-panel" id={panelId} hidden />}
+</article>
 
 <style lang="scss">
-  .project-container {
-    --border-radius: 16px;
-    width: clamp(700px, 75%, 940px);
-    aspect-ratio: 2;
-    position: relative;
-    .left {
-      left: 0;
+  .project {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
+    gap: 3rem;
+    align-items: center;
+    padding: 3rem 0;
+    border-top: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+    transition: border-color var(--theme-transition);
+
+    &:first-child {
+      border-top: none;
+      padding-top: 0;
     }
-    .right {
-      right: 0;
-    }
-    .presentation {
-      width: max(60%, 500px);
-      position: absolute;
-      top: 0;
-      aspect-ratio: 16/9;
-      background-color: var(--white);
-      border-radius: var(--border-radius);
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
-      padding: 1rem 2rem;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      h3 {
-        color: var(--black);
-        font-size: 1.5rem;
-        margin: 1rem 0;
-        text-align: center;
-      }
-      .description {
-        font-size: 0.9rem;
-        color: var(--black);
-        margin: 0 0 1rem 0;
-      }
-      .technologies {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        margin: 0 0 0.6rem 0;
-        list-style: none;
-        padding: 0;
-        li {
-          font-size: 1rem;
-          white-space: nowrap;
-          padding: 0.5rem 1rem;
-          border-radius: 6px;
-          color: var(--white);
-          background-color: var(--black);
-        }
-      }
-    }
-    .project-image-link {
-      position: absolute;
-      bottom: 0;
-      width: max(60%, 500px);
-      aspect-ratio: 16/9;
-    }
-    .project-image {
-      height: auto;
+  }
+
+  .cover {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius);
+    border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transition:
+      border-color var(--theme-transition),
+      box-shadow 0.3s ease;
+
+    :global(.cover-image) {
+      display: block;
       width: 100%;
+      height: 100%;
       object-fit: cover;
-      border-radius: var(--border-radius);
+      object-position: top;
+      transition: transform 0.4s ease;
     }
-    .project-links {
-      width: 40%;
-      position: absolute;
-      bottom: 2%;
-      display: flex;
+  }
+
+  .project:has(.links :global(.primary:hover)) .cover,
+  .cover:hover {
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    :global(.cover-image) {
+      transform: scale(1.03);
+    }
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    h3 {
+      font-size: 1.5rem;
+      line-height: 1.25;
+      margin: 0;
+      color: var(--text);
+      transition: color var(--theme-transition);
+    }
+  }
+
+  .description {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text);
+    opacity: 0.85;
+    transition: color var(--theme-transition);
+  }
+
+  .technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      font-size: 0.8rem;
+      font-weight: 500;
       white-space: nowrap;
-      justify-content: center;
-      align-items: center;
-      gap: 2rem;
-      &.inverted {
-        flex-direction: row-reverse;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      color: var(--text);
+      border: 1px solid color-mix(in srgb, var(--text) 22%, transparent);
+      transition:
+        color var(--theme-transition),
+        border-color var(--theme-transition);
+    }
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+  }
+
+  // :global so the SolidJS "Play" button (no scoped attribute) matches too
+  .links :global(.link) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    transition:
+      background-color var(--theme-transition),
+      color var(--theme-transition);
+
+    :global(svg) {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    &:global(.primary) {
+      padding: 0.55rem 1.1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 500;
+      background-color: var(--text);
+      color: var(--background);
+      :global(span),
+      :global(svg) {
+        color: var(--background);
+        transition: color var(--theme-transition);
       }
-      .link {
-        height: fit-content;
-        display: flex;
-        align-items: center;
-        transition: background-color var(--theme-transition);
-        span {
-          transition: color var(--theme-transition);
-        }
-        &.website {
-          padding: 0.6rem 1.2rem;
-          background-color: var(--text);
-          border-radius: 10px;
-          gap: 0.8rem;
-          span {
-            color: var(--background);
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            font-size: 1.2rem;
-          }
-        }
-        &.website :global(svg) {
-          height: 22px;
-          width: 22px;
-          color: var(--background);
-        }
-        &.github {
-          gap: 0.5rem;
-          span {
-            color: var(--text);
-            font-size: 1rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-          }
-        }
-        &.github :global(svg) {
-          height: 22px;
-          width: 22px;
-          color: var(--text);
-        }
-        & :global(path) {
-          transition: color var(--theme-transition);
-        }
+      :global(.arrow) {
+        transition: transform 0.2s ease;
+      }
+      &:hover :global(.arrow) {
+        transform: translateX(3px);
+      }
+    }
+
+    &:global(.github) {
+      color: var(--text);
+      :global(span),
+      :global(svg) {
+        color: var(--text);
+        transition: color var(--theme-transition);
+      }
+      &:hover :global(span) {
+        text-decoration: underline;
+        text-underline-offset: 3px;
       }
     }
   }
 
-  @media (max-width: 1150px) {
-    .project-container {
-      .project-links {
-        bottom: -18%;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-    }
+  .play-panel {
+    grid-column: 1 / -1;
+    scroll-margin-top: 5rem;
   }
 
   @media (max-width: 768px) {
-    .project-container {
-      width: 100%;
-      aspect-ratio: inherit;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      .presentation {
-        position: static;
-        width: max(60%, 450px);
-      }
-      .project-image-link {
-        position: static;
-        width: max(60%, 450px);
-      }
-      .project-links {
-        position: static;
-        margin-top: 1rem;
-        width: 100%;
-        flex-direction: row-reverse;
-        flex-wrap: wrap;
-        transform: translateX(0);
-      }
+    .project {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.5rem;
+      padding: 2.5rem 0;
     }
-  }
-  @media (max-width: 480px) {
-    .project-container {
-      .presentation {
-        width: 100%;
-      }
-      .project-image-link {
-        width: 100%;
-      }
-      .presentation {
-        padding: 0.8rem 1.2rem;
-        .technologies {
-          flex-wrap: wrap;
-          gap: 0.8rem;
-          justify-content: space-evenly;
-          li {
-            font-size: 0.9rem;
-            padding: 0.5rem 0.8rem;
-          }
-        }
-      }
+    .content h3 {
+      font-size: 1.3rem;
     }
   }
 </style>
