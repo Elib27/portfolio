@@ -24,8 +24,11 @@ const othelloLabels = pickTranslations(lang, 'othello.')
       projects.map((project) => {
         // Only Othello is playable for now
         const panelId = project.data.playable ? 'othello-game' : undefined
+        // Folder name ("en/othello/othello" -> "othello"), so /#othello links to the row
+        const anchorId = project.id.split('/')[1]
         return (
           <Project
+            id={anchorId}
             title={project.data.title}
             description={project.body ?? ''}
             technologies={project.data.technologies.split(', ')}
@@ -40,6 +43,7 @@ const othelloLabels = pickTranslations(lang, 'othello.')
                 slot="action"
                 client:idle
                 panelId={panelId}
+                deepLinkHash={`#${anchorId}`}
                 labels={othelloLabels}
               />
             )}

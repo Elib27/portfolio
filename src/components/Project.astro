@@ -5,6 +5,8 @@ import GithubLogo from '../assets/github.svg?raw'
 import LinkIcon from '../assets/link.svg?raw'
 
 export interface Props {
+  // Anchor for links to this row, e.g. /#othello
+  id?: string
   title: string
   description: string
   technologies: string[]
@@ -18,6 +20,7 @@ export interface Props {
 }
 
 const {
+  id,
   title,
   description,
   technologies,
@@ -38,7 +41,7 @@ const demoRel = isInternal ? undefined : 'noopener noreferrer'
 const demoLabel = t(isInternal ? 'projects.read' : 'projects.live')
 ---
 
-<article class="project">
+<article class="project" id={id}>
   {
     panelId ? (
       <div class="cover">
@@ -118,6 +121,8 @@ const demoLabel = t(isInternal ? 'projects.read' : 'projects.live')
     gap: 3rem;
     align-items: center;
     padding: 3rem 0;
+    // Keeps the row clear of the fixed navbar when reached through its anchor
+    scroll-margin-top: 5rem;
     border-top: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
     transition: border-color var(--theme-transition);
 

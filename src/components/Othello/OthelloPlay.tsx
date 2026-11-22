@@ -9,6 +9,8 @@ const OthelloGame = lazy(() => import("./OthelloGame/OthelloGame"));
 type Props = {
   // Element (rendered by Project.astro, below the row) the game is mounted into
   panelId: string;
+  // Opening the page with this hash (e.g. "#othello") opens the game
+  deepLinkHash?: string;
   labels: OthelloLabels;
 };
 
@@ -22,6 +24,7 @@ const OthelloPlay: Component<Props> = (props) => {
 
   onMount(() => {
     panel = document.getElementById(props.panelId);
+    if (props.deepLinkHash && location.hash === props.deepLinkHash) toggle();
   });
 
   // The panel is a grid row of the project; hiding it removes the row gap too

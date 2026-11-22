@@ -174,7 +174,7 @@ export const ui = {
         title: 'Software Engineering Intern',
         dates: 'Mar – Aug 2026',
         bullets: [
-          'Built Midas, a production enrichment agent running daily across <strong>2,000 contacts</strong>. LLM classification, workspace resolution, and CRM write-back replaced a manual sales-ops process.',
+          'Built Midas, a production enrichment agent running daily across <strong>1,200 contacts</strong>. LLM classification, workspace resolution, and CRM write-back replaced a manual sales-ops process.',
           'Shipped Drag, a company-wide RAG security agent that answers policy questions with cited sources and auto-fills vendor security questionnaires, saving <strong>19h/month</strong> for legal and people ops. Its self-healing loop routes unanswered queries to experts on Slack and feeds their replies back into the knowledge base.',
           "Contributed fallback model routing to Botpress's open-source LLM engine (<strong>15k stars</strong>), letting users define provider priority chains that auto-retry on failure.",
         ],
