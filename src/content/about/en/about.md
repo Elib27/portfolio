@@ -8,6 +8,6 @@ Before that, I worked on payments at Upflow, a YC-backed fintech in Paris, and r
 
 I care about <span class="highlight">doing things right</span>: not perfectly, just properly. I can't pretend something is fine when I know it isn't, which makes me a bad salesperson and, depending on who you ask, a good teammate. And when I want to understand something, I build a small, worse version of it: an HTTP server from scratch in C, a text editor in Rust, my own <a href="/projects/commits-fine-tuning">fine-tuned LLM</a>.
 
-In October 2026 I rode <span class="highlight">2,700 km solo</span> from Grenoble to Sevilla: 18,500 m of climbing, 136 hours in the saddle, a hammock and a tarp for a home, and a hostel every time the rain won. Main takeaways: buy a lighter hammock and a bigger power bank.
+In October 2026 I rode <button type="button" class="trip-trigger" data-bike-trip-trigger aria-controls="bike-trip-card" aria-expanded="false">2,700 km solo</button> from Grenoble to Sevilla: 18,500 m of climbing, 136 hours in the saddle, a hammock and a tarp for a home, and a hostel every time the rain won. Main takeaways: buy a lighter hammock and a bigger power bank.
 
 When I'm not at a keyboard, you'll find me:

@@ -83,7 +83,7 @@
 
 .count {
   margin-left: auto;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-heading);
   font-size: 1.4rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;

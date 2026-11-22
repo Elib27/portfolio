@@ -1,5 +1,6 @@
 ---
 import { getLangFromUrl, useTranslations } from '../i18n/utils'
+import { Font } from 'astro:assets'
 import Loader from '../components/Loader.astro'
 
 const lang = getLangFromUrl(Astro.url)
@@ -55,9 +56,8 @@ const ogImage = new URL(ogImagePath, siteUrl)
     <meta name="twitter:image" content={ogImage.href} />
     {noIndex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <Font cssVariable="--font-body" preload />
+    <Font cssVariable="--font-heading" preload />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
@@ -90,7 +90,7 @@ const ogImage = new URL(ogImagePath, siteUrl)
     }
   }
   html {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--font-body);
     font-size: clamp(16px, calc(15px + 0.2vw), 20px);
     font-weight: 400;
     font-style: normal;
@@ -112,7 +112,7 @@ const ogImage = new URL(ogImagePath, siteUrl)
     transition: color var(--theme-transition);
   }
   :is(h1, h2, h3):not(:where(.vdk-edge *)) {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: var(--font-heading);
   }
   a:not(:where(.vdk-edge *)) {
     text-decoration: none;
