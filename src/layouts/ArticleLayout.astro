@@ -15,7 +15,12 @@ const { frontmatter } = Astro.props
 const { title, description, date, draft } = frontmatter
 ---
 
-<Layout noIndex={draft}>
+<Layout
+  noIndex={draft}
+  title={`${title} | Eliot Bas`}
+  description={description}
+  ogType="article"
+>
   <header class="article-topbar">
     <a class="back" href="/#projects" aria-label="Back to portfolio">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -55,8 +60,8 @@ const { title, description, date, draft } = frontmatter
     margin: 0 auto;
     width: 100%;
     background: color-mix(in srgb, var(--background) 80%, transparent);
-    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     transition: background-color var(--theme-transition);
 
     .back {

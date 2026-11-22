@@ -7,9 +7,28 @@ const t = useTranslations(lang)
 
 export interface Props {
   noIndex?: boolean
+  /** Page-specific title; defaults to the site title. */
+  title?: string
+  /** Page-specific meta/social description; defaults to the site description. */
+  description?: string
+  /** Path of a 1200x630 social preview image, relative to the site root. */
+  ogImage?: string
+  ogType?: 'website' | 'article'
 }
 
-const { noIndex } = Astro.props
+const {
+  noIndex,
+  title = t('site.title') as string,
+  description = t('site.metaDescription') as string,
+  ogImage: ogImagePath = '/og/home.png',
+  ogType = 'website',
+} = Astro.props
+
+// Social preview metadata. Absolute URLs are required by the scrapers, so
+// everything is resolved against `site` in astro.config.mjs.
+const siteUrl = Astro.site ?? new URL('https://eliotbas.com')
+const pageUrl = new URL(Astro.url.pathname, siteUrl)
+const ogImage = new URL(ogImagePath, siteUrl)
 ---
 
 <!doctype html>
@@ -17,14 +36,30 @@ const { noIndex } = Astro.props
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={t('site.metaDescription') as string} />
+    <meta name="description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="Eliot Bas" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={pageUrl.href} />
+    <meta property="og:image" content={ogImage.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Eliot Bas — software engineer, based in Montréal"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage.href} />
     {noIndex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
     <meta name="generator" content={Astro.generator} />
-    <title>{t('site.title')}</title>
+    <title>{title}</title>
   </head>
   <body>
     <Loader />
@@ -71,28 +106,22 @@ const { noIndex } = Astro.props
       overflow: hidden;
     }
   }
-  h1,
-  h2,
-  h3,
-  p,
-  a,
-  span {
+  // :not(:where(...)) keeps the original specificity while leaving the Botpress webchat alone
+  :is(h1, h2, h3, p, a, span):not(:where(.vdk-edge *)) {
     color: var(--text);
     transition: color var(--theme-transition);
   }
-  h1,
-  h2,
-  h3 {
+  :is(h1, h2, h3):not(:where(.vdk-edge *)) {
     font-family: 'Space Grotesk', sans-serif;
   }
-  a {
+  a:not(:where(.vdk-edge *)) {
     text-decoration: none;
     line-height: 0;
     outline-color: var(--accent);
   }
   button {
   }
-  p {
+  p:not(:where(.vdk-edge *)) {
     font-size: 1rem;
     margin: 0;
     transition: color var(--theme-transition);

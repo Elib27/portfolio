@@ -19,12 +19,13 @@ interface Role {
   bullets: string[]
 }
 
-// Each mark is sized so the three match in visual mass rather than bounding box:
-// the solid Botpress tile has to sit smaller than the open Koesio and Upflow letterforms.
+// Each mark is sized so they read as the same size inside the chip rather than sharing a bounding box.
+// The solid Botpress tile sits a little smaller than the open Koesio and Upflow letterforms, but not so
+// small that it reads as a box inside a box.
 const logos: Record<string, { src: ImageMetadata; w: number; h: number }> = {
-  botpress: { src: botpressMark, w: 56.7, h: 56.7 },
-  koesio: { src: koesioMark, w: 52.3, h: 74.4 },
-  upflow: { src: upflowMark, w: 75, h: 57.5 },
+  botpress: { src: botpressMark, w: 66, h: 66 },
+  koesio: { src: koesioMark, w: 48.1, h: 68.4 },
+  upflow: { src: upflowMark, w: 69, h: 52.9 },
   freelance: { src: freelanceMark, w: 61.8, h: 61.8 },
 }
 
@@ -43,22 +44,20 @@ const roles = t('experience.roles') as unknown as Role[]
               style={`width:${logos[role.logo].w}%;height:${logos[role.logo].h}%`}
             />
           </span>
-          <div class="head">
-            <h3>
-              {role.url ? (
-                <a href={role.url} target="_blank" rel="noopener noreferrer">
-                  {role.company}
-                </a>
-              ) : (
-                role.company
-              )}
-            </h3>
+          <h3>
+            {role.url ? (
+              <a href={role.url} target="_blank" rel="noopener noreferrer">
+                {role.company}
+              </a>
+            ) : (
+              role.company
+            )}
+          </h3>
+          <span class="job-title">{role.title}</span>
+          <span class="meta">
+            <span>{role.dates}</span>
             <span class="location">{role.location}</span>
-          </div>
-          <div class="meta">
-            <span class="job-title">{role.title}</span>
-            <span class="dates">{role.dates}</span>
-          </div>
+          </span>
           <ul class="points">
             {role.bullets.map((bullet) => (
               <li set:html={bullet} />
@@ -83,7 +82,15 @@ const roles = t('experience.roles') as unknown as Role[]
     // nudges the chip onto the optical centre of the two-line company/role header
     --logo-top: 0.3rem;
     position: relative;
-    padding: 0 0 2.75rem calc(var(--logo-size) + 1.1rem);
+    display: grid;
+    grid-template-columns: var(--logo-size) minmax(0, 1fr) auto;
+    grid-template-areas:
+      'logo company meta'
+      'logo title   title'
+      '.    points  points';
+    column-gap: 1.1rem;
+    align-items: baseline;
+    padding-bottom: 2.75rem;
 
     &:last-child {
       padding-bottom: 0;
@@ -107,9 +114,9 @@ const roles = t('experience.roles') as unknown as Role[]
   }
 
   .logo {
-    position: absolute;
-    left: 0;
-    top: var(--logo-top);
+    grid-area: logo;
+    align-self: start;
+    margin-top: var(--logo-top);
     height: var(--logo-size);
     width: var(--logo-size);
     border-radius: 11px;
@@ -124,54 +131,53 @@ const roles = t('experience.roles') as unknown as Role[]
     }
   }
 
-  .head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
+  h3 {
+    grid-area: company;
+    font-size: 1.15rem;
+    margin: 0;
 
-    h3 {
-      font-size: 1.15rem;
-      margin: 0;
+    a {
+      line-height: inherit;
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+      text-decoration-color: color-mix(in srgb, var(--text) 30%, transparent);
+      transition: text-decoration-color 0.2s ease;
 
-      a {
-        line-height: inherit;
-        color: inherit;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        text-decoration-thickness: 1px;
-        text-decoration-color: color-mix(in srgb, var(--text) 30%, transparent);
-        transition: text-decoration-color 0.2s ease;
-
-        &:hover {
-          text-decoration-color: var(--accent);
-        }
+      &:hover {
+        text-decoration-color: var(--accent);
       }
     }
   }
 
-  .meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
+  .job-title {
+    grid-area: title;
     margin-top: 0.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--text) 72%, transparent);
+    transition: color var(--theme-transition);
+  }
 
-    .job-title {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--accent);
+  .meta {
+    grid-area: meta;
+    // flex drops the source whitespace between the two spans, so the dot spacing stays even
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.45em;
+    font-size: 0.875rem;
+    opacity: 0.6;
+    white-space: nowrap;
+
+    .location::before {
+      content: '·';
+      margin-right: 0.45em;
     }
   }
 
-  .location,
-  .dates {
-    font-size: 0.85rem;
-    opacity: 0.6;
-    white-space: nowrap;
-  }
-
   .points {
+    grid-area: points;
     list-style: none;
     padding: 0;
     margin: 0.85rem 0 0;
@@ -205,20 +211,39 @@ const roles = t('experience.roles') as unknown as Role[]
     }
   }
 
+  // Phone: the logo sits beside a three-line header and the bullets take the full width,
+  // so the rail has nothing to connect and is dropped.
   @media (max-width: 600px) {
     .timeline {
       width: 100%;
     }
 
-    .head,
-    .meta {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.15rem;
+    .role {
+      grid-template-columns: var(--logo-size) minmax(0, 1fr);
+      grid-template-areas:
+        'logo   company'
+        'logo   title'
+        'logo   meta'
+        'points points';
+      column-gap: 0.85rem;
+      align-items: start;
+      padding-bottom: 2.25rem;
+
+      &::before {
+        display: none;
+      }
     }
 
-    .location,
-    .dates {
+    .logo {
+      align-self: center;
+      margin-top: 0;
+    }
+
+    .job-title {
+      margin-top: 0.1rem;
+    }
+
+    .meta {
       white-space: normal;
     }
   }

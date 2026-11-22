@@ -1,0 +1,219 @@
+---
+// The self-healing loop, drawn as a snake: 1 → 2 → 3 on the top row,
+// 4 ← 5 ← 6 read back on the bottom row, and 6 feeding 1 again.
+const steps = [
+  {
+    n: 1,
+    who: 'Employee',
+    title: 'Asks a question',
+    body: 'In a Slack DM, or as one row of a CSV security questionnaire.',
+  },
+  {
+    n: 2,
+    who: 'Drag',
+    title: 'Answers and classifies',
+    body: 'Searches three sources, answers, and labels the result yes / partial / no.',
+  },
+  {
+    n: 3,
+    who: 'Drag',
+    title: 'Isolates the gap',
+    body: 'Only the uncovered part, rewritten as one self-contained sentence under 25 words.',
+  },
+  {
+    n: 4,
+    who: 'Drag',
+    title: 'Dedupes, then posts',
+    body: 'New question → new thread in the security experts’ Slack channel. Already asked → “asked again” bump linking the original thread.',
+  },
+  {
+    n: 5,
+    who: 'Expert',
+    title: 'Replies SAVE: …',
+    body: 'Plain replies stay discussion. Only an explicit SAVE is stored; latest save wins, DELETE removes.',
+  },
+  {
+    n: 6,
+    who: 'Drag',
+    title: 'Stores it, instantly searchable',
+    body: 'Upserted into a table read synchronously by the next search, with no indexing delay.',
+  },
+]
+---
+
+<figure class="loop" aria-label="The self-healing loop, in six steps">
+  <ol>
+    {
+      steps.map((s) => (
+        <li class={`step s${s.n} ${s.who.toLowerCase()}`}>
+          <div class="head">
+            <span class="n">{s.n}</span>
+            <span class="who">{s.who}</span>
+          </div>
+          <p class="title">{s.title}</p>
+          <p class="body">{s.body}</p>
+        </li>
+      ))
+    }
+  </ol>
+  <figcaption>
+    <span class="back" aria-hidden="true">↺</span>
+    Step 6 feeds step 2: the next person who asks gets an answer, and nobody had to maintain a FAQ.
+  </figcaption>
+</figure>
+
+<style lang="scss">
+  .loop {
+    margin: 2rem 0;
+    padding: 0;
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas:
+      's1 s2 s3'
+      's6 s5 s4';
+    gap: 1.6rem 1.8rem;
+  }
+
+  .s1 { grid-area: s1; }
+  .s2 { grid-area: s2; }
+  .s3 { grid-area: s3; }
+  .s4 { grid-area: s4; }
+  .s5 { grid-area: s5; }
+  .s6 { grid-area: s6; }
+
+  .step {
+    position: relative;
+    margin: 0;
+    padding: 0.9rem 1rem 1rem;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+    background: color-mix(in srgb, var(--text) 3%, var(--background));
+    transition: background-color var(--theme-transition);
+
+    &.expert,
+    &.employee {
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+      background: color-mix(in srgb, var(--accent) 9%, var(--background));
+    }
+
+    // Arrows between cards (desktop snake)
+    &::after {
+      position: absolute;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    &.s1::after,
+    &.s2::after {
+      content: '→';
+      right: -1.45rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    &.s3::after {
+      content: '↓';
+      bottom: -1.45rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    &.s4::after,
+    &.s5::after {
+      content: '←';
+      left: -1.45rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    &.s6::after {
+      content: '↑';
+      top: -1.45rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.4rem;
+  }
+  .n {
+    display: inline-grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--white);
+    background: var(--accent);
+  }
+  .who {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--text) 60%, transparent);
+  }
+
+  .step p {
+    margin: 0;
+  }
+  .step .title {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.35;
+    margin-bottom: 0.3rem;
+  }
+  .step .body {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--text) 78%, transparent);
+  }
+
+  figcaption {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    margin-top: 1.2rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--text) 75%, transparent);
+    .back {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+  }
+
+  @media (max-width: 720px) {
+    ol {
+      grid-template-columns: 1fr;
+      grid-template-areas: 's1' 's2' 's3' 's4' 's5' 's6';
+      gap: 1.6rem;
+    }
+    .step::after,
+    .step.s1::after,
+    .step.s2::after,
+    .step.s3::after,
+    .step.s4::after,
+    .step.s5::after {
+      content: '↓';
+      top: auto;
+      right: auto;
+      bottom: -1.45rem;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .step.s6::after {
+      content: none;
+    }
+  }
+</style>

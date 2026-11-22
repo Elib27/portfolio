@@ -1,0 +1,170 @@
+---
+// Every technology at a glance: one labelled row of compact chips per category,
+// so nothing is hidden behind tabs and the names are easy to scan.
+
+// Languages
+import TypescriptLogo from '../assets/technologies/typescript.svg'
+import PythonLogo from '../assets/technologies/python.svg'
+import CLogo from '../assets/technologies/c.svg'
+import RustLogo from '../assets/technologies/rust.svg?raw'
+import JavaLogo from '../assets/technologies/java.svg'
+import SqlLogo from '../assets/technologies/sql.svg'
+// Frameworks & Libraries
+import NextLogo from '../assets/technologies/next.svg?raw'
+import ReactLogo from '../assets/technologies/react.svg'
+import AstroLogo from '../assets/technologies/astro.svg?raw'
+import NodeLogo from '../assets/technologies/nodejs.svg'
+import SolidjsLogo from '../assets/technologies/solidjs.svg'
+import VuejsLogo from '../assets/technologies/vuejs.svg'
+import LaravelLogo from '../assets/technologies/laravel.svg'
+import Threejs from '../assets/technologies/threejs.svg?raw'
+import GraphqlLogo from '../assets/technologies/graphql.svg'
+// Tools & Infra
+import VercelLogo from '../assets/technologies/vercel.svg?raw'
+import NetlifyLogo from '../assets/technologies/netlify.svg'
+import GitLogo from '../assets/technologies/git.svg'
+import GithubLogo from '../assets/technologies/github.svg?raw'
+import GitlabLogo from '../assets/technologies/gitlab.svg'
+import DockerLogo from '../assets/technologies/docker.svg'
+
+interface Tech {
+  name: string
+  /** Raw SVG markup (inlined so it follows the text colour) or an imported image. */
+  logo: ImageMetadata | string
+  url: string
+}
+
+export interface Props {
+  /** Category labels, in the same order as the groups below. */
+  labels: string[]
+}
+
+const { labels } = Astro.props
+
+const groups: Tech[][] = [
+  [
+    { name: 'TypeScript', logo: TypescriptLogo, url: 'https://www.typescriptlang.org' },
+    { name: 'Python', logo: PythonLogo, url: 'https://www.python.org' },
+    { name: 'C/C++', logo: CLogo, url: 'https://en.cppreference.com' },
+    { name: 'Rust', logo: RustLogo, url: 'https://www.rust-lang.org' },
+    { name: 'Java', logo: JavaLogo, url: 'https://www.java.com' },
+    { name: 'SQL', logo: SqlLogo, url: 'https://en.wikipedia.org/wiki/SQL' },
+  ],
+  [
+    { name: 'Next.js', logo: NextLogo, url: 'https://nextjs.org' },
+    { name: 'React', logo: ReactLogo, url: 'https://react.dev' },
+    { name: 'Astro', logo: AstroLogo, url: 'https://astro.build' },
+    { name: 'Node.js', logo: NodeLogo, url: 'https://nodejs.org' },
+    { name: 'SolidJS', logo: SolidjsLogo, url: 'https://www.solidjs.com' },
+    { name: 'Vue.js', logo: VuejsLogo, url: 'https://vuejs.org' },
+    { name: 'Laravel', logo: LaravelLogo, url: 'https://laravel.com' },
+    { name: 'Three.js', logo: Threejs, url: 'https://threejs.org' },
+    { name: 'GraphQL', logo: GraphqlLogo, url: 'https://graphql.org' },
+  ],
+  [
+    { name: 'Vercel', logo: VercelLogo, url: 'https://vercel.com' },
+    { name: 'Netlify', logo: NetlifyLogo, url: 'https://www.netlify.com' },
+    { name: 'Docker', logo: DockerLogo, url: 'https://www.docker.com' },
+    { name: 'Git', logo: GitLogo, url: 'https://git-scm.com' },
+    { name: 'GitHub', logo: GithubLogo, url: 'https://github.com' },
+    { name: 'GitLab', logo: GitlabLogo, url: 'https://about.gitlab.com' },
+  ],
+]
+---
+
+<div class="tech-groups">
+  {
+    groups.map((techs, i) => (
+      <div class="group">
+        <h3 class="label">{labels[i]}</h3>
+        <ul class="chips">
+          {techs.map((tech) => (
+            <li>
+              <a class="chip" href={tech.url} target="_blank" rel="noopener noreferrer">
+                {typeof tech.logo === 'string' ? (
+                  <span class="logo" aria-hidden="true" set:html={tech.logo} />
+                ) : (
+                  <img class="logo" src={tech.logo.src} width="24" height="24" alt="" loading="lazy" />
+                )}
+                <span class="name">{tech.name}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>
+
+<style lang="scss">
+  .tech-groups {
+    width: min(100%, 760px);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .label {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--text) 65%, transparent);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.5rem 0.9rem 0.5rem 0.65rem;
+    line-height: 1;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+    background: color-mix(in srgb, var(--text) 3%, transparent);
+    transition:
+      border-color 0.2s ease,
+      background-color var(--theme-transition);
+
+    &:hover {
+      border-color: var(--accent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+  }
+
+  .logo {
+    width: 1.4rem;
+    height: 1.4rem;
+    flex-shrink: 0;
+    object-fit: contain;
+    display: inline-flex;
+    color: var(--text);
+    transition: color var(--theme-transition);
+
+    :global(svg) {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  }
+
+  .name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+</style>

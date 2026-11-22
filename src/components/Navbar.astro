@@ -6,8 +6,6 @@ import Logo from '../components/Logo.astro'
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 
-const langLink = lang === 'en' ? 'fr' : 'en'
-
 const navItems = [
   { href: '#about', label: t('nav.about'), section: 'about' },
   { href: '#experience', label: t('nav.experience'), section: 'experience' },
@@ -20,7 +18,7 @@ const navItems = [
   <div class="navbar__inner">
     <Logo link="#" />
 
-    <nav class="navbar__desktop animated" aria-label="Main navigation">
+    <nav class="navbar__desktop" aria-label="Main navigation">
       <div class="navbar__indicator"></div>
       <ul>
         {navItems.map(({ href, label, section }) => (
@@ -31,17 +29,11 @@ const navItems = [
       </ul>
     </nav>
 
-    <div class="navbar__actions animated">
-      <a class="navbar__lang" href={`/${langLink === 'en' ? '' : langLink}`} aria-label={`Switch to ${langLink}`}>
-        {langLink}
-      </a>
+    <div class="navbar__actions">
       <ToggleThemeButton id="desktop" />
     </div>
 
-    <div class="navbar__mobile-actions animated">
-      <a class="navbar__lang" href={`/${langLink === 'en' ? '' : langLink}`} aria-label={`Switch to ${langLink}`}>
-        {langLink}
-      </a>
+    <div class="navbar__mobile-actions">
       <ToggleThemeButton id="mobile" />
       <button class="navbar__hamburger" aria-expanded="false" aria-label="Toggle menu">
         <span class="line"></span>
@@ -60,12 +52,6 @@ const navItems = [
       </li>
     ))}
   </ul>
-  <div class="mobile-nav__footer" style="--delay: 0.2s">
-    <a class="navbar__lang" href={`/${langLink === 'en' ? '' : langLink}`}>
-      {langLink}
-    </a>
-    <ToggleThemeButton id="mobile-nav" />
-  </div>
 </nav>
 
 <style lang="scss">
@@ -93,9 +79,9 @@ const navItems = [
     }
   }
 
-  .animated {
+  // Intro start state, released by the Loader (see Loader.astro)
+  :global(html.is-loading) :is(.navbar__desktop, .navbar__actions, .navbar__mobile-actions) {
     transform: translateY(20px);
-    transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s;
   }
 
   // Desktop nav pill
@@ -106,8 +92,8 @@ const navItems = [
     align-items: center;
     padding: 0.35rem 0.4rem;
     background: color-mix(in srgb, var(--nav-background) 70%, transparent);
-    backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
     border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
     border-radius: 50px;
     box-shadow:
@@ -180,8 +166,8 @@ const navItems = [
     gap: 1rem;
     padding: 0.5rem 0.8rem;
     background: color-mix(in srgb, var(--nav-background) 70%, transparent);
-    backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
     border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
     border-radius: 50px;
     box-shadow:
@@ -270,8 +256,8 @@ const navItems = [
     justify-content: center;
     align-items: center;
     background: color-mix(in srgb, var(--nav-background) 95%, transparent);
-    backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
     opacity: 0;
     visibility: hidden;
     transition:
@@ -284,11 +270,6 @@ const navItems = [
       visibility: visible;
 
       ul li {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .mobile-nav__footer {
         opacity: 1;
         transform: translateY(0);
       }
@@ -325,18 +306,6 @@ const navItems = [
         }
       }
     }
-
-    &__footer {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-top: 3rem;
-      opacity: 0;
-      transform: translateY(20px);
-      transition:
-        opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--delay),
-        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--delay);
-    }
   }
 
   // Responsive
@@ -347,6 +316,9 @@ const navItems = [
     }
     .navbar__mobile-actions {
       display: flex;
+      // The desktop nav is hidden, so pin this group to the right column
+      // instead of letting it flow into the centre (auto) column.
+      grid-column: 3;
     }
     .mobile-nav {
       display: flex;

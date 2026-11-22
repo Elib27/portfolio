@@ -1,56 +1,58 @@
 ---
-import { getLangFromUrl, useTranslations } from '../i18n/utils'
-import { getCollection, getEntry } from 'astro:content'
+import { getLangFromUrl, pickTranslations, useTranslations } from '../i18n/utils'
+import { getCollection } from 'astro:content'
 import SectionLayout from '../layouts/SectionLayout.astro'
 import Project from '../components/Project.astro'
-import OthelloProject from '../components/Othello/OthelloProject'
+import OthelloPlay from '../components/Othello/OthelloPlay'
 
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
 
-const projects = await getCollection('projects', ({ id }) =>
-  id.startsWith(`${lang}/`)
-)
-const othelloDescription = await getEntry('othello', `${lang}/othello`)
+const projects = (
+  await getCollection(
+    'projects',
+    ({ id, data }) => id.startsWith(`${lang}/`) && !data.hidden,
+  )
+).sort((a, b) => a.data.order - b.data.order)
+
+const othelloLabels = pickTranslations(lang, 'othello.')
 ---
 
 <SectionLayout title={t('projects.title') as string} id="projects">
-  <div class="projects-container">
+  <div class="projects-list">
     {
-      projects.map((project, index) => (
-        <Project
-          title={project.data.title}
-          description={project.body}
-          technologies={project.data.technologies.split(', ')}
-          cover={project.data.cover}
-          coverAlt={project.data.coverAlt}
-          demoLink={project.data.demoLink}
-          repoLink={project.data.repoLink}
-          inverted={index % 2 === 1}
-        />
-      ))
+      projects.map((project) => {
+        // Only Othello is playable for now
+        const panelId = project.data.playable ? 'othello-game' : undefined
+        return (
+          <Project
+            title={project.data.title}
+            description={project.body ?? ''}
+            technologies={project.data.technologies.split(', ')}
+            cover={project.data.cover}
+            coverAlt={project.data.coverAlt}
+            demoLink={project.data.demoLink}
+            repoLink={project.data.repoLink}
+            panelId={panelId}
+          >
+            {panelId && (
+              <OthelloPlay
+                slot="action"
+                client:idle
+                panelId={panelId}
+                labels={othelloLabels}
+              />
+            )}
+          </Project>
+        )
+      })
     }
-    <OthelloProject
-      client:idle
-      buttonTitle={t('projects.last-project') as string}
-      description= {othelloDescription.body}
-    />
   </div>
 </SectionLayout>
 
 <style lang="scss">
-  .projects-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8rem;
-    position: relative;
-  }
-
-  @media (max-width: 768px) {
-    .projects-container {
-      gap: 5rem;
-    }
+  .projects-list {
+    width: min(100%, 1000px);
+    margin: 0 auto;
   }
 </style>
