@@ -2,6 +2,7 @@
 import { getLangFromUrl, useTranslations } from '../i18n/utils.js'
 import { getEntry, render } from 'astro:content'
 import SectionLayout from '../layouts/SectionLayout.astro'
+import BikeTripCard from '../components/BikeTripCard.astro'
 
 const lang = getLangFromUrl(Astro.url)
 const t = useTranslations(lang)
@@ -29,6 +30,8 @@ const activities = t('hobbies.activities') as unknown as string[]
       {t("hobbies.outro")}
     </p>
   </div>
+  {/* English only: the French copy has no trip trigger and stays frozen */}
+  {lang === 'en' && <BikeTripCard />}
 </SectionLayout>
 
 <script>
