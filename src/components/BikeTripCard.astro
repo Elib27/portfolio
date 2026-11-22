@@ -1,0 +1,658 @@
+---
+// Hover card for the Grenoble -> Sevilla bike trip, opened from the `[data-bike-trip-trigger]`
+// button in the About copy. The map is pre-projected by scripts/build-bike-trip.mjs.
+// English only: the French site is frozen (see AGENTS.md), so this is rendered for `en` only.
+import { Image, getImage } from 'astro:assets'
+import trip from '../data/bike-trip.json'
+
+// Photos, in trip order, each with a short location caption. Files live in src/assets/bike-trip/.
+const photoList: { file: string; alt: string; caption: string }[] = [
+  { file: '01-palm-beach.jpg', alt: 'Loaded bike leaning on a bent palm tree on the beach at Le Barcarès, the Pyrenees behind', caption: 'Le Barcarès' },
+  { file: '02-tossa-de-mar.jpg', alt: 'Pine-covered cliffs above the bay and old town of Tossa de Mar', caption: 'Tossa de Mar' },
+  { file: '03-penon-de-ifach.jpg', alt: 'The Peñón de Ifach rock rising from the sea behind the white villas of Calp', caption: 'Peñón de Ifach, Calp' },
+  { file: '04-village-moonrise.jpg', alt: 'The white seaside village of Calabardina under red cliffs at dusk, with the moon above', caption: 'Calabardina' },
+  { file: '05-coast-road-viaduct.jpg', alt: 'View from the Mirador de la Granatilla over a road winding across a viaduct through dry coastal hills', caption: 'Mirador de la Granatilla' },
+  { file: '06-granada.jpg', alt: 'White houses climbing the hillside of an old quarter in Granada under a deep blue sky', caption: 'Granada' },
+  { file: '07-limestone-plateau.jpg', alt: 'A grey limestone plateau near Alhama de Granada, scattered with white rocks and oak trees under heavy clouds', caption: 'Near Alhama de Granada' },
+  { file: '08-tarifa-atlantic.jpg', alt: 'Loaded bike in front of the "Océano Atlántico" sign in Tarifa, kitesurfers behind', caption: 'Tarifa' },
+  { file: '09-dune-road.jpg', alt: 'A road squeezed between the sand of the Valdevaqueros dune, wind turbines on the ridge', caption: 'Duna de Valdevaqueros' },
+  { file: '10-sunset.jpg', alt: 'The sun setting into the Atlantic off Cádiz under orange clouds', caption: 'Cádiz' },
+  { file: '11-sevilla.jpg', alt: 'A yellow church bell tower behind orange trees in Sevilla', caption: 'Sevilla' },
+]
+
+const photoModules = import.meta.glob<{ default: ImageMetadata }>('../assets/bike-trip/*.jpg', { eager: true })
+const photos = await Promise.all(
+  photoList.map(async (photo) => {
+    const src = photoModules[`../assets/bike-trip/${photo.file}`]?.default
+    if (!src) throw new Error(`BikeTripCard: missing photo src/assets/bike-trip/${photo.file}`)
+    // Large version shown in place of the map, only fetched when its thumbnail is clicked
+    const full = await getImage({ src, width: 640, densities: [1, 2], format: 'webp' })
+    return { ...photo, src, full }
+  }),
+)
+
+const stats = [
+  { value: '2,700', unit: 'km', label: 'distance' },
+  { value: '18,500', unit: 'm', label: 'climbing' },
+  { value: '136', unit: 'h', label: 'in the saddle' },
+  { value: '31', unit: 'days', label: 'Oct 2 – Nov 1' },
+]
+
+const start = trip.cities.find((c) => c.role === 'start')!
+const end = trip.cities.find((c) => c.role === 'end')!
+---
+
+<div id="bike-trip-card" class="trip-card" popover="manual" role="dialog" aria-labelledby="bike-trip-title">
+  <div class="trip-media" style={`aspect-ratio: ${trip.width} / ${trip.height}`}>
+  <svg
+    class="trip-map"
+    viewBox={`0 0 ${trip.width} ${trip.height}`}
+    role="img"
+    aria-label="Map of the route: from Grenoble down the Rhône valley, along the Mediterranean coast through Montpellier, Barcelona and Valencia, inland to Granada, then via Málaga and Cádiz to Sevilla."
+  >
+    <path class="land" d={trip.land} fill-rule="evenodd" />
+    <path class="borders" d={trip.borders} />
+    <path class="route-halo" d={trip.route} />
+    <path class="route" d={trip.route} />
+    {trip.cities.map((city) => (
+      <g class:list={['city', city.role]}>
+        {!city.role && <circle cx={city.x} cy={city.y} r="3" />}
+        <text x={city.x + city.dx} y={city.y + city.dy} text-anchor={city.anchor}>{city.name}</text>
+      </g>
+    ))}
+    {/* Start and finish dots drawn last so the route never covers them */}
+    <circle class="endpoint" cx={start.x} cy={start.y} r="4.5" />
+    <circle class="endpoint" cx={end.x} cy={end.y} r="4.5" />
+  </svg>
+    <figure class="trip-photo" hidden>
+      <img alt="" decoding="async" />
+      <figcaption></figcaption>
+    </figure>
+  </div>
+
+  <div class="trip-info">
+    <header class="trip-header">
+      <h3 id="bike-trip-title">Grenoble <span aria-hidden="true">→</span><span class="sr-only">to</span> Sevilla</h3>
+      <p>Solo bikepacking trip</p>
+    </header>
+
+    <dl class="trip-stats">
+      {stats.map((stat) => (
+        <div>
+          <dt>{stat.label}</dt>
+          <dd>{stat.value}<span class="unit"> {stat.unit}</span></dd>
+        </div>
+      ))}
+    </dl>
+
+    <ul class="trip-thumbs" aria-label="Map and photos from the trip">
+      <li>
+        <button type="button" class="thumb thumb-map" data-trip-view="map" aria-pressed="true" aria-label="Show the route map">
+          <svg viewBox={`0 0 ${trip.width} ${trip.height}`} aria-hidden="true">
+            <path d={trip.route} />
+          </svg>
+        </button>
+      </li>
+      {photos.map((photo, i) => (
+        <li>
+          <button
+            type="button"
+            class="thumb"
+            data-trip-view={i}
+            data-src={photo.full.src}
+            data-srcset={photo.full.srcSet.attribute}
+            data-alt={photo.alt}
+            data-caption={photo.caption}
+            aria-pressed="false"
+            aria-label={`Show photo: ${photo.alt}`}
+          >
+            <Image src={photo.src} alt="" width={96} height={96} fit="cover" loading="lazy" />
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+</div>
+
+<script>
+  const OPEN_DELAY = 120
+  const CLOSE_DELAY = 220
+  const GAP = 10
+  const MARGIN = 12
+
+  function initBikeTripCard() {
+    const trigger = document.querySelector<HTMLElement>('[data-bike-trip-trigger]')
+    const card = document.getElementById('bike-trip-card')
+    if (!trigger || !card || !('showPopover' in card)) return
+
+    const sheet = window.matchMedia('(max-width: 560px)')
+    let openTimer: number | undefined
+    let closeTimer: number | undefined
+    // Opened by a click or tap: stays open until dismissed, instead of closing on mouse leave
+    let pinned = false
+
+    const isOpen = () => card.matches(':popover-open')
+
+    function position() {
+      if (sheet.matches) {
+        card.style.removeProperty('--x')
+        card.style.removeProperty('--y')
+        return
+      }
+      const t = trigger!.getBoundingClientRect()
+      const { offsetWidth: w, offsetHeight: h } = card!
+      const vw = document.documentElement.clientWidth
+      const vh = window.innerHeight
+      const spaceAbove = t.top - GAP - MARGIN
+      const spaceBelow = vh - t.bottom - GAP - MARGIN
+      let y = spaceAbove >= h || spaceAbove > spaceBelow ? t.top - GAP - h : t.bottom + GAP
+      y = Math.max(MARGIN, Math.min(y, vh - h - MARGIN))
+      const x = Math.max(MARGIN, Math.min(t.left + t.width / 2 - w / 2, vw - w - MARGIN))
+      card!.style.setProperty('--x', `${Math.round(x)}px`)
+      card!.style.setProperty('--y', `${Math.round(y)}px`)
+    }
+
+    function open() {
+      clearTimeout(closeTimer)
+      if (isOpen()) return
+      card!.showPopover()
+      position()
+      trigger!.setAttribute('aria-expanded', 'true')
+      // Force a style flush in the closed state so adding the class transitions in
+      void card!.offsetHeight
+      card!.classList.add('is-visible')
+      window.addEventListener('scroll', position, { passive: true })
+      window.addEventListener('resize', position)
+    }
+
+    function close() {
+      clearTimeout(openTimer)
+      if (!isOpen()) return
+      pinned = false
+      trigger!.setAttribute('aria-expanded', 'false')
+      card!.classList.remove('is-visible')
+      window.removeEventListener('scroll', position)
+      window.removeEventListener('resize', position)
+      const hide = () => {
+        if (!card!.classList.contains('is-visible') && isOpen()) card!.hidePopover()
+      }
+      const duration = parseFloat(getComputedStyle(card!).transitionDuration) * 1000
+      setTimeout(hide, duration || 0)
+    }
+
+    const scheduleOpen = () => {
+      clearTimeout(closeTimer)
+      openTimer = window.setTimeout(open, OPEN_DELAY)
+    }
+    const scheduleClose = () => {
+      clearTimeout(openTimer)
+      if (!pinned) closeTimer = window.setTimeout(close, CLOSE_DELAY)
+    }
+
+    // Hover, for mouse and pen only: touch goes through the click handler
+    for (const el of [trigger, card]) {
+      el.addEventListener('pointerenter', (e) => {
+        if (e.pointerType !== 'touch' && (el === trigger || isOpen())) scheduleOpen()
+      })
+      el.addEventListener('pointerleave', (e) => {
+        if (e.pointerType !== 'touch') scheduleClose()
+      })
+    }
+
+    trigger.addEventListener('click', () => {
+      if (isOpen() && pinned) {
+        close()
+      } else {
+        pinned = true
+        open()
+      }
+    })
+
+    trigger.addEventListener('focus', () => {
+      if (trigger.matches(':focus-visible')) open()
+    })
+    trigger.addEventListener('blur', () => {
+      if (!pinned) close()
+    })
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen()) {
+        close()
+        trigger.focus({ preventScroll: true })
+      }
+    })
+    document.addEventListener('pointerdown', (e) => {
+      const target = e.target as Node
+      if (isOpen() && !card.contains(target) && !trigger.contains(target)) close()
+    })
+
+    sheet.addEventListener('change', () => isOpen() && position())
+
+    // Thumbnail row: swaps the map panel for a photo, and back
+    const map = card.querySelector<SVGElement>('.trip-map')!
+    const figure = card.querySelector<HTMLElement>('.trip-photo')!
+    const img = figure.querySelector('img')!
+    const caption = figure.querySelector('figcaption')!
+    const thumbs = [...card.querySelectorAll<HTMLButtonElement>('[data-trip-view]')]
+
+    function show(thumb: HTMLButtonElement) {
+      thumbs.forEach((t) => t.setAttribute('aria-pressed', String(t === thumb)))
+      const isMap = thumb.dataset.tripView === 'map'
+      map.toggleAttribute('hidden', !isMap)
+      figure.toggleAttribute('hidden', isMap)
+      if (isMap) return
+      img.srcset = thumb.dataset.srcset ?? ''
+      img.src = thumb.dataset.src!
+      img.alt = thumb.dataset.alt ?? ''
+      caption.textContent = thumb.dataset.caption ?? ''
+      caption.toggleAttribute('hidden', !thumb.dataset.caption)
+    }
+
+    for (const thumb of thumbs) thumb.addEventListener('click', () => show(thumb))
+    // Interacting with the card means the reader is looking at it: keep it open on mouse leave
+    card.addEventListener('click', () => (pinned = true))
+    // Always reopen on the map
+    card.addEventListener('toggle', (e) => {
+      if ((e as ToggleEvent).newState === 'closed') show(thumbs[0])
+    })
+
+    // Nudge the pin once, the first time the trigger is fully on screen
+    const hint = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        hint.disconnect()
+        setTimeout(() => trigger.classList.add('is-hinting'), 400)
+      },
+      { threshold: 1 },
+    )
+    hint.observe(trigger)
+    trigger.addEventListener('animationend', () => trigger.classList.remove('is-hinting'))
+  }
+
+  initBikeTripCard()
+</script>
+
+<style lang="scss">
+  // The trigger lives in the About markdown, so its styles are global
+  :global(#about .trip-trigger) {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    border-radius: 3px;
+    // Dotted underline: the usual "there's more here" cue; it turns solid on hover/open
+    text-decoration: underline dotted var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+    transition: color 0.15s ease;
+    &:hover,
+    &[aria-expanded='true'] {
+      color: var(--accent);
+      text-decoration-style: solid;
+    }
+    // Small map pin after the text
+    &::after {
+      content: '';
+      display: inline-block;
+      width: 0.85em;
+      height: 0.85em;
+      margin-left: 0.25em;
+      vertical-align: -0.05em;
+      background: var(--accent);
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z'/%3E%3C/svg%3E") center / contain no-repeat;
+      transition: transform 0.2s ease;
+    }
+    // Bounces a few times the first time the line scrolls into view (class set in the script)
+    &.is-hinting::after {
+      animation: trip-pin-bounce 0.7s ease-in-out 3;
+    }
+    &:hover::after,
+    &[aria-expanded='true']::after {
+      transform: translateY(-2px);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+  }
+  // Lighter tone in dark mode: the accent is too dark on the navy background
+  :global(html.dark-theme #about .trip-trigger) {
+    text-decoration-color: var(--secondary);
+    &:hover,
+    &[aria-expanded='true'] {
+      color: var(--secondary);
+    }
+    &::after {
+      background: var(--secondary);
+    }
+  }
+
+  @keyframes trip-pin-bounce {
+    0%,
+    100% {
+      transform: none;
+    }
+    40% {
+      transform: translateY(-5px);
+    }
+    60% {
+      transform: translateY(-1px);
+    }
+  }
+
+  .trip-card {
+    // Reset the UA popover styles and position from the variables set in the script
+    position: fixed;
+    inset: auto;
+    top: var(--y, 0);
+    left: var(--x, 0);
+    margin: 0;
+    // Map on the left, title and stats on the right: a wide, short card fits above or
+    // below the line it's anchored to on most screens. Only set while open: an author
+    // `display` would override the UA's `display: none` for closed popovers.
+    &:popover-open {
+      display: grid;
+    }
+    grid-template-columns: 300px 1fr;
+    gap: 0 1.25rem;
+    width: min(600px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+    padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
+    border-radius: var(--radius);
+    background: var(--background);
+    color: var(--text);
+    box-shadow:
+      0 1px 2px color-mix(in srgb, var(--black) 8%, transparent),
+      0 16px 40px -12px color-mix(in srgb, var(--black) 30%, transparent);
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+    transform-origin: center bottom;
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease;
+    &.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+    :global(html.dark-theme) & {
+      border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+      box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
+    }
+  }
+
+  .trip-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+  }
+
+  .trip-header {
+    h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      line-height: 1.2;
+    }
+    p {
+      margin: 0.15rem 0 0;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+  }
+
+  // Map and photo share one panel, sized by the map's aspect ratio (set inline)
+  .trip-media {
+    position: relative;
+    align-self: center;
+  }
+
+  .trip-map {
+    display: block;
+    width: 100%;
+    height: 100%;
+    &[hidden] {
+      display: none;
+    }
+    // The sea is the SVG's own background; land is drawn on top
+    background: color-mix(in srgb, var(--accent) 9%, var(--background));
+    border-radius: calc(var(--radius) - 6px);
+    :global(html.dark-theme) & {
+      background: color-mix(in srgb, var(--accent) 16%, var(--background));
+      .land {
+        fill: color-mix(in srgb, var(--text) 11%, var(--background));
+      }
+    }
+
+    .land {
+      fill: color-mix(in srgb, var(--text) 4%, var(--background));
+    }
+    .borders {
+      fill: none;
+      stroke: color-mix(in srgb, var(--text) 28%, transparent);
+      stroke-width: 0.8;
+      stroke-dasharray: 2 2.5;
+    }
+    .route,
+    .route-halo {
+      fill: none;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+    .route-halo {
+      stroke: var(--background);
+      stroke-width: 6;
+    }
+    .route {
+      stroke: var(--accent);
+      stroke-width: 2.6;
+    }
+    .city {
+      circle {
+        fill: var(--background);
+        stroke: var(--accent);
+        stroke-width: 1.8;
+      }
+      text {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        fill: var(--text);
+        // Halo so labels stay readable over the route and borders
+        paint-order: stroke;
+        stroke: var(--background);
+        stroke-width: 3.5px;
+        stroke-linejoin: round;
+      }
+      &.start text,
+      &.end text {
+        font-weight: 700;
+      }
+    }
+    .endpoint {
+      fill: var(--accent);
+      stroke: var(--background);
+      stroke-width: 1.8;
+    }
+  }
+
+  .trip-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem 1rem;
+    margin: 0;
+    dt {
+      font-size: 0.68rem;
+      line-height: 1.2;
+      opacity: 0.65;
+      order: 2;
+    }
+    div {
+      display: flex;
+      flex-direction: column;
+    }
+    dd {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .unit {
+      font-size: 0.75rem;
+      font-weight: 500;
+      opacity: 0.7;
+    }
+  }
+
+  .trip-photo {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    border-radius: calc(var(--radius) - 6px);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--text) 6%, var(--background));
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    figcaption {
+      position: absolute;
+      left: 0.5rem;
+      bottom: 0.5rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--white);
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+    }
+  }
+
+  .trip-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    // Room for the selected thumbnail's outline
+    padding: 3px;
+    li {
+      flex: 0 0 auto;
+    }
+  }
+
+  .thumb {
+    display: block;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    background: color-mix(in srgb, var(--accent) 9%, var(--background));
+    opacity: 0.65;
+    outline: 2px solid transparent;
+    outline-offset: 1px;
+    transition:
+      opacity 0.15s ease,
+      outline-color 0.15s ease;
+    &:hover {
+      opacity: 1;
+    }
+    &[aria-pressed='true'] {
+      opacity: 1;
+      outline-color: var(--accent);
+    }
+    &:focus-visible {
+      outline-color: var(--accent);
+    }
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 4px;
+      path {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 18;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+      }
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  // Narrow screens: a bottom sheet instead of a floating card
+  @media (max-width: 560px) {
+    .trip-card {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      max-height: 85vh;
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+      border-radius: var(--radius) var(--radius) 0 0;
+      border-bottom: 0;
+      transform: translateY(24px);
+      transform-origin: center bottom;
+      // minmax(0, …) so the scrolling thumbnail row can't widen the column
+      grid-template-columns: minmax(0, 1fr);
+      padding-inline: 1rem;
+    }
+    .trip-info {
+      order: -1;
+      padding: 0.25rem 0 0.5rem;
+    }
+    .trip-stats {
+      grid-template-columns: repeat(4, auto);
+      justify-content: space-between;
+    }
+    // One scrollable row on phones
+    .trip-thumbs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trip-card,
+    .trip-card.is-visible {
+      transform: none;
+    }
+    :global(#about .trip-trigger) {
+      transition: none;
+      &::after {
+        transition: none;
+        animation: none !important;
+      }
+    }
+  }
+</style>
