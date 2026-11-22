@@ -17,7 +17,9 @@
       .then(([{ webchat }]) => {
         // follow the site's theme toggle (.dark-theme on <html>) instead of the OS preference
         const siteTheme = () => (document.documentElement.classList.contains("dark-theme") ? "dark" : "light")
-        VdkEdgeWebchat.mount({ ...webchat, theme: siteTheme(), fontFamily: "'Plus Jakarta Sans', sans-serif", mode: "bubble", baseUrl, botId })
+        // the self-hosted font family names are hashed by Astro, so read them from the CSS variable
+        const fontFamily = getComputedStyle(document.documentElement).getPropertyValue("--font-body").trim() || "sans-serif"
+        VdkEdgeWebchat.mount({ ...webchat, theme: siteTheme(), fontFamily, mode: "bubble", baseUrl, botId })
         // the accent is set inline at mount, so swap it here: the site's black on light, white on dark
         const applyTheme = () => {
           const dark = siteTheme() === "dark"
