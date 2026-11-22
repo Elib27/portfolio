@@ -97,8 +97,8 @@ const activities = t('hobbies.activities') as unknown as string[]
 
 <style lang="scss">
   .content {
-    --highlight-padding: 4px;
-    width: min(80%, 800px);
+    // ~70 characters per line keeps the long About copy comfortable on wide screens
+    width: min(80%, 68ch);
     margin: auto;
     & :global(p) {
       margin: 0 0 1rem 0;
@@ -111,18 +111,20 @@ const activities = t('hobbies.activities') as unknown as string[]
       text-underline-offset: 2px;
       text-decoration-thickness: 1px;
     }
+    // Drawn as a background (not a pseudo-element) so it follows the text when a
+    // highlight wraps onto several lines; `clone` gives every line its own rounded bar.
+    // No horizontal padding: the bar hugs the words, so no gap appears before punctuation.
     & :global(.highlight) {
-      position: relative;
-      padding: 0 var(--highlight-padding);
-    }
-    & :global(.highlight::after) {
-      content: '';
-      position: absolute;
-      inset: 52% 0 10% 0;
-      z-index: -1;
-      background: var(--highlight);
+      background: linear-gradient(
+        to bottom,
+        transparent 52%,
+        var(--highlight) 52%,
+        var(--highlight) 90%,
+        transparent 90%
+      );
       border-radius: 3px;
-      transition: background-color var(--theme-transition);
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
     }
   }
 
