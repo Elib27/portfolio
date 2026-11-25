@@ -16,6 +16,8 @@ interface Role {
   location: string
   title: string
   dates: string
+  /** Stack used in the role, shown as chips under the bullets. Optional: roles without it render no chips. */
+  tags?: string[]
   bullets: string[]
 }
 
@@ -63,6 +65,13 @@ const roles = t('experience.roles') as unknown as Role[]
               <li set:html={bullet} />
             ))}
           </ul>
+          {role.tags && role.tags.length > 0 && (
+            <ul class="tags">
+              {role.tags.map((tag) => (
+                <li>{tag}</li>
+              ))}
+            </ul>
+          )}
         </li>
       ))
     }
@@ -87,7 +96,8 @@ const roles = t('experience.roles') as unknown as Role[]
     grid-template-areas:
       'logo company meta'
       'logo title   title'
-      '.    points  points';
+      '.    points  points'
+      '.    tags    tags';
     column-gap: 1.1rem;
     align-items: baseline;
     padding-bottom: 2.75rem;
@@ -205,6 +215,30 @@ const roles = t('experience.roles') as unknown as Role[]
     }
   }
 
+  // Same chip style as the project cards' technology list
+  .tags {
+    grid-area: tags;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      font-size: 0.8rem;
+      font-weight: 500;
+      white-space: nowrap;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      color: color-mix(in srgb, var(--text) 80%, transparent);
+      border: 1px solid color-mix(in srgb, var(--text) 22%, transparent);
+      transition:
+        color var(--theme-transition),
+        border-color var(--theme-transition);
+    }
+  }
+
   @media (max-width: 768px) {
     .timeline {
       width: 90%;
@@ -224,7 +258,8 @@ const roles = t('experience.roles') as unknown as Role[]
         'logo   company'
         'logo   title'
         'logo   meta'
-        'points points';
+        'points points'
+        'tags   tags';
       column-gap: 0.85rem;
       align-items: start;
       padding-bottom: 2.25rem;

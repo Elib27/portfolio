@@ -173,6 +173,7 @@ export const ui = {
         location: 'Montréal, Canada',
         title: 'Software Engineering Intern',
         dates: 'Mar – Aug 2026',
+        tags: ['TypeScript', 'LLM agents', 'RAG', 'LLM evals', 'OpenAI & Anthropic APIs', 'Botpress ADK'],
         bullets: [
           'Built Midas, a production enrichment agent running daily across <strong>1,200 contacts</strong>. LLM classification, workspace resolution, and CRM write-back replaced a manual sales-ops process.',
           'Shipped Drag, a company-wide RAG security agent that answers policy questions with cited sources and auto-fills vendor security questionnaires, saving <strong>19h/month</strong> for legal and people ops. Its self-healing loop routes unanswered queries to experts on Slack and feeds their replies back into the knowledge base.',
@@ -186,6 +187,7 @@ export const ui = {
         location: 'Valence, France',
         title: 'Software Engineer Intern',
         dates: 'Jan – Jun 2025',
+        tags: ['Vue.js', 'Laravel', 'PostgreSQL', 'GitLab CI/CD', 'Scrum'],
         bullets: [
           'Built a benchmarking platform (Vue.js / Laravel / PostgreSQL) that replaced manual spreadsheets with an auditable system, powering group margin calculations on a <strong>$300M</strong> project reviewed by executive and project committees.',
           'Authored the software specs and led a 3-person Agile team through sprint planning and task dispatch.',
@@ -198,6 +200,7 @@ export const ui = {
         location: 'Paris, France',
         title: 'Fullstack Engineer Intern',
         dates: 'Jun – Aug 2024',
+        tags: ['TypeScript', 'React', 'GraphQL', 'Node.js', 'PostgreSQL', 'Stripe API'],
         bullets: [
           "Built a net-new payout tracking view (React / GraphQL / Express) handling <strong>$1M+ in monthly transactions</strong>, giving customers their first centralized view of those flows.",
           'Designed and integrated a payment refund system on the Stripe API, removing a manual support step.',
@@ -209,6 +212,7 @@ export const ui = {
         location: 'Remote',
         title: 'Fullstack Developer',
         dates: 'Oct 2022 – Dec 2023',
+        tags: ['Astro', 'TypeScript', 'Tailwind CSS'],
         bullets: [
           'Built and deployed client websites with Astro, TypeScript, and TailwindCSS, tuned for SEO, accessibility, and performance.',
           'Migrated an ageing WordPress site for an overseas client and added search, lifting organic traffic by <strong>25%</strong>.',
