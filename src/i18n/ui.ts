@@ -174,6 +174,7 @@ export const ui = {
         title: 'Software Engineering Intern',
         dates: 'Mar – Aug 2026',
         summary: 'Montréal platform for building, testing and running AI agents, backed by a $25M Series B (2025).',
+        tags: ['TypeScript', 'React', 'LLM agents', 'RAG', 'LLM evals', 'OpenAI & Anthropic APIs', 'Botpress ADK'],
         bullets: [
           'Built Midas, an agent that runs daily over <strong>~1,200 HubSpot contacts</strong>. It matches each contact to their Botpress workspaces, pulls their usage (plan, AI spend, quotas), and has an LLM read their bots to classify the use case. Sales no longer looks customers up by hand, and it has run <strong>4 months</strong> in production without anyone stepping in.',
           "Designed and shipped <a href=\"/projects/drag\">Drag</a> on my own; it became Botpress's main infosec reference. It fully answers <strong>74%</strong> of questions, and when it can't, it asks the experts in Slack and learns from their reply. It saves legal and people ops <strong>19h/month</strong>.",
@@ -190,6 +191,7 @@ export const ui = {
         title: 'Software Engineer Intern',
         dates: 'Jan – Jun 2025',
         summary: 'Started as a Valence print specialist in 1991; now a €1.2B print and IT services group with 4,500+ people.',
+        tags: ['Vue.js', 'Laravel', 'PostgreSQL', 'GitLab CI/CD', 'Scrum'],
         bullets: [
           "With two other interns, built a printer cost-of-ownership platform inside Koesio's in-house ERP, replacing scattered regional Excel and Power BI files. It now drives group margin calculations on a <strong>$300M</strong> project.",
           'Started from a Power BI / Microsoft Fabric prototype that the steering committee approved, then made the case for rebuilding it in Laravel / Vue / PostgreSQL because it was faster and easier to maintain. Designed the schema from scratch, with role-based access through Okta SSO.',
@@ -205,6 +207,7 @@ export const ui = {
         title: 'Fullstack Engineer Intern',
         dates: 'Jun – Aug 2024',
         summary: 'Paris fintech that automates invoice collection and B2B payments for mid-sized companies like Vercel and Lattice.',
+        tags: ['TypeScript', 'React', 'GraphQL', 'Node.js', 'PostgreSQL', 'Stripe API', 'Jest & Cypress'],
         bullets: [
           'Owned the payouts view from written proposal (RFC) to gradual rollout. Customers could finally track the <strong>$1M+ a month</strong> moving from Stripe to their bank, with each payout linked to its transactions. I chose a new data model over stretching the existing table.',
           "Built in-app refunds on the Stripe API and webhooks, so support no longer had to issue refunds through Stripe's dashboard.",
@@ -216,6 +219,7 @@ export const ui = {
         location: 'Remote',
         title: 'Fullstack Developer',
         dates: 'Oct 2022 – Dec 2023',
+        tags: ['Astro', 'TypeScript', 'Tailwind CSS'],
         bullets: [
           'Built and deployed client websites with Astro, TypeScript, and TailwindCSS, tuned for SEO, accessibility, and performance.',
           'Migrated an ageing WordPress site for an overseas client and added search, lifting organic traffic by <strong>25%</strong>.',
