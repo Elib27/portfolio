@@ -16,7 +16,15 @@ interface Role {
   location: string
   title: string
   dates: string
+  // One line on what the company does, for readers who haven't heard of it
+  summary?: string
+  badge?: keyof typeof badges
   bullets: string[]
+}
+
+// Short chip after the company name; the full name is read out and shown on hover
+const badges = {
+  yc: { short: 'YC', full: 'Y Combinator W20' },
 }
 
 // Each mark is sized so they read as the same size inside the chip rather than sharing a bounding box.
@@ -52,12 +60,19 @@ const roles = t('experience.roles') as unknown as Role[]
             ) : (
               role.company
             )}
+            {role.badge && (
+              <span class="badge" title={badges[role.badge].full}>
+                <span aria-hidden="true">{badges[role.badge].short}</span>
+                <span class="sr-only">({badges[role.badge].full})</span>
+              </span>
+            )}
           </h3>
           <span class="job-title">{role.title}</span>
           <span class="meta">
             <span>{role.dates}</span>
             <span class="location">{role.location}</span>
           </span>
+          {role.summary && <p class="summary">{role.summary}</p>}
           <ul class="points">
             {role.bullets.map((bullet) => (
               <li set:html={bullet} />
@@ -87,6 +102,7 @@ const roles = t('experience.roles') as unknown as Role[]
     grid-template-areas:
       'logo company meta'
       'logo title   title'
+      '.    summary summary'
       '.    points  points';
     column-gap: 1.1rem;
     align-items: baseline;
@@ -151,6 +167,45 @@ const roles = t('experience.roles') as unknown as Role[]
     }
   }
 
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.5em;
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    // YC orange, with white text that stays readable in both themes
+    background-color: #f26522;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    vertical-align: 0.2em;
+    cursor: default;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .summary {
+    grid-area: summary;
+    margin: 0.6rem 0 0;
+    font-size: 0.9rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--text) 65%, transparent);
+    transition: color var(--theme-transition);
+  }
+
   .job-title {
     grid-area: title;
     margin-top: 0.2rem;
@@ -195,6 +250,20 @@ const roles = t('experience.roles') as unknown as Role[]
         margin-bottom: 0;
       }
 
+      // Bullets are injected as HTML, so their links need :global to pick up these styles
+      :global(a) {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+        text-decoration-color: var(--accent);
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: var(--accent);
+        }
+      }
+
       &::before {
         content: '•';
         position: absolute;
@@ -224,6 +293,7 @@ const roles = t('experience.roles') as unknown as Role[]
         'logo   company'
         'logo   title'
         'logo   meta'
+        'summary summary'
         'points points';
       column-gap: 0.85rem;
       align-items: start;
