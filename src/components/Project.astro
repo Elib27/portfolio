@@ -83,7 +83,7 @@ const demoLabel = t(isInternal ? 'projects.read' : 'projects.live')
         panelId ? (
           <slot name="action" />
         ) : (
-          <a class="link primary" href={demoLink} target={demoTarget} rel={demoRel}>
+          <a class="link primary theme-inverted" href={demoLink} target={demoTarget} rel={demoRel}>
             <span>{demoLabel}</span>
             {isInternal ? (
               <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">

@@ -107,6 +107,20 @@ const ogImage = new URL(ogImagePath, siteUrl)
       box-shadow var(--theme-transition),
       --gradient-color var(--theme-transition) !important;
   }
+  // Inverted elements (label in the background colour on a fill in the text colour) would pass
+  // through the same grey halfway through that fade, so the label vanishes for a moment. The fill
+  // still fades; the label flips in one step a third of the way in, when the ease-out fill is
+  // about halfway and the label reads on it either way.
+  html.theme-switching :is(.theme-inverted, .vdk-edge-launcher, .vdk-edge-teaser-bubble),
+  html.theme-switching :is(.theme-inverted, .vdk-edge-launcher, .vdk-edge-teaser-bubble) * {
+    transition:
+      background-color var(--theme-transition),
+      border-color var(--theme-transition),
+      box-shadow var(--theme-transition),
+      color 0s 0.05s,
+      fill 0s 0.05s,
+      stroke 0s 0.05s !important;
+  }
   // Colour used inside a gradient (TechnoBand edges, About highlight). Registered so it can be
   // transitioned: a gradient itself would swap instantly on a theme switch.
   @property --gradient-color {

@@ -217,6 +217,11 @@ const roles = t('experience.roles') as unknown as Role[]
     line-height: 1.2;
     vertical-align: 0.2em;
     cursor: default;
+
+    // the global span rule would otherwise paint the label in the text colour
+    span {
+      color: inherit;
+    }
   }
 
   .sr-only {
