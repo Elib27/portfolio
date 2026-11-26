@@ -20,6 +20,18 @@ const t = useTranslations(lang)
     <div class="line-wrapper">
       <p class="availability"><span class="dot"></span>{t('header.availability')}</p>
     </div>
+    {/* English only: the French copy is frozen (see AGENTS.md) */}
+    {lang === 'en' && (
+      <div class="line-wrapper">
+        <a class="cta theme-inverted" href="#contact">
+          {t('header.cta')}
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14" />
+            <path d="m13 6 6 6-6 6" />
+          </svg>
+        </a>
+      </div>
+    )}
   </div>
 
   <a class="scroll-arrow" href="#about" aria-label="Scroll down">
@@ -69,6 +81,7 @@ const t = useTranslations(lang)
     &:nth-child(2) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.4s, opacity 1s ease 0.4s; }
     &:nth-child(3) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.5s, opacity 1s ease 0.5s; }
     &:nth-child(4) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.6s, opacity 1s ease 0.6s; }
+    &:nth-child(5) { transition: transform 1s cubic-bezier(0, 0, 0.16, 1) 0.7s, opacity 1s ease 0.7s; }
   }
 
   .greeting {
@@ -93,7 +106,8 @@ const t = useTranslations(lang)
 
   .tagline {
     font-size: clamp(1rem, 1.6vw, 1.3rem);
-    opacity: 0.75;
+    // Near full strength: it sits on the contour lines, and size alone keeps it below the title
+    opacity: 0.9;
     font-weight: 400;
     margin: 0.5rem 0 0;
   }
@@ -116,6 +130,49 @@ const t = useTranslations(lang)
       border-radius: 50%;
       background-color: var(--accent);
       flex-shrink: 0;
+    }
+  }
+
+  // The one action in the hero: solid, in the text colour, so it stands apart from the tinted chip
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1.4rem;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--background);
+    background: var(--text);
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    svg {
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      background: var(--accent);
+      color: var(--white);
+      box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--accent) 60%, transparent);
+      svg {
+        transform: translateX(3px);
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cta svg {
+      transition: none;
     }
   }
 

@@ -16,7 +16,17 @@ interface Role {
   location: string
   title: string
   dates: string
+  // One line on what the company does, for readers who haven't heard of it
+  summary?: string
+  badge?: keyof typeof badges
+  /** Stack used in the role, shown as chips under the bullets. Optional: roles without it render no chips. */
+  tags?: string[]
   bullets: string[]
+}
+
+// Short chip after the company name; the full name is read out and shown on hover
+const badges = {
+  yc: { short: 'YC', full: 'Y Combinator W20' },
 }
 
 // Each mark is sized so they read as the same size inside the chip rather than sharing a bounding box.
@@ -52,17 +62,31 @@ const roles = t('experience.roles') as unknown as Role[]
             ) : (
               role.company
             )}
+            {role.badge && (
+              <span class="badge" title={badges[role.badge].full}>
+                <span aria-hidden="true">{badges[role.badge].short}</span>
+                <span class="sr-only">({badges[role.badge].full})</span>
+              </span>
+            )}
           </h3>
           <span class="job-title">{role.title}</span>
           <span class="meta">
             <span>{role.dates}</span>
             <span class="location">{role.location}</span>
           </span>
+          {role.summary && <p class="summary">{role.summary}</p>}
           <ul class="points">
             {role.bullets.map((bullet) => (
               <li set:html={bullet} />
             ))}
           </ul>
+          {role.tags && role.tags.length > 0 && (
+            <ul class="tags">
+              {role.tags.map((tag) => (
+                <li>{tag}</li>
+              ))}
+            </ul>
+          )}
         </li>
       ))
     }
@@ -71,40 +95,52 @@ const roles = t('experience.roles') as unknown as Role[]
 
 <style lang="scss">
   .timeline {
-    width: min(80%, 800px);
+    // ~75 characters per line in the bullet column
+    width: min(80%, 760px);
     margin: auto;
     list-style: none;
     padding: 0;
   }
 
   .role {
-    --logo-size: 40px;
+    --logo-size: 44px;
     // nudges the chip onto the optical centre of the two-line company/role header
-    --logo-top: 0.3rem;
+    --logo-top: 0.15rem;
+    --logo-center: calc(var(--logo-top) + var(--logo-size) / 2);
+    --gutter: 1.25rem;
+    --rail: color-mix(in srgb, var(--accent) 28%, transparent);
     position: relative;
     display: grid;
     grid-template-columns: var(--logo-size) minmax(0, 1fr) auto;
     grid-template-areas:
       'logo company meta'
       'logo title   title'
-      '.    points  points';
-    column-gap: 1.1rem;
+      '.    summary summary'
+      '.    points  points'
+      '.    tags    tags';
+    column-gap: var(--gutter);
     align-items: baseline;
-    padding-bottom: 2.75rem;
+    padding-bottom: 3rem;
+
+    // the indigo tint fades into the navy background, so it needs more weight there
+    :global(.dark-theme) & {
+      --rail: color-mix(in srgb, var(--accent) 50%, transparent);
+    }
 
     &:last-child {
       padding-bottom: 0;
     }
 
-    // Rail, running from just under the logo to the next one
+    // Rail: one continuous line from this chip's centre to the next one's, drawn behind the chips
     &::before {
       content: '';
       position: absolute;
-      left: calc(var(--logo-size) / 2);
-      top: calc(var(--logo-top) + var(--logo-size) + 0.5rem);
-      bottom: 0;
-      width: 1px;
-      background-color: color-mix(in srgb, var(--text) 15%, transparent);
+      left: calc(var(--logo-size) / 2 - 1px);
+      top: var(--logo-center);
+      bottom: calc(-1 * var(--logo-center));
+      width: 2px;
+      border-radius: 1px;
+      background-color: var(--rail);
       transition: background-color var(--theme-transition);
     }
 
@@ -116,29 +152,44 @@ const roles = t('experience.roles') as unknown as Role[]
   .logo {
     grid-area: logo;
     align-self: start;
+    position: relative;
+    z-index: 1;
     margin-top: var(--logo-top);
     height: var(--logo-size);
     width: var(--logo-size);
-    border-radius: 11px;
+    border-radius: 12px;
     background-color: var(--white);
     border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+    // the background-coloured ring opens a small gap where the rail meets the chip
+    box-shadow:
+      0 0 0 6px var(--background),
+      0 1px 3px color-mix(in srgb, var(--black) 8%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition:
+      border-color 0.2s ease,
+      box-shadow var(--theme-transition);
 
     img {
       display: block;
     }
   }
 
+  .role:hover .logo {
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+
   h3 {
     grid-area: company;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
+    line-height: 1.3;
     margin: 0;
 
     a {
       line-height: inherit;
-      color: inherit;
+      // not inherit: that makes the link lag behind the heading during a theme switch (see About.astro)
+      color: var(--text);
       text-decoration: underline;
       text-underline-offset: 3px;
       text-decoration-thickness: 1px;
@@ -151,12 +202,56 @@ const roles = t('experience.roles') as unknown as Role[]
     }
   }
 
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.5em;
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    // YC orange, with white text that stays readable in both themes
+    background-color: #f26522;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    vertical-align: 0.2em;
+    cursor: default;
+
+    // the global span rule would otherwise paint the label in the text colour
+    span {
+      color: inherit;
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .summary {
+    grid-area: summary;
+    margin: 0.6rem 0 0;
+    font-size: 0.9rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--text) 65%, transparent);
+    transition: color var(--theme-transition);
+  }
+
   .job-title {
     grid-area: title;
-    margin-top: 0.2rem;
-    font-size: 0.9rem;
+    margin-top: 0.15rem;
+    font-size: 0.95rem;
     font-weight: 500;
-    color: color-mix(in srgb, var(--text) 72%, transparent);
+    color: color-mix(in srgb, var(--text) 75%, transparent);
     transition: color var(--theme-transition);
   }
 
@@ -167,8 +262,12 @@ const roles = t('experience.roles') as unknown as Role[]
     flex-wrap: wrap;
     column-gap: 0.45em;
     font-size: 0.875rem;
-    opacity: 0.6;
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
+
+    span {
+      color: color-mix(in srgb, var(--text) 68%, transparent);
+    }
 
     .location::before {
       content: '·';
@@ -180,14 +279,14 @@ const roles = t('experience.roles') as unknown as Role[]
     grid-area: points;
     list-style: none;
     padding: 0;
-    margin: 0.85rem 0 0;
+    margin: 0.9rem 0 0;
 
     li {
+      --marker: 5px;
       position: relative;
-      padding-left: 1.1rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.6rem;
       font-size: 0.95rem;
-      line-height: 1.55;
+      line-height: 1.6;
       color: var(--text);
       transition: color var(--theme-transition);
 
@@ -195,13 +294,56 @@ const roles = t('experience.roles') as unknown as Role[]
         margin-bottom: 0;
       }
 
-      &::before {
-        content: '•';
-        position: absolute;
-        left: 0;
-        color: var(--accent);
-        transition: color var(--theme-transition);
+      // Bullets are injected as HTML, so their links need :global to pick up these styles
+      :global(a) {
+        color: var(--text);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+        text-decoration-color: var(--accent);
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: var(--accent);
+        }
       }
+
+      // Hanging marker: sits in the gutter so the bullet text lines up with the company name
+      &::before {
+        content: '';
+        position: absolute;
+        left: calc(-1 * var(--gutter) / 2 - var(--marker) / 2);
+        top: calc(0.8em - var(--marker) / 2);
+        width: var(--marker);
+        height: var(--marker);
+        border-radius: 50%;
+        background-color: var(--accent);
+        transition: background-color var(--theme-transition);
+      }
+    }
+  }
+
+  // Same chip style as the project cards' technology list
+  .tags {
+    grid-area: tags;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      font-size: 0.8rem;
+      font-weight: 500;
+      white-space: nowrap;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      color: color-mix(in srgb, var(--text) 80%, transparent);
+      border: 1px solid color-mix(in srgb, var(--text) 22%, transparent);
+      transition:
+        color var(--theme-transition),
+        border-color var(--theme-transition);
     }
   }
 
@@ -219,15 +361,18 @@ const roles = t('experience.roles') as unknown as Role[]
     }
 
     .role {
+      --logo-size: 40px;
       grid-template-columns: var(--logo-size) minmax(0, 1fr);
       grid-template-areas:
         'logo   company'
         'logo   title'
         'logo   meta'
-        'points points';
+        'summary summary'
+        'points points'
+        'tags   tags';
       column-gap: 0.85rem;
       align-items: start;
-      padding-bottom: 2.25rem;
+      padding-bottom: 2.5rem;
 
       &::before {
         display: none;
@@ -237,6 +382,7 @@ const roles = t('experience.roles') as unknown as Role[]
     .logo {
       align-self: center;
       margin-top: 0;
+      box-shadow: 0 1px 3px color-mix(in srgb, var(--black) 8%, transparent);
     }
 
     .job-title {
@@ -244,7 +390,17 @@ const roles = t('experience.roles') as unknown as Role[]
     }
 
     .meta {
+      margin-top: 0.1rem;
       white-space: normal;
+    }
+
+    // no gutter to hang into here, so the marker moves back inside the text block
+    .points li {
+      padding-left: 1rem;
+
+      &::before {
+        left: 0.1rem;
+      }
     }
   }
 </style>
