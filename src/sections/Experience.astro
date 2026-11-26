@@ -188,7 +188,8 @@ const roles = t('experience.roles') as unknown as Role[]
 
     a {
       line-height: inherit;
-      color: inherit;
+      // not inherit: that makes the link lag behind the heading during a theme switch (see About.astro)
+      color: var(--text);
       text-decoration: underline;
       text-underline-offset: 3px;
       text-decoration-thickness: 1px;
@@ -290,7 +291,7 @@ const roles = t('experience.roles') as unknown as Role[]
 
       // Bullets are injected as HTML, so their links need :global to pick up these styles
       :global(a) {
-        color: inherit;
+        color: var(--text);
         text-decoration: underline;
         text-underline-offset: 3px;
         text-decoration-thickness: 1px;

@@ -124,17 +124,19 @@ const logos: { name: string; svg: string; size: number; nudge?: number }[] = [
       width: 10%;
       z-index: 1;
       pointer-events: none;
-      transition: background var(--theme-transition);
+      // a gradient can't be transitioned, but its registered colour (Layout.astro) can
+      --gradient-color: var(--background);
+      transition: --gradient-color var(--theme-transition);
     }
 
     &::before {
       left: 0;
-      background: linear-gradient(to right, var(--background), transparent);
+      background: linear-gradient(to right, var(--gradient-color), transparent);
     }
 
     &::after {
       right: 0;
-      background: linear-gradient(to left, var(--background), transparent);
+      background: linear-gradient(to left, var(--gradient-color), transparent);
     }
 
     .text-scroll {

@@ -109,7 +109,9 @@ const activities = t('hobbies.activities') as unknown as string[]
     }
     & :global(a) {
       line-height: inherit;
-      color: inherit;
+      // var(--text) rather than inherit: an inherited colour restarts its fade from the paragraph's
+      // in-between value on every frame of a theme switch, so the link would lag behind the text
+      color: var(--text);
       text-decoration: underline;
       text-underline-offset: 2px;
       text-decoration-thickness: 1px;
@@ -118,13 +120,18 @@ const activities = t('hobbies.activities') as unknown as string[]
     // highlight wraps onto several lines; `clone` gives every line its own rounded bar.
     // No horizontal padding: the bar hugs the words, so no gap appears before punctuation.
     & :global(.highlight) {
+      // a gradient can't be transitioned, but its registered colour (Layout.astro) can
+      --gradient-color: var(--highlight);
       background: linear-gradient(
         to bottom,
         transparent 52%,
-        var(--highlight) 52%,
-        var(--highlight) 90%,
+        var(--gradient-color) 52%,
+        var(--gradient-color) 90%,
         transparent 90%
       );
+      transition:
+        color var(--theme-transition),
+        --gradient-color var(--theme-transition);
       border-radius: 3px;
       -webkit-box-decoration-break: clone;
       box-decoration-break: clone;

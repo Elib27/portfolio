@@ -143,10 +143,19 @@ const { id } = Astro.props
     }
   }
 
+  // .theme-switching (Layout.astro) gives every colour on the page, the Botpress webchat included,
+  // the same fade for the length of the switch, whatever timing each element uses for its own hover.
+  // It is removed well after the 0.15s fade ends, so no running transition gets cut short.
+  let switchTimer: number | undefined
+
   function toggleTheme() {
-    document.documentElement.classList.toggle('dark-theme')
+    const root = document.documentElement
+    root.classList.add('theme-switching')
+    root.classList.toggle('dark-theme')
     updateDataTheme()
     updatePreferredTheme()
+    window.clearTimeout(switchTimer)
+    switchTimer = window.setTimeout(() => root.classList.remove('theme-switching'), 400)
   }
 
   toggleThemeButtons.forEach((button) =>
