@@ -143,6 +143,7 @@ export const ui = {
     'header.title-2': 'software engineer',
     'header.tagline': 'AI agents, developer tooling, and the systems underneath them.',
     'header.availability': 'Montréal · Available from January 2027',
+    'header.cta': 'Get in touch',
     'about.title': 'About',
     'hobbies.outro':
       "Always up for talking code, travel tips, Montréal gems, or whatever rabbit hole I'm in this week. Feel free to reach out.",
