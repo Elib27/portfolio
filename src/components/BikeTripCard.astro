@@ -31,6 +31,11 @@ const photos = await Promise.all(
   }),
 )
 
+// Three photos stacked inside the trigger chip, so the line reads as "there's something to see here"
+const chipPhotos = ['08-tarifa-atlantic.jpg', '03-penon-de-ifach.jpg', '06-granada.jpg'].map(
+  (file) => photos.find((photo) => photo.file === file)!,
+)
+
 const stats = [
   { value: '2,700', unit: 'km', label: 'distance' },
   { value: '18,500', unit: 'm', label: 'climbing' },
@@ -115,6 +120,15 @@ const end = trip.cities.find((c) => c.role === 'end')!
 
 </div>
 
+{/* Copied into the About trigger by the script: the trigger itself lives in the markdown copy */}
+<template id="bike-trip-chip-photos">
+  <span class="trip-chip-photos" aria-hidden="true">
+    {chipPhotos.map((photo) => (
+      <Image src={photo.src} alt="" width={22} height={22} densities={[1, 2]} fit="cover" loading="lazy" />
+    ))}
+  </span>
+</template>
+
 <script>
   const OPEN_DELAY = 120
   const CLOSE_DELAY = 220
@@ -125,6 +139,14 @@ const end = trip.cities.find((c) => c.role === 'end')!
     const trigger = document.querySelector<HTMLElement>('[data-bike-trip-trigger]')
     const card = document.getElementById('bike-trip-card')
     if (!trigger || !card || !('showPopover' in card)) return
+
+    // Turn the plain trigger into a photo chip. Done here, not in the markdown, because the
+    // photo URLs come from Astro's image pipeline; without JS the trigger couldn't open anything anyway.
+    const chipPhotos = document.querySelector<HTMLTemplateElement>('#bike-trip-chip-photos')
+    if (chipPhotos) {
+      trigger.append(chipPhotos.content.cloneNode(true))
+      trigger.classList.add('has-photos')
+    }
 
     const sheet = window.matchMedia('(max-width: 560px)')
     let openTimer: number | undefined
@@ -328,6 +350,100 @@ const end = trip.cities.find((c) => c.role === 'end')!
     }
     &::after {
       background: var(--secondary);
+    }
+  }
+
+  // Chip version, once the script has added the photos: a tinted pill with a fanned photo
+  // stack, so it reads as something to open rather than another link in the copy
+  // `--chip-tint` is the pill colour; `--chip-bg` mixes it into the page colour so it's opaque,
+  // which lets the photo rings use the same colour and blend into the pill instead of cutting it
+  :global(#about .trip-trigger.has-photos) {
+    --chip-tint: var(--accent);
+    --chip-bg: color-mix(in srgb, var(--chip-tint) 12%, var(--background));
+    --chip-border: color-mix(in srgb, var(--chip-tint) 30%, var(--background));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.05em 0.25em 0.05em 0.6em;
+    border-radius: 999px;
+    text-decoration: none;
+    background: var(--chip-bg);
+    box-shadow: inset 0 0 0 1px var(--chip-border);
+    font-weight: 600;
+    // Keeps the pill from making its line taller than the others
+    line-height: 1.35;
+    vertical-align: baseline;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+    &::after {
+      display: none;
+    }
+    &:hover,
+    &[aria-expanded='true'] {
+      --chip-bg: color-mix(in srgb, var(--chip-tint) 20%, var(--background));
+      --chip-border: color-mix(in srgb, var(--chip-tint) 55%, var(--background));
+    }
+  }
+  :global(html.dark-theme #about .trip-trigger.has-photos) {
+    --chip-tint: var(--secondary);
+  }
+
+  :global(#about .trip-chip-photos) {
+    display: inline-flex;
+    // Room for the outer photos when they tilt outwards
+    padding-inline: 0.1em;
+    :global(img) {
+      display: block;
+      // Small enough that photo plus ring stays inside the pill's border
+      width: 1.1em;
+      height: 1.1em;
+      border-radius: 50%;
+      object-fit: cover;
+      // Ring in the pill colour so overlapping photos stay distinct without a white halo
+      box-shadow: 0 0 0 1.5px var(--chip-bg);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.15s ease;
+    }
+    :global(img + img) {
+      margin-left: -0.4em;
+    }
+  }
+  // Fans the photos out on hover/open, and once when the line first scrolls into view
+  :global(#about .trip-trigger:is(:hover, [aria-expanded='true']) .trip-chip-photos img:nth-child(1)) {
+    transform: translate(-2px, -1px) rotate(-10deg);
+  }
+  :global(#about .trip-trigger:is(:hover, [aria-expanded='true']) .trip-chip-photos img:nth-child(2)) {
+    transform: translateY(-2px);
+  }
+  :global(#about .trip-trigger:is(:hover, [aria-expanded='true']) .trip-chip-photos img:nth-child(3)) {
+    transform: translate(2px, -1px) rotate(10deg);
+  }
+  :global(#about .trip-trigger.has-photos.is-hinting .trip-chip-photos img:nth-child(1)) {
+    animation: trip-fan-left 0.8s ease-in-out 2;
+  }
+  :global(#about .trip-trigger.has-photos.is-hinting .trip-chip-photos img:nth-child(2)) {
+    animation: trip-fan-middle 0.8s ease-in-out 2;
+  }
+  :global(#about .trip-trigger.has-photos.is-hinting .trip-chip-photos img:nth-child(3)) {
+    animation: trip-fan-right 0.8s ease-in-out 2;
+  }
+
+  @keyframes trip-fan-left {
+    50% {
+      transform: translate(-2px, -1px) rotate(-10deg);
+    }
+  }
+  @keyframes trip-fan-middle {
+    50% {
+      transform: translateY(-2px);
+    }
+  }
+  @keyframes trip-fan-right {
+    50% {
+      transform: translate(2px, -1px) rotate(10deg);
     }
   }
 
@@ -653,6 +769,10 @@ const end = trip.cities.find((c) => c.role === 'end')!
         transition: none;
         animation: none !important;
       }
+    }
+    :global(#about .trip-chip-photos img) {
+      transition: none;
+      animation: none !important;
     }
   }
 </style>
