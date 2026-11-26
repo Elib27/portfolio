@@ -51,7 +51,7 @@ const OthelloPlay: Component<Props> = (props) => {
       <button
         ref={button}
         type="button"
-        class="link primary"
+        class="link primary theme-inverted"
         aria-expanded={open()}
         aria-controls={props.panelId}
         onClick={toggle}
