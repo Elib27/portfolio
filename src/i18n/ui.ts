@@ -178,10 +178,10 @@ export const ui = {
         tags: ['TypeScript', 'React', 'LLM agents', 'RAG', 'LLM evals', 'OpenAI & Anthropic APIs', 'Botpress ADK'],
         bullets: [
           "<strong><a href=\"/projects/drag\">Drag</a>:</strong> designed and shipped solo, now Botpress's main infosec reference. Fully answers <strong>74%</strong> of questions; when it can't, it asks the experts in Slack and learns from their reply. Saves legal and people ops <strong>19h/month</strong>.",
-          '<strong><a href="https://botpress.com/features/viber" target="_blank" rel="noopener noreferrer">Viber</a>:</strong> helped launch the Botpress agent builder you drive in plain English (<strong>9,500 agents</strong> in its first month). Worked across its UI, API and runtime, and fixed a bug that made agents fire HTTP tool calls twice, which could mean duplicate orders.',
+          '<strong><a href="https://botpress.com/features/viber" target="_blank" rel="noopener noreferrer">Viber</a>:</strong> helped launch the Botpress agent builder you drive in plain English. Worked across its UI, API and runtime, and fixed a bug that made agents fire HTTP tool calls twice, which could mean duplicate orders.',
           '<strong>Dev Console Triggers:</strong> owned the feature from research on Langfuse, LangSmith and Mastra to public release. Developers can fire test events, replay runs and inspect traces without waiting for real traffic.',
-          '<strong>Midas:</strong> built an agent that runs daily over <strong>~1,200 HubSpot contacts</strong>, matching each to their Botpress workspaces, pulling their usage (plan, AI spend, quotas) and having an LLM classify the use case from their bots. Sales no longer looks customers up by hand; <strong>4 months</strong> in production without anyone stepping in.',
-          '<strong>Open source:</strong> added fallback model routing to Botpress\'s <a href="https://github.com/botpress/botpress" target="_blank" rel="noopener noreferrer">LLM engine</a> (<strong>15k stars</strong>). If one provider fails, the request retries on the next one, in the order you set.',
+          '<strong>Midas:</strong> built an agent that runs daily over <strong>~1,200 HubSpot contacts</strong>, matching each to their Botpress workspaces, pulling their usage and having an LLM classify the use case from their bots. Sales no longer looks customers up by hand; <strong>4 months</strong> in production without anyone stepping in.',
+          '<strong>Open source:</strong> worked on fallback model routing in Botpress\'s <a href="https://github.com/botpress/botpress" target="_blank" rel="noopener noreferrer">LLM engine</a> (<strong>15k stars</strong>). If one provider fails, the request retries on the next one, in the order you set.',
         ],
       },
       {
@@ -195,7 +195,7 @@ export const ui = {
         tags: ['Vue.js', 'Laravel', 'PostgreSQL', 'GitLab CI/CD', 'Scrum'],
         bullets: [
           "With two other interns, built a printer cost-of-ownership platform inside Koesio's in-house ERP, replacing scattered regional Excel and Power BI files. Used for group margin calculations on a <strong>$300M</strong> project.",
-          'Started from a Power BI / Microsoft Fabric prototype that the steering committee approved, then made the case for rebuilding it in Laravel / Vue / PostgreSQL because it was faster and easier to maintain. Designed the schema from scratch, with role-based access through Okta SSO.',
+          'Started from a Power BI / Microsoft Fabric prototype that the steering committee approved, then made the case for rebuilding it in Laravel / Vue / PostgreSQL.',
           'Wrote the specs and led the three-person Scrum team through sprint planning.',
         ],
       },
