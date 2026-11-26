@@ -89,6 +89,31 @@ const ogImage = new URL(ogImagePath, siteUrl)
       --othello-gameboard-bg: #1e1f33;
     }
   }
+  // Only while the theme toggle is switching (ToggleThemeButton.astro): one fade for every colour,
+  // overriding hover timings (0.2s, 0.3s…) and third-party styles such as the Botpress webchat, which
+  // would otherwise switch instantly or lag behind. The toggle keeps its own sun/moon animation.
+  html.theme-switching :not(.toggle-theme, .toggle-theme *),
+  html.theme-switching :not(.toggle-theme, .toggle-theme *)::before,
+  html.theme-switching :not(.toggle-theme, .toggle-theme *)::after {
+    transition:
+      color var(--theme-transition),
+      background-color var(--theme-transition),
+      border-color var(--theme-transition),
+      outline-color var(--theme-transition),
+      text-decoration-color var(--theme-transition),
+      fill var(--theme-transition),
+      stroke var(--theme-transition),
+      stop-color var(--theme-transition),
+      box-shadow var(--theme-transition),
+      --gradient-color var(--theme-transition) !important;
+  }
+  // Colour used inside a gradient (TechnoBand edges, About highlight). Registered so it can be
+  // transitioned: a gradient itself would swap instantly on a theme switch.
+  @property --gradient-color {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: transparent;
+  }
   html {
     font-family: var(--font-body);
     font-size: clamp(16px, calc(15px + 0.2vw), 20px);
