@@ -35,8 +35,15 @@
       height: 100%;
       opacity: 0;
       transition: opacity 0.8s ease;
+      // Calm patch behind the hero text. Sized in px to fit the text block rather than as a share of
+      // the screen, which left the text on full-strength lines on phones and narrow windows.
       -webkit-mask-image:
-        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0,0,0, 0.1) 30%, rgba(0, 0, 0, 1) 70%),
+        radial-gradient(
+          ellipse clamp(300px, 60vw, 640px) clamp(240px, 32vh, 320px) at 50% 50%,
+          rgba(0, 0, 0, 0.06) 40%,
+          rgba(0, 0, 0, 0.45) 65%,
+          rgba(0, 0, 0, 1) 90%
+        ),
         linear-gradient(rgba(0, 0, 0, 1) 80%, transparent 100%);
       mask-composite: intersect;
     }

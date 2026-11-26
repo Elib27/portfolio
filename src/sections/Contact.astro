@@ -229,6 +229,13 @@ const email = 'contact@eliotbas.com'
     }
   }
 
+  // Keeps the gradient border, frozen in place
+  @media (prefers-reduced-motion: reduce) {
+    .container .email-card {
+      animation: none;
+    }
+  }
+
   .waves {
     stroke-width: 1px;
     width: 45%;
